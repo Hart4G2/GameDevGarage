@@ -1,0 +1,27 @@
+
+button-atlas.png
+size: 2048, 128
+format: RGBA8888
+filter: Linear, Linear
+repeat: none
+button-down
+  rotate: false
+  xy: 2, 2
+  size: 361, 100
+  orig: 361, 100
+  offset: 0, 0
+  index: -1
+button-hover
+  rotate: false
+  xy: 365, 2
+  size: 361, 100
+  orig: 361, 100
+  offset: 0, 0
+  index: -1
+button-up
+  rotate: false
+  xy: 728, 2
+  size: 361, 100
+  orig: 361, 100
+  offset: 0, 0
+  index: -1
