@@ -14,7 +14,6 @@ public class Game extends com.badlogic.gdx.Game {
         assets = new Assets();
 
         batch = new SpriteBatch();
-        font = assets.font;
 
         this.setScreen(new MainScreen(this));
     }
