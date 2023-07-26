@@ -1,7 +1,5 @@
 package com.mygdx.gamedevgarage;
 
-import static com.mygdx.gamedevgarage.Game.assets;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
@@ -117,7 +115,7 @@ public class MainScreen implements Screen {
     }
 
     private void initButtonStyle(){
-        TextureAtlas mainButtonAtlas = assets.mainButtonAtlas;
+        TextureAtlas mainButtonAtlas = game.getAssets().mainButtonAtlas;
 
         buttonStyle = new TextButton.TextButtonStyle();
 

@@ -1,21 +1,16 @@
 package com.mygdx.gamedevgarage;
 
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.mygdx.gamedevgarage.mini_games.TechSelectionScreen;
 
 public class Game extends com.badlogic.gdx.Game {
 
-    public SpriteBatch batch;
-    public BitmapFont font;
-    public static Assets assets;
+    private Assets assets;
 
     @Override
     public void create() {
         assets = new Assets();
 
-        batch = new SpriteBatch();
-
-        this.setScreen(new MainScreen(this));
+        this.setScreen(new TechSelectionScreen(this));
     }
 
     @Override
@@ -35,8 +30,10 @@ public class Game extends com.badlogic.gdx.Game {
 
     @Override
     public void dispose() {
-        batch.dispose();
-        font.dispose();
-        assets.assetManager.dispose();
+        assets.dispose();
+    }
+
+    public Assets getAssets() {
+        return assets;
     }
 }

@@ -1,6 +1,6 @@
 package com.mygdx.gamedevgarage;
 
-import static com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.*;
+import static com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
@@ -17,9 +17,17 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class Assets {
 
-    public AssetManager assetManager;
+    private AssetManager assetManager;
+    private Skin skin;
+    private FreeTypeFontGenerator generator;
+
     public TextureAtlas mainButtonAtlas;
+    public TextureAtlas backButtonAtlas;
     public TextureAtlas progressBarStyleAtlas;
+    public TextureAtlas scrollPaneStyleAtlas;
+    public TextureAtlas designColorsAtlas;
+    public TextureAtlas designObjectsAtlas;
+    public TextureAtlas designObjects100Atlas;
     public BitmapFont black_16;
     public BitmapFont black_18;
     public BitmapFont black_20;
@@ -30,8 +38,8 @@ public class Assets {
     public BitmapFont white_20;
     public BitmapFont white_24;
     public BitmapFont white_32;
-    public Skin skin;
-    private FreeTypeFontGenerator generator;
+    public TextureRegionDrawable transparent;
+    public TextureRegionDrawable frame;
 
     public Assets() {
         assetManager = new AssetManager();
@@ -43,7 +51,12 @@ public class Assets {
         AssetManager assetManager = new AssetManager();
 
         assetManager.load("atlases/button-atlas.atlas", TextureAtlas.class);
+        assetManager.load("atlases/back-button-atlas.atlas", TextureAtlas.class);
         assetManager.load("atlases/progressbar-atlas.atlas", TextureAtlas.class);
+        assetManager.load("atlases/scrollpane-atlas.atlas", TextureAtlas.class);
+        assetManager.load("design_items/colors/primary_color-atlas.atlas", TextureAtlas.class);
+        assetManager.load("design_items/objects/object-atlas.atlas", TextureAtlas.class);
+        assetManager.load("design_items/objects/object-100-atlas.atlas", TextureAtlas.class);
 
 
         while (!assetManager.update()) {
@@ -52,7 +65,15 @@ public class Assets {
 
 
         mainButtonAtlas = assetManager.get("atlases/button-atlas.atlas", TextureAtlas.class);
+        backButtonAtlas = assetManager.get("atlases/back-button-atlas.atlas", TextureAtlas.class);
         progressBarStyleAtlas = assetManager.get("atlases/progressbar-atlas.atlas", TextureAtlas.class);
+        scrollPaneStyleAtlas = assetManager.get("atlases/scrollpane-atlas.atlas", TextureAtlas.class);
+        designColorsAtlas = assetManager.get("design_items/colors/primary_color-atlas.atlas", TextureAtlas.class);
+        designObjectsAtlas = assetManager.get("design_items/objects/object-atlas.atlas", TextureAtlas.class);
+        designObjects100Atlas = assetManager.get("design_items/objects/object-100-atlas.atlas", TextureAtlas.class);
+
+        transparent = new TextureRegionDrawable(new TextureRegion(new Texture("transparent.png")));
+        frame = new TextureRegionDrawable(new TextureRegion(new Texture("frame.png")));
 
         skin = new Skin();
 
@@ -69,13 +90,34 @@ public class Assets {
 
         Drawable drawable = new TextureRegionDrawable(new TextureRegion(new Texture("atlases/styles/selection.png")));
         skin.add("selection_drawable", drawable, Drawable.class);
+
+        drawable = new TextureRegionDrawable(new TextureRegion(new Texture("atlases/styles/list_background.png")));
         skin.add("list_background", drawable, Drawable.class);
 
-        drawable = new TextureRegionDrawable(new TextureRegion(new Texture("atlases/styles/window.png")));
-        skin.add("window_drawable", drawable, Drawable.class);
+        drawable = new TextureRegionDrawable(new TextureRegion(new Texture("atlases/styles/window_red.png")));
+        skin.add("window_drawable_red", drawable, Drawable.class);
 
+        drawable = new TextureRegionDrawable(new TextureRegion(new Texture("atlases/styles/window_yellow.png")));
+        skin.add("window_drawable_yellow", drawable, Drawable.class);
+
+        drawable = new TextureRegionDrawable(new TextureRegion(new Texture("atlases/styles/window_blue.png")));
+        skin.add("window_drawable_blue", drawable, Drawable.class);
+
+        drawable = new TextureRegionDrawable(new TextureRegion(new Texture("atlases/styles/window_green.png")));
+        skin.add("window_drawable_green", drawable, Drawable.class);
+
+        drawable = new TextureRegionDrawable(new TextureRegion(new Texture("atlases/styles/window_purple.png")));
+        skin.add("window_drawable_purple", drawable, Drawable.class);
+
+        // TextField style images
         drawable = new TextureRegionDrawable(new TextureRegion(new Texture("atlases/styles/text_field_background.png")));
         skin.add("text_field_background", drawable, Drawable.class);
+
+        drawable = new TextureRegionDrawable(new TextureRegion(new Texture("atlases/styles/text_field_cursor.png")));
+        skin.add("text_field_cursor", drawable, Drawable.class);
+
+        drawable = new TextureRegionDrawable(new TextureRegion(new Texture("atlases/styles/text_field_selection.png")));
+        skin.add("text_field_selection", drawable, Drawable.class);
 
         // Button style images
         drawable = new TextureRegionDrawable(mainButtonAtlas.findRegion("button-up"));
@@ -84,6 +126,15 @@ public class Assets {
         skin.add("button_down", drawable, Drawable.class);
         drawable = new TextureRegionDrawable(mainButtonAtlas.findRegion("button-hover"));
         skin.add("button_hover", drawable, Drawable.class);
+        drawable = new TextureRegionDrawable(mainButtonAtlas.findRegion("button-disabled"));
+        skin.add("button_disabled", drawable, Drawable.class);
+
+        drawable = new TextureRegionDrawable(backButtonAtlas.findRegion("button-up"));
+        skin.add("back_button_up", drawable, Drawable.class);
+        drawable = new TextureRegionDrawable(backButtonAtlas.findRegion("button-down"));
+        skin.add("back_button_down", drawable, Drawable.class);
+        drawable = new TextureRegionDrawable(backButtonAtlas.findRegion("button-hover"));
+        skin.add("back_button_hover", drawable, Drawable.class);
 
         // Progress bar images
         drawable = new TextureRegionDrawable(progressBarStyleAtlas.findRegion("background"));
@@ -92,6 +143,16 @@ public class Assets {
         skin.add("progressbar_knob_before", drawable, Drawable.class);
         drawable = new TextureRegionDrawable(progressBarStyleAtlas.findRegion("knob-after"));
         skin.add("progressbar_knob_after", drawable, Drawable.class);
+
+        // ScrollPane images
+        drawable = new TextureRegionDrawable(scrollPaneStyleAtlas.findRegion("scrollpane_vscroll"));
+        skin.add("scrollpane_vscroll", drawable, Drawable.class);
+        drawable = new TextureRegionDrawable(scrollPaneStyleAtlas.findRegion("scrollpane_vscrollknob"));
+        skin.add("scrollpane_vscrollknob", drawable, Drawable.class);
+        drawable = new TextureRegionDrawable(scrollPaneStyleAtlas.findRegion("scrollpane_hscroll"));
+        skin.add("scrollpane_hscroll", drawable, Drawable.class);
+        drawable = new TextureRegionDrawable(scrollPaneStyleAtlas.findRegion("scrollpane_hscrollknob"));
+        skin.add("scrollpane_hscrollknob", drawable, Drawable.class);
 
         skin.load(Gdx.files.internal("skin.json"));
     }
@@ -137,25 +198,32 @@ public class Assets {
 
 //    public static void main(String[] args) {
 //        TexturePacker.Settings settings = new TexturePacker.Settings();
-//        settings.maxWidth = 2048;
-//        settings.maxHeight = 2048;
+//        settings.maxWidth = 1024;
+//        settings.maxHeight = 1024;
 //        settings.filterMin = Texture.TextureFilter.Linear;
 //        settings.filterMag = Texture.TextureFilter.Linear;
 //
 //        TexturePacker packer = new TexturePacker(settings);
 //        try {
-//            File file = new File("C:\\ProjectsJava\\GameDevGarage\\assets\\atlases\\button\\button-down.png");
-//            BufferedImage downImg = ImageIO.read(file);
 //
-//            file = new File("C:\\ProjectsJava\\GameDevGarage\\assets\\atlases\\button\\button-up.png");
-//            BufferedImage upImg = ImageIO.read(file);
+//            String[] fileNames = new String[]{
+//                    "button-down", "button-hover",
+//                    "button-up", "button-disabled",
+//            };
 //
-//            file = new File("C:\\ProjectsJava\\GameDevGarage\\assets\\atlases\\button\\button-hover.png");
-//            BufferedImage hoverImg = ImageIO.read(file);
+//            for (String fileName : fileNames) {
+//                String filePath = "C:\\ProjectsJava\\GameDevGarage\\assets\\atlases\\button\\" + fileName + ".png";
 //
-//            packer.addImage(downImg, "button-down");
-//            packer.addImage(upImg, "button-up");
-//            packer.addImage(hoverImg, "button-hover");
+//                File file = new File(filePath);
+//                if(!file.exists()){
+//                    System.out.println(fileName);
+//                    break;
+//                }
+//                BufferedImage img = ImageIO.read(file);
+//
+//                packer.addImage(img, fileName);
+//            }
+//
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
@@ -166,17 +234,13 @@ public class Assets {
 
     public void dispose() {
         skin.dispose();
-        black_16.dispose();
-        black_18.dispose();
-        black_20.dispose();
-        black_24.dispose();
-        white_16.dispose();
-        white_18.dispose();
-        white_20.dispose();
-        white_24.dispose();
         mainButtonAtlas.dispose();
         progressBarStyleAtlas.dispose();
         assetManager.dispose();
         generator.dispose();
+    }
+
+    public Skin getSkin() {
+        return skin;
     }
 }
