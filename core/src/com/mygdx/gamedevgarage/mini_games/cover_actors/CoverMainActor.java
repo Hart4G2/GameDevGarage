@@ -1,6 +1,7 @@
 package com.mygdx.gamedevgarage.mini_games.cover_actors;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -118,9 +119,15 @@ public class CoverMainActor extends Table {
                 "black", "white", "light_grey", "dark_grey", "grey", "dark_green", "light_green", "green"
         };
 
+        TextureRegionDrawable background = new TextureRegionDrawable(
+                new Texture(Gdx.files.internal("item_bg.png")));
+
+        TextureRegionDrawable imageBackground = new TextureRegionDrawable(
+                new Texture(Gdx.files.internal("item_image_bg.png")));
+
         for (int i = 0; i < colorNames.length; i++) {
             TextureRegionDrawable drawable = new TextureRegionDrawable(assets.designColorsAtlas.findRegion(colorRegions[i]));
-            colors.add(new CoverListItem(colorNames[i], drawable, skin));
+            colors.add(new CoverListItem(colorNames[i], drawable, background, imageBackground, skin));
         }
 
         return colors;

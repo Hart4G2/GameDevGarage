@@ -12,9 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.Timer;
 import com.mygdx.gamedevgarage.Assets;
+import com.mygdx.gamedevgarage.DialogThread;
 import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.MainGameScreen;
 import com.mygdx.gamedevgarage.mini_games.cover_actors.CoverMainActor;
 
 public class CoverCreationScreen implements Screen {
@@ -34,44 +36,15 @@ public class CoverCreationScreen implements Screen {
         this.game = game;
         this.assets = game.getAssets();
         this.skin = assets.getSkin();
-
-        stage = new Stage(new ScreenViewport());
-
-        createUIElements();
-        setupUIListeners();
-    }
-
-    private void createUIElements() {
-        CoverMainActor coverListActor = new CoverMainActor(this, assets);
-
-        okButton = new TextButton("OK", skin, "white_18");
-        okButton.setDisabled(true);
-
-        Table table = new Table();
-        table.setFillParent(true);
-        table.add(coverListActor).row();
-        table.add(okButton).colspan(2).center().row();
-
-        stage.addActor(table);
-
-        table.setBackground(new TextureRegionDrawable(new Texture(Gdx.files.internal("atlases/styles/window_yellow.png"))));
-    }
-
-    private void setupUIListeners() {
-        okButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if(!okButton.isDisabled()){
-                    System.out.println("Selected Color: " + selectedColor);
-                    System.out.println("Selected Object: " + selectedObject);
-                }
-            }
-        });
     }
 
     @Override
     public void show() {
+        stage = new Stage();
         Gdx.input.setInputProcessor(stage);
+
+        createUIElements();
+        setupUIListeners();
     }
 
     @Override
@@ -106,6 +79,39 @@ public class CoverCreationScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
+    }
+
+    private void createUIElements() {
+        CoverMainActor coverListActor = new CoverMainActor(this, assets);
+
+        okButton = new TextButton("OK", skin, "white_18");
+        okButton.setDisabled(true);
+
+        Table table = new Table();
+        table.setFillParent(true);
+        table.add(coverListActor).row();
+        table.add(okButton).colspan(2).center().row();
+
+        stage.addActor(table);
+
+        table.setBackground(new TextureRegionDrawable(new Texture(Gdx.files.internal("atlases/styles/window_yellow.png"))));
+    }
+
+    private void setupUIListeners() {
+        okButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if(!okButton.isDisabled()){
+                    System.out.println("Selected Color: " + selectedColor);
+                    System.out.println("Selected Object: " + selectedObject);
+
+                    game.setMainScreen();
+                    game.getMainScreen().setGameInProgress(true);
+                    DialogThread.getDesignThread().cancel();
+                    new Timer().scheduleTask(DialogThread.getProgrammingThread(), DialogThread.getDesignTime());
+                }
+            }
+        });
     }
 
     public void setSelectedCoverItems(String selectedColor, String selectedObject) {

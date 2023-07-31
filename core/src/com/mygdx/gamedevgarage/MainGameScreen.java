@@ -1,7 +1,5 @@
 package com.mygdx.gamedevgarage;
 
-import static com.mygdx.gamedevgarage.DialogThread.isGameInProgress;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Cubemap;
@@ -145,6 +143,8 @@ public class MainGameScreen implements Screen {
 
     float value = 0f;
 
+    private boolean isGameInProgress = false;
+
     @Override
     public void render(float delta) {
         float deltaTime = Gdx.graphics.getDeltaTime();
@@ -211,11 +211,23 @@ public class MainGameScreen implements Screen {
         DialogThread dialogThread = new DialogThread(game,
                 stage,
                 assets,
-                10000,
+                10,
                 0.4,
                 0.4,
                 0.2);
 
         dialogThread.start();
+    }
+
+    public void setGameStarted(){
+        buttonMakeGame.setVisible(false);
+    }
+
+    public void setGameInProgress(boolean progress){
+        this.isGameInProgress = progress;
+    }
+
+    public void setGameEnded(){
+        buttonMakeGame.setVisible(true);
     }
 }

@@ -1,5 +1,7 @@
 package com.mygdx.gamedevgarage;
 
+import static com.badlogic.gdx.utils.Timer.Task;
+
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
@@ -7,34 +9,25 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.mygdx.gamedevgarage.mini_games.CoverCreationScreen;
+import com.badlogic.gdx.utils.Timer;
 import com.mygdx.gamedevgarage.utils.DialogFactory;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class DialogThread {
 
-    long mainTime;
-    double designPercent;
-    double programmingPercent;
-    double gameDesignPercent;
-    long designTime;
-    long programmingTime;
-    long gameDesignTime;
+    private static Game game;
+    private static Stage stage;
 
-    Game game;
-    Stage stage;
-    Assets assets;
+    private static MainGameScreen mainGameScreen;
+    private static Assets assets;
+    private static long designTime;
+    private static long programmingTime;
+    private static long gameDesignTime;
 
     public DialogThread(Game game, Stage stage, Assets assets, long mainTime, double designPercent, double programmingPercent, double gameDesignPercent) {
-        this.mainTime = mainTime;
-        this.designPercent = designPercent;
-        this.programmingPercent = programmingPercent;
-        this.gameDesignPercent = gameDesignPercent;
-        this.game = game;
-        this.stage = stage;
-        this.assets = assets;
+        DialogThread.game = game;
+        DialogThread.stage = stage;
+        DialogThread.assets = assets;
+        DialogThread.mainGameScreen = game.getMainScreen();
         designTime = Math.round(mainTime * designPercent);
         programmingTime = Math.round(mainTime * programmingPercent);
         gameDesignTime = Math.round(mainTime * gameDesignPercent);
@@ -44,81 +37,50 @@ public class DialogThread {
         mainThread.run();
     }
 
-    TimerTask mainThread = new TimerTask() {
+    private static Task mainThread = new Task() {
         @Override
         public void run() {
-//            System.out.println("mainThread started");
-//            openGameMakeDialog();
-            openDesignDialog();
-        }
-
-        @Override
-        public boolean cancel() {
-            System.out.println("mainThread canceled");
-            return super.cancel();
+            System.out.println("mainThread started");
+            openGameMakeDialog();
+            mainGameScreen.setGameStarted();
         }
     };
 
-    TimerTask designThread = new TimerTask() {
+    private static Task designThread = new Task() {
         @Override
         public void run() {
             openDesignDialog();
             System.out.println("designThread started");
         }
-
-        @Override
-        public boolean cancel() {
-            System.out.println("designThread canceled");
-            return super.cancel();
-        }
     };
 
-    TimerTask programmingThread = new TimerTask() {
+    private static Task programmingThread = new Task() {
         @Override
         public void run() {
             openProgrammingDialog();
             System.out.println("programmingThread started");
         }
-
-        @Override
-        public boolean cancel() {
-            System.out.println("programmingThread canceled");
-            return super.cancel();
-        }
     };
 
-    TimerTask gameDesignThread = new TimerTask() {
+    private static Task gameDesignThread = new Task() {
         @Override
         public void run() {
             openGameDesignDialog();
             System.out.println("gameDesignThread started");
         }
-
-        @Override
-        public boolean cancel() {
-            System.out.println("gameDesignThread canceled");
-            return super.cancel();
-        }
     };
 
-    TimerTask endGameThread = new TimerTask() {
+    private static Task endGameThread = new Task() {
         @Override
         public void run() {
-            isGameInProgress = false;
             System.out.println("EndGameThread started");
+            mainGameScreen.setGameInProgress(false);
+            mainGameScreen.setGameEnded();
             endGameThread.cancel();
-        }
-
-        @Override
-        public boolean cancel() {
-            System.out.println("EndGameThread canceled");
-            return super.cancel();
         }
     };
 
-    public static boolean isGameInProgress = false;
-
-    private void openGameMakeDialog() {
+    private static void openGameMakeDialog() {
         mainThread.cancel();
 
         final Dialog dialog = DialogFactory.createMakeGameDialog(assets.getSkin());
@@ -136,8 +98,8 @@ public class DialogThread {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 dialog.hide();
-                new Timer().schedule(designThread, 0L);
-                isGameInProgress = true;
+                new Timer().scheduleTask(designThread, 0);
+                mainGameScreen.setGameInProgress(true);
             }
         });
 
@@ -145,82 +107,53 @@ public class DialogThread {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 dialog.hide();
-                isGameInProgress = false;
+                mainGameScreen.setGameInProgress(false);
             }
         });
 
         dialog.show(stage);
     }
 
-    private void openDesignDialog() {
-        game.setScreen(new CoverCreationScreen(game));
-
-//        final Dialog dialog = DialogFactory.createDesignDialog(assets.skin);
-//        isGameInProgress = false;
-//
-//        TextButton okButton = dialog.getButtonTable().findActor("okButton");
-//
-//        final SelectBox<String> graphicSelectBox = dialog.getContentTable().findActor("graphicSelectBox");
-//
-//        okButton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                String graphic = graphicSelectBox.getSelected();
-//
-//                dialog.hide();
-//                isGameInProgress = true;
-//                designThread.cancel();
-//                new Timer().schedule(programmingThread, designTime);
-//            }
-//        });
-//
-//        dialog.show(stage);
-
+    private static void openDesignDialog() {
+        mainGameScreen.setGameInProgress(false);
+        game.setCoverScreen();
     }
 
-    private void openProgrammingDialog() {
-        final Dialog dialog = DialogFactory.createProgrammingDialog(assets.getSkin());
-        isGameInProgress = false;
-
-        TextButton okButton = dialog.getButtonTable().findActor("okButton");
-
-        final SelectBox<String> technicSelectBox = dialog.getContentTable().findActor("technicSelectBox");
-
-        okButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                String technic = technicSelectBox.getSelected();
-
-                dialog.hide();
-                isGameInProgress = true;
-                programmingThread.cancel();
-                new Timer().schedule(gameDesignThread, programmingTime);
-            }
-        });
-
-        dialog.show(stage);
+    private static void openProgrammingDialog() {
+        mainGameScreen.setGameInProgress(false);
+        game.setTechScreen();
     }
 
-    private void openGameDesignDialog() {
-        final Dialog dialog = DialogFactory.createGameDesignDialog(assets.getSkin());
-        isGameInProgress = false;
+    private static void openGameDesignDialog() {
+        mainGameScreen.setGameInProgress(false);
+        game.setMechanicScreen();
+    }
 
-        TextButton okButton = dialog.getButtonTable().findActor("okButton");
+    public static long getDesignTime() {
+        return designTime;
+    }
 
-        final SelectBox<String> mechanicSelectBox = dialog.getContentTable().findActor("mechanicSelectBox");
+    public static long getProgrammingTime() {
+        return programmingTime;
+    }
 
-        okButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                String mechanic = mechanicSelectBox.getSelected();
+    public static long getGameDesignTime() {
+        return gameDesignTime;
+    }
 
-                dialog.hide();
-                isGameInProgress = true;
-                gameDesignThread.cancel();
-                new Timer().schedule(endGameThread, gameDesignTime);
-            }
-        });
+    public static Task getDesignThread() {
+        return designThread;
+    }
 
-        dialog.show(stage);
+    public static Task getProgrammingThread() {
+        return programmingThread;
+    }
+
+    public static Task getGameDesignThread() {
+        return gameDesignThread;
+    }
+
+    public static Task getEndGameThread() {
+        return endGameThread;
     }
 }

@@ -32,8 +32,7 @@ public class CoverList extends Table {
 
     private void addColorItems() {
         for (CoverListItem item : items) {
-            add(item.getLabel()).pad(5);
-            add(item.getImage()).pad(5).row();
+            add(item).row();
             addClickListener(item);
         }
     }
@@ -44,26 +43,17 @@ public class CoverList extends Table {
 
         for (int i = 0; i < items.size; i++) {
             final CoverListItem item = items.get(i);
-            add(item.getImage()).padRight(20).padTop(10).padBottom(10);
+            add(item).padRight(20).padTop(8).padBottom(10);
 
             if (i % itemsPerRow == itemsPerRow - 1) {
                 row();
             }
-
             addClickListenerForObjects(item, objects);
         }
     }
 
     private void addClickListener(final CoverListItem item) {
-        item.getLabel().addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                img.setDrawable(item.getImage().getDrawable());
-                parent.setSelectedColor(item.getText());
-            }
-        });
-
-        item.getImage().addListener(new ClickListener() {
+        item.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 img.setDrawable(item.getImage().getDrawable());
@@ -73,7 +63,7 @@ public class CoverList extends Table {
     }
 
     private void addClickListenerForObjects(final CoverListItem item, final Array<CoverListItem> objects) {
-        item.getImage().addListener(new ClickListener() {
+        item.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
 
@@ -115,7 +105,6 @@ public class CoverList extends Table {
                                 Actions.alpha(alphaAmount, duration)
                         )
                 );
-
                 item.getImage().addAction(clickAnimation);
             }
 
@@ -131,7 +120,6 @@ public class CoverList extends Table {
                                 Actions.alpha(1f, duration)
                         )
                 );
-
                 item.getImage().addAction(clickAnimation);
             }
         });

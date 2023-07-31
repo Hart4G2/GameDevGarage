@@ -1,30 +1,53 @@
 package com.mygdx.gamedevgarage.mini_games.cover_actors;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 public class CoverListItem extends Group {
 
     private Label label;
-    private Image image;
-    private String text;
+    private final Image image;
+    private final String text;
 
-    public CoverListItem(String text, Drawable drawable, Skin skin) {
+    public CoverListItem(String text, Drawable drawable, Drawable background, Drawable imageBackground, Skin skin) {
         this.text = text;
         label = new Label(text, skin);
         image = new Image(drawable);
+        image.setBounds(5, 5, 100, 100);
+
+        Image backgroundImage = new Image(imageBackground);
+
+        setSize(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 6f);
+
+        Group imageGroup = new Group();
+        imageGroup.addActor(backgroundImage);
+        imageGroup.addActor(image);
+
+        Table mainTable = new Table();
+        mainTable.setBackground(background);
+        mainTable.setFillParent(true);
+        mainTable.add(label).left().padRight(40);
+        mainTable.add(imageGroup).right().padTop(130);
+
+        addActor(mainTable);
     }
 
     public CoverListItem(String text, Drawable drawable) {
         this.text = text;
         image = new Image(drawable);
-    }
 
-    public Label getLabel() {
-        return label;
+        setSize(100, 100);
+
+        Table mainTable = new Table();
+        mainTable.setFillParent(true);
+        mainTable.add(image).padRight(5);
+
+        addActor(mainTable);
     }
 
     public Image getImage() {
