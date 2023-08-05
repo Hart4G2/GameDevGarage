@@ -14,12 +14,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Timer;
 import com.mygdx.gamedevgarage.Assets;
-import com.mygdx.gamedevgarage.DialogThread;
+import com.mygdx.gamedevgarage.utils.DialogThread;
 import com.mygdx.gamedevgarage.Game;
-import com.mygdx.gamedevgarage.MainGameScreen;
 import com.mygdx.gamedevgarage.mini_games.cover_actors.CoverMainActor;
 
-public class CoverCreationScreen implements Screen {
+public class DesignMiniGameScreen implements Screen {
 
     private Game game;
     private Assets assets;
@@ -32,7 +31,7 @@ public class CoverCreationScreen implements Screen {
     private String selectedColor;
     private String selectedObject;
 
-    public CoverCreationScreen(Game game) {
+    public DesignMiniGameScreen(Game game) {
         this.game = game;
         this.assets = game.getAssets();
         this.skin = assets.getSkin();
@@ -106,7 +105,6 @@ public class CoverCreationScreen implements Screen {
                     System.out.println("Selected Object: " + selectedObject);
 
                     game.setMainScreen();
-                    game.getMainScreen().setGameInProgress(true);
                     DialogThread.getDesignThread().cancel();
                     new Timer().scheduleTask(DialogThread.getProgrammingThread(), DialogThread.getDesignTime());
                 }

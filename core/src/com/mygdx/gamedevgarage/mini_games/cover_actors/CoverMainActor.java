@@ -15,12 +15,12 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.gamedevgarage.Assets;
-import com.mygdx.gamedevgarage.mini_games.CoverCreationScreen;
+import com.mygdx.gamedevgarage.mini_games.DesignMiniGameScreen;
 
 public class CoverMainActor extends Table {
 
     private final Assets assets;
-    private final CoverCreationScreen screen;
+    private final DesignMiniGameScreen screen;
     private final Skin skin;
 
     private CoverImage coverImage;
@@ -36,7 +36,7 @@ public class CoverMainActor extends Table {
     private String selectedColor;
     private String selectedObject;
 
-    public CoverMainActor(CoverCreationScreen screen, Assets assets) {
+    public CoverMainActor(DesignMiniGameScreen screen, Assets assets) {
         this.assets = assets;
         this.screen = screen;
         this.skin = assets.getSkin();
@@ -120,14 +120,14 @@ public class CoverMainActor extends Table {
         };
 
         TextureRegionDrawable background = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("item_bg.png")));
+                new Texture(Gdx.files.internal("design_item.png")));
 
         TextureRegionDrawable imageBackground = new TextureRegionDrawable(
                 new Texture(Gdx.files.internal("item_image_bg.png")));
 
         for (int i = 0; i < colorNames.length; i++) {
-            TextureRegionDrawable drawable = new TextureRegionDrawable(assets.designColorsAtlas.findRegion(colorRegions[i]));
-            colors.add(new CoverListItem(colorNames[i], drawable, background, imageBackground, skin));
+            TextureRegionDrawable item = new TextureRegionDrawable(assets.designColorsAtlas.findRegion(colorRegions[i]));
+            colors.add(new CoverListItem(colorNames[i], item, background, imageBackground, skin));
         }
 
         return colors;

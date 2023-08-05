@@ -1,4 +1,4 @@
-package com.mygdx.gamedevgarage;
+package com.mygdx.gamedevgarage.utils;
 
 import static com.badlogic.gdx.utils.Timer.Task;
 
@@ -10,14 +10,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Timer;
-import com.mygdx.gamedevgarage.utils.DialogFactory;
+import com.mygdx.gamedevgarage.Assets;
+import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.MainScreen;
 
 public class DialogThread {
 
     private static Game game;
     private static Stage stage;
 
-    private static MainGameScreen mainGameScreen;
+    private static MainScreen mainScreen;
     private static Assets assets;
     private static long designTime;
     private static long programmingTime;
@@ -27,7 +29,7 @@ public class DialogThread {
         DialogThread.game = game;
         DialogThread.stage = stage;
         DialogThread.assets = assets;
-        DialogThread.mainGameScreen = game.getMainScreen();
+        DialogThread.mainScreen = game.getMainScreen();
         designTime = Math.round(mainTime * designPercent);
         programmingTime = Math.round(mainTime * programmingPercent);
         gameDesignTime = Math.round(mainTime * gameDesignPercent);
@@ -41,8 +43,8 @@ public class DialogThread {
         @Override
         public void run() {
             System.out.println("mainThread started");
+            mainScreen.setGameStarted();
             openGameMakeDialog();
-            mainGameScreen.setGameStarted();
         }
     };
 
@@ -74,14 +76,14 @@ public class DialogThread {
         @Override
         public void run() {
             System.out.println("EndGameThread started");
-            mainGameScreen.setGameInProgress(false);
-            mainGameScreen.setGameEnded();
+            mainScreen.setGameEnded();
             endGameThread.cancel();
         }
     };
 
     private static void openGameMakeDialog() {
         mainThread.cancel();
+        game.getMainScreen().hide();
 
         final Dialog dialog = DialogFactory.createMakeGameDialog(assets.getSkin());
 
@@ -93,13 +95,11 @@ public class DialogThread {
         final SelectBox<String> platformSelectBox = dialog.getContentTable().findActor("platformSelectBox");
         final SelectBox<String> levelSelectBox = dialog.getContentTable().findActor("levelSelectBox");
 
-
         okButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 dialog.hide();
                 new Timer().scheduleTask(designThread, 0);
-                mainGameScreen.setGameInProgress(true);
             }
         });
 
@@ -107,7 +107,6 @@ public class DialogThread {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 dialog.hide();
-                mainGameScreen.setGameInProgress(false);
             }
         });
 
@@ -115,17 +114,14 @@ public class DialogThread {
     }
 
     private static void openDesignDialog() {
-        mainGameScreen.setGameInProgress(false);
         game.setCoverScreen();
     }
 
     private static void openProgrammingDialog() {
-        mainGameScreen.setGameInProgress(false);
         game.setTechScreen();
     }
 
     private static void openGameDesignDialog() {
-        mainGameScreen.setGameInProgress(false);
         game.setMechanicScreen();
     }
 

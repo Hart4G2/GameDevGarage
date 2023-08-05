@@ -13,29 +13,40 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 public class CheckListItem extends Group {
 
     private final Skin skin;
-    private final Label label;
-    private final Image image;
-    private final Image backgroundImage;
-    private final String text;
+    private Label label;
+    private Image image;
+    private Image backgroundImage;
+    private String text;
     private boolean isSelected;
-    private final Table mainTable;
-    private final Drawable bgSelected;
-    private final Drawable bgUnselected;
-    private final Drawable imageFrameUnselected;
-    private final Drawable imageFrameSelected;
-    private final Animation<TextureRegionDrawable> animation;
+    private Table mainTable;
+    private Drawable bgSelected;
+    private Drawable bgUnselected;
+    private Drawable imageFrameUnselected;
+    private Drawable imageFrameSelected;
+    private Animation<TextureRegionDrawable> animation;
     private float stateTime;
+    private TextureRegionDrawable frame1;
+    private TextureRegionDrawable frame2;
 
-    public CheckListItem(String text, TextureRegionDrawable frame1, TextureRegionDrawable frame2, Drawable bgUnselected,
-                         Drawable bgSelected, Drawable imageFrameUnselected, Drawable imageFrameSelected, Skin skin) {
+    public CheckListItem(String text, TextureRegionDrawable frame1, TextureRegionDrawable frame2,
+                         Drawable bgUnselected, Drawable bgSelected, Drawable imageFrameUnselected,
+                         Drawable imageFrameSelected, Skin skin) {
         this.skin = skin;
         this.text = text;
         this.bgSelected = bgSelected;
         this.bgUnselected = bgUnselected;
         this.imageFrameUnselected = imageFrameUnselected;
         this.imageFrameSelected = imageFrameSelected;
-        label = new Label(text, skin, "default_18");
+        this.frame1 = frame1;
+        this.frame2 = frame2;
 
+        setSize(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 6f);
+
+        initAnimation();
+        initUIElements();
+    }
+
+    private void initAnimation(){
         float frameDuration = 0.5f;
 
         animation = new Animation<>(frameDuration, frame1, frame2);
@@ -44,8 +55,10 @@ public class CheckListItem extends Group {
         stateTime = 0f;
         image = new Image(animation.getKeyFrame(stateTime));
         image.setPosition(0, 14);
+    }
 
-        setSize(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 6f);
+    private void initUIElements(){
+        label = new Label(text, skin, "default_18");
 
         backgroundImage = new Image(imageFrameUnselected);
         backgroundImage.setPosition(-5, 9);
@@ -54,12 +67,11 @@ public class CheckListItem extends Group {
         imageGroup.addActor(backgroundImage);
         imageGroup.addActor(image);
 
-
         mainTable = new Table();
         mainTable.setFillParent(true);
         mainTable.setBackground(bgUnselected);
-        mainTable.add(label).padRight(40);
-        mainTable.add(imageGroup).padTop(130);
+        mainTable.add(label).left().width(getWidth() - Gdx.graphics.getWidth() / 4f);
+        mainTable.add(imageGroup).right().padTop(130);
 
         addActor(mainTable);
     }

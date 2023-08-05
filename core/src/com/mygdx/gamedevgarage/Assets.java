@@ -158,7 +158,7 @@ public class Assets {
     }
 
     private void generateFont() {
-        generator = new FreeTypeFontGenerator(Gdx.files.internal("atlases/fonts/AovelSansRounded-rdDL.TTF"));
+        generator = new FreeTypeFontGenerator(Gdx.files.internal("atlases\\fonts\\sans.ttf"));
 
         FreeTypeFontParameter parameter = new FreeTypeFontParameter();
         parameter.color = Color.BLACK;

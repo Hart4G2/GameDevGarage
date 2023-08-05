@@ -18,12 +18,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
-import com.mygdx.gamedevgarage.DialogThread;
+import com.mygdx.gamedevgarage.utils.DialogThread;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.mini_games.selection_actors.CheckList;
 import com.mygdx.gamedevgarage.mini_games.selection_actors.CheckListItem;
 
-public class TechSelectionScreen implements Screen, MiniGameScreen {
+public class ProgrammingMiniGameScreen implements Screen, MiniGameScreen {
 
     private Game game;
     private Assets assets;
@@ -36,7 +36,7 @@ public class TechSelectionScreen implements Screen, MiniGameScreen {
 
     private Array<String> selectedTechnologies;
 
-    public TechSelectionScreen(Game game) {
+    public ProgrammingMiniGameScreen(Game game) {
         this.game = game;
         this.assets = game.getAssets();
         this.skin = assets.getSkin();
@@ -142,7 +142,6 @@ public class TechSelectionScreen implements Screen, MiniGameScreen {
                     System.out.println();
 
                     game.setMainScreen();
-                    game.getMainScreen().setGameInProgress(true);
                     DialogThread.getProgrammingThread().cancel();
                     new Timer().scheduleTask(DialogThread.getGameDesignThread(), DialogThread.getProgrammingTime());
                 }
@@ -172,10 +171,10 @@ public class TechSelectionScreen implements Screen, MiniGameScreen {
         };
 
         TextureRegionDrawable bgUnselected = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("item_bg.png")));
+                new Texture(Gdx.files.internal("programming_item.png")));
 
         TextureRegionDrawable bgSelected = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("item_bg_selected.png")));
+                new Texture(Gdx.files.internal("programming_item_selected.png")));
 
         TextureRegionDrawable imageFrameUnselected = new TextureRegionDrawable(
                 new Texture(Gdx.files.internal("item_image_bg.png")));

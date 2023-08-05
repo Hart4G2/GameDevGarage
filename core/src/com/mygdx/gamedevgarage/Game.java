@@ -1,20 +1,20 @@
 package com.mygdx.gamedevgarage;
 
 
-import com.mygdx.gamedevgarage.mini_games.CoverCreationScreen;
-import com.mygdx.gamedevgarage.mini_games.MechanicSelectionScreen;
-import com.mygdx.gamedevgarage.mini_games.TechSelectionScreen;
+import com.mygdx.gamedevgarage.mini_games.DesignMiniGameScreen;
+import com.mygdx.gamedevgarage.mini_games.GameDesignMiniGameScreen;
+import com.mygdx.gamedevgarage.mini_games.ProgrammingMiniGameScreen;
 
 
 public class Game extends com.badlogic.gdx.Game {
 
     private Assets assets;
-    private MainGameScreen mainScreen;
+    private MainScreen mainScreen;
 
     @Override
     public void create() {
         assets = new Assets();
-        mainScreen = new MainGameScreen(this);
+        mainScreen = new MainScreen(this);
 
         this.setScreen(mainScreen);
     }
@@ -43,7 +43,7 @@ public class Game extends com.badlogic.gdx.Game {
         return assets;
     }
 
-    public MainGameScreen getMainScreen() {
+    public MainScreen getMainScreen() {
         return mainScreen;
     }
 
@@ -52,14 +52,14 @@ public class Game extends com.badlogic.gdx.Game {
     }
 
     public void setCoverScreen() {
-        setScreen(new CoverCreationScreen(this));
+        setScreen(new DesignMiniGameScreen(this));
     }
 
     public void setTechScreen() {
-        setScreen(new TechSelectionScreen(this));
+        setScreen(new ProgrammingMiniGameScreen(this));
     }
 
     public void setMechanicScreen() {
-        setScreen(new MechanicSelectionScreen(this));
+        setScreen(new GameDesignMiniGameScreen(this));
     }
 }

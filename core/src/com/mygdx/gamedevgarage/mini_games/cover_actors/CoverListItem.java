@@ -10,38 +10,52 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 public class CoverListItem extends Group {
 
-    private Label label;
-    private final Image image;
+    private Skin skin;
+    private final Drawable item;
+    private Image image;
     private final String text;
 
-    public CoverListItem(String text, Drawable drawable, Drawable background, Drawable imageBackground, Skin skin) {
+    public CoverListItem(String text, Drawable item, Drawable background, Drawable imageBackground, Skin skin) {
+        this.skin = skin;
         this.text = text;
-        label = new Label(text, skin);
-        image = new Image(drawable);
+        this.item = item;
+
+        setSize(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 7f);
+
+        initColorUIElements(background, imageBackground);
+    }
+
+    public CoverListItem(String text, Drawable item) {
+        this.text = text;
+        this.item = item;
+
+        setSize(100, 100);
+
+        initObjectUIElements();
+    }
+
+    private void initColorUIElements(Drawable background, Drawable imageBackground){
+        Label label = new Label(text, skin);
+        image = new Image(item);
         image.setBounds(5, 5, 100, 100);
 
         Image backgroundImage = new Image(imageBackground);
-
-        setSize(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 6f);
 
         Group imageGroup = new Group();
         imageGroup.addActor(backgroundImage);
         imageGroup.addActor(image);
 
-        Table mainTable = new Table();
-        mainTable.setBackground(background);
-        mainTable.setFillParent(true);
-        mainTable.add(label).left().padRight(40);
-        mainTable.add(imageGroup).right().padTop(130);
+        Table table = new Table();
+        table.setFillParent(true);
+        table.setBackground(background);
+        table.add(label).left().width(getWidth() - Gdx.graphics.getWidth() / 4f);
+        table.add(imageGroup).right().padTop(110);
 
-        addActor(mainTable);
+        addActor(table);
     }
 
-    public CoverListItem(String text, Drawable drawable) {
-        this.text = text;
-        image = new Image(drawable);
-
-        setSize(100, 100);
+    private void initObjectUIElements(){
+        image = new Image(item);
 
         Table mainTable = new Table();
         mainTable.setFillParent(true);
