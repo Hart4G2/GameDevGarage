@@ -1,8 +1,9 @@
 package com.mygdx.gamedevgarage.mini_games.cover_actors;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import static com.mygdx.gamedevgarage.utils.Utils.createButton;
+import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
+import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
+
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -10,17 +11,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Array;
 import com.mygdx.gamedevgarage.Assets;
-import com.mygdx.gamedevgarage.mini_games.DesignMiniGameScreen;
+import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.mini_games.DesignScreen;
 
 public class CoverMainActor extends Table {
 
+    private final Game game;
     private final Assets assets;
-    private final DesignMiniGameScreen screen;
+    private final DesignScreen screen;
     private final Skin skin;
 
     private CoverImage coverImage;
@@ -30,44 +30,33 @@ public class CoverMainActor extends Table {
     private ScrollPane objectScrollPane;
     private Button backButton;
 
-    private Array<CoverListItem> colors;
-    private Array<CoverListItem> objects;
-
     private String selectedColor;
-    private String selectedObject;
 
-    public CoverMainActor(DesignMiniGameScreen screen, Assets assets) {
-        this.assets = assets;
+    public CoverMainActor(Game game, DesignScreen screen) {
+        this.game = game;
         this.screen = screen;
+        this.assets = game.getAssets();
         this.skin = assets.getSkin();
 
-        setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 3f * 2f);
+        setSize(getWidthPercent(1), getHeightPercent(.8f));
 
         createUIElements();
         setupUIListeners();
-
-        Group group = new Group();
-        group.addActor(objectScrollPane);
-        group.addActor(colorScrollPane);
-        group.addActor(backButton);
-        group.setSize(Gdx.graphics.getWidth() - Gdx.graphics.getWidth() / 10f, Gdx.graphics.getHeight() / 2.4f);
-
-        add(coverImage).pad(20).row();
-        add(group).pad(20).row();
     }
 
     private void createUIElements() {
-        backButton = new TextButton("", skin, "back_button");
+        backButton = createButton(skin, "back_button");
+        backButton.setSize(getWidthPercent(.18f), getWidthPercent(.18f));
         backButton.setVisible(false);
 
         coverImage = new CoverImage(assets);
+        coverImage.setSize(getWidthPercent(1f), getWidthPercent(1f));
+
         Image colorImage = coverImage.getColorImage();
         Image objectImage = coverImage.getObjectImage();
 
-        initLists();
-
-        colorList = new CoverList(colors, colorImage, true, this, assets);
-        objectList = new CoverList(objects, objectImage, false, this,  assets);
+        colorList = new CoverList(game, colorImage, true, this, assets);
+        objectList = new CoverList(game, objectImage, false, this,  assets);
 
         colorScrollPane = new ScrollPane(colorList, skin);
         colorScrollPane.setFillParent(true);
@@ -77,6 +66,16 @@ public class CoverMainActor extends Table {
         objectScrollPane.setFillParent(true);
         objectScrollPane.setVisible(false);
         objectScrollPane.setScrollbarsVisible(true);
+
+        Group group = new Group();
+        group.addActor(objectScrollPane);
+        group.addActor(colorScrollPane);
+        group.addActor(backButton);
+
+        add(coverImage).width(getHeightPercent(.4f)).height(getHeightPercent(.4f))
+                .pad(getHeightPercent(.01f)).row();
+        add(group).width(getWidthPercent(.95f)).height(getHeightPercent(.4f))
+                .row();
     }
 
     private void setupUIListeners() {
@@ -99,78 +98,11 @@ public class CoverMainActor extends Table {
         });
     }
 
-    private void initLists(){
-        colors = initColors();
-        objects = initObjects(assets.designObjects100Atlas);
-    }
-
-    private Array<CoverListItem> initColors() {
-        Array<CoverListItem> colors = new Array<>();
-
-        String[] colorNames = {
-                "Light Blue", "Dark Blue", "Blue", "Red", "Light Red", "Dark Red", "Yellow", "Dark Yellow", "Sandy", "Orange",
-                "Light Purple", "Dark Purple", "Purple", "Light Pink", "Pink", "Light Brown", "Dark Brown", "Brown",
-                "Black", "White", "Light Grey", "Dark Grey", "Grey", "Dark Green", "Light Green", "Green"
-        };
-
-        String[] colorRegions = {
-                "light_blue", "dark_blue", "blue", "red", "light_red", "dark_red", "yellow", "dark_yellow", "sandy", "orange",
-                "light_purple", "dark_purple", "purple", "light_pink", "pink", "light_brown", "dark_brown", "brown",
-                "black", "white", "light_grey", "dark_grey", "grey", "dark_green", "light_green", "green"
-        };
-
-        TextureRegionDrawable background = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("design_item.png")));
-
-        TextureRegionDrawable imageBackground = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("item_image_bg.png")));
-
-        for (int i = 0; i < colorNames.length; i++) {
-            TextureRegionDrawable item = new TextureRegionDrawable(assets.designColorsAtlas.findRegion(colorRegions[i]));
-            colors.add(new CoverListItem(colorNames[i], item, background, imageBackground, skin));
-        }
-
-        return colors;
-    }
-
-    public Array<CoverListItem> initObjects(TextureAtlas atlas){
-        Array<CoverListItem> objects = new Array<>();
-
-        String[] objectNames = {
-                "Aliens", "Aviation", "Business", "Cinema", "City", "Comedy", "Construction",
-                "Cooking", "Criminal", "Cyberpunk", "Dance", "Detective", "Fantasy", "Farm",
-                "Fashion", "Game development", "Government", "Hacker", "Horror", "Hospital",
-                "Hunting", "Life", "Medieval", "Music", "Ninja", "Pirates", "Prison", "Race",
-                "Romantic", "Rhythm", "School", "Space", "Sport", "Superheros", "Time traveling",
-                "Transport", "Vampires", "Virtual animals", "War", "Wild west", "Zombie"
-        };
-
-        String[] objectRegions = {
-                "aliens", "aviation", "business", "cinema", "city", "comedy", "construction",
-                "cooking", "criminal", "cyberpunk", "dance", "detective", "fantasy", "farm",
-                "fashion", "game_development", "government", "hacker", "horror", "hospital",
-                "hunting", "life", "medieval", "music", "ninja", "pirates", "prison", "race",
-                "romantic", "rhythm", "school", "space", "sport", "superheros", "time_travel",
-                "transport", "vampires", "virtual_animal", "war", "westwood", "zombie"
-        };
-
-        for (int i = 0; i < objectNames.length; i++) {
-            TextureRegionDrawable drawable1 = new TextureRegionDrawable(atlas.findRegion(objectRegions[i], 1));
-            TextureRegionDrawable drawable2 = new TextureRegionDrawable(atlas.findRegion(objectRegions[i], 2));
-            objects.add(new CoverListItem(objectNames[i] + "_1", drawable1));
-            objects.add(new CoverListItem(objectNames[i] + "_2", drawable2));
-        }
-
-        return objects;
-    }
-
     public void setSelectedColor(String selectedColor) {
         this.selectedColor = selectedColor;
     }
 
     public void setSelectedObject(String selectedObject) {
-        this.selectedObject = selectedObject;
-
         screen.setSelectedCoverItems(selectedColor, selectedObject);
     }
 }

@@ -1,6 +1,7 @@
 package com.mygdx.gamedevgarage.mini_games.cover_actors;
 
-import com.badlogic.gdx.Gdx;
+import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
+
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -19,8 +20,6 @@ public class CoverImage extends Group {
         this.transparent = assets.transparent;
         this.frame = assets.frame;
 
-        setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 3f * 1.2f);
-
         createUIElements();
 
         addActor(colorImage);
@@ -33,20 +32,17 @@ public class CoverImage extends Group {
         objectImage = new Image(transparent);
         frameImage = new Image(frame);
 
-        float leftPad = getWidth() / 5f;
-        float topColorPad = getHeight() / 30f;
+        float frameSize = getHeightPercent(.4f);
+        float colorPad = frameSize * .02f;
+        float colorSize = frameSize - (colorPad * 2);
+        float objectPad = frameSize * .05f;
+        float objectSize = frameSize - (objectPad * 2);
 
-        float leftObjectPad = getWidth() / 4f;
-        float topObjectPad = getHeight() / 15f;
-
-        float frameTopPad = getHeight() / 36f;
-
-        colorImage.setBounds(leftPad, topColorPad,
-                getWidth() - (leftPad * 2), getHeight() - (topColorPad * 2));
-        objectImage.setBounds(leftObjectPad, topObjectPad,
-                getWidth() - (leftObjectPad * 2), getHeight() - (topObjectPad * 2));
-        frameImage.setBounds(leftPad, frameTopPad,
-                getWidth() - (leftPad * 2), getHeight() - (frameTopPad * 2));
+        colorImage.setBounds(colorPad, colorPad,
+                colorSize, colorSize);
+        objectImage.setBounds(objectPad, objectPad,
+                objectSize, objectSize);
+        frameImage.setSize(frameSize, frameSize);
     }
 
     public Image getColorImage() {

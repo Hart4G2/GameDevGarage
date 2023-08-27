@@ -1,6 +1,8 @@
 package com.mygdx.gamedevgarage.mini_games.cover_actors;
 
-import com.badlogic.gdx.Gdx;
+import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
+import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
+
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -13,43 +15,50 @@ public class CoverListItem extends Group {
     private Skin skin;
     private final Drawable item;
     private Image image;
+    private Table table;
     private final String text;
+    private boolean isPurchased;
+    private Drawable background;
 
     public CoverListItem(String text, Drawable item, Drawable background, Drawable imageBackground, Skin skin) {
         this.skin = skin;
         this.text = text;
         this.item = item;
+        this.background = background;
 
-        setSize(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 7f);
-
-        initColorUIElements(background, imageBackground);
+        initColorUIElements(imageBackground);
     }
 
     public CoverListItem(String text, Drawable item) {
         this.text = text;
         this.item = item;
 
-        setSize(100, 100);
-
         initObjectUIElements();
     }
 
-    private void initColorUIElements(Drawable background, Drawable imageBackground){
+    private void initColorUIElements(Drawable imageBackground){
         Label label = new Label(text, skin);
         image = new Image(item);
-        image.setBounds(5, 5, 100, 100);
 
         Image backgroundImage = new Image(imageBackground);
+
+        float frameSize = getHeightPercent(.13f);
+        float colorPad = frameSize * .03f;
+        float colorSize = frameSize - (colorPad * 2);
+
+        image.setBounds(colorPad, colorPad,
+                colorSize, colorSize);
+        backgroundImage.setSize(frameSize, frameSize);
 
         Group imageGroup = new Group();
         imageGroup.addActor(backgroundImage);
         imageGroup.addActor(image);
 
-        Table table = new Table();
+        table = new Table();
         table.setFillParent(true);
         table.setBackground(background);
-        table.add(label).left().width(getWidth() - Gdx.graphics.getWidth() / 4f);
-        table.add(imageGroup).right().padTop(110);
+        table.add(label).left().width(getWidthPercent(.4f)).height(getHeightPercent(.15f));
+        table.add(imageGroup).right().width(frameSize).height(frameSize);
 
         addActor(table);
     }
@@ -57,11 +66,16 @@ public class CoverListItem extends Group {
     private void initObjectUIElements(){
         image = new Image(item);
 
-        Table mainTable = new Table();
-        mainTable.setFillParent(true);
-        mainTable.add(image).padRight(5);
+        float size = getWidthPercent(.21f);
 
-        addActor(mainTable);
+        image.setSize(size, size);
+
+        table = new Table();
+        table.setFillParent(true);
+        table.add(image).width(size).height(size)
+                .pad(10);
+
+        addActor(table);
     }
 
     public Image getImage() {
@@ -70,5 +84,18 @@ public class CoverListItem extends Group {
 
     public String getText() {
         return text;
+    }
+
+    public boolean isPurchased() {
+        return isPurchased;
+    }
+
+    public void setPurchased(boolean purchased) {
+        isPurchased = purchased;
+    }
+
+    public void setBackground(Drawable background) {
+        this.background = background;
+        table.setBackground(background);
     }
 }

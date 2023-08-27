@@ -17,18 +17,19 @@ import com.mygdx.gamedevgarage.MainScreen;
 public class DialogThread {
 
     private static Game game;
+    private static Assets assets;
     private static Stage stage;
 
     private static MainScreen mainScreen;
-    private static Assets assets;
     private static long designTime;
     private static long programmingTime;
     private static long gameDesignTime;
 
-    public DialogThread(Game game, Stage stage, Assets assets, long mainTime, double designPercent, double programmingPercent, double gameDesignPercent) {
+    public DialogThread(Game game, Stage stage, long mainTime, double designPercent,
+                        double programmingPercent, double gameDesignPercent) {
         DialogThread.game = game;
         DialogThread.stage = stage;
-        DialogThread.assets = assets;
+        DialogThread.assets = game.getAssets();
         DialogThread.mainScreen = game.getMainScreen();
         designTime = Math.round(mainTime * designPercent);
         programmingTime = Math.round(mainTime * programmingPercent);
@@ -51,7 +52,7 @@ public class DialogThread {
     private static Task designThread = new Task() {
         @Override
         public void run() {
-            openDesignDialog();
+            game.setCoverScreen();
             System.out.println("designThread started");
         }
     };
@@ -59,7 +60,7 @@ public class DialogThread {
     private static Task programmingThread = new Task() {
         @Override
         public void run() {
-            openProgrammingDialog();
+            game.setTechScreen();
             System.out.println("programmingThread started");
         }
     };
@@ -67,14 +68,26 @@ public class DialogThread {
     private static Task gameDesignThread = new Task() {
         @Override
         public void run() {
-            openGameDesignDialog();
+            game.setMechanicScreen();
+
             System.out.println("gameDesignThread started");
+        }
+    };
+
+    private static Task platformThread = new Task() {
+        @Override
+        public void run() {
+            game.setPlatformScreen();
+
+            System.out.println("platformThread started");
         }
     };
 
     private static Task endGameThread = new Task() {
         @Override
         public void run() {
+            game.setEndScreen();
+
             System.out.println("EndGameThread started");
             mainScreen.setGameEnded();
             endGameThread.cancel();
@@ -85,21 +98,24 @@ public class DialogThread {
         mainThread.cancel();
         game.getMainScreen().hide();
 
-        final Dialog dialog = DialogFactory.createMakeGameDialog(assets.getSkin());
+        final Dialog dialog = DialogFactory.createMakeGameDialog(game);
 
         TextButton okButton = dialog.getButtonTable().findActor("okButton");
         TextButton cancelButton = dialog.getButtonTable().findActor("cancelButton");
 
         final TextField nameTextField = dialog.getContentTable().findActor("nameTextField");
         final SelectBox<String> genreSelectBox = dialog.getContentTable().findActor("genreSelectBox");
-        final SelectBox<String> platformSelectBox = dialog.getContentTable().findActor("platformSelectBox");
+        final SelectBox<String> themesSelectBox = dialog.getContentTable().findActor("themesSelectBox");
         final SelectBox<String> levelSelectBox = dialog.getContentTable().findActor("levelSelectBox");
 
         okButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 dialog.hide();
-                new Timer().scheduleTask(designThread, 0);
+                new Timer().scheduleTask(designThread, 1);
+                game.reward.genre = genreSelectBox.getSelected();
+                game.reward.theme = themesSelectBox.getSelected();
+                game.reward.name = nameTextField.getText();
             }
         });
 
@@ -107,22 +123,11 @@ public class DialogThread {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 dialog.hide();
+                mainScreen.setGameCanceled();
             }
         });
 
         dialog.show(stage);
-    }
-
-    private static void openDesignDialog() {
-        game.setCoverScreen();
-    }
-
-    private static void openProgrammingDialog() {
-        game.setTechScreen();
-    }
-
-    private static void openGameDesignDialog() {
-        game.setMechanicScreen();
     }
 
     public static long getDesignTime() {
@@ -151,5 +156,9 @@ public class DialogThread {
 
     public static Task getEndGameThread() {
         return endGameThread;
+    }
+
+    public static Task getPlatformThread() {
+        return platformThread;
     }
 }

@@ -1,246 +1,286 @@
 package com.mygdx.gamedevgarage;
 
+import static com.mygdx.gamedevgarage.utils.Utils.createButton;
+import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
+import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
+import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Cubemap;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
-import com.badlogic.gdx.graphics.g3d.environment.ShadowMap;
+import com.badlogic.gdx.graphics.g3d.utils.AnimationController;
+import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
+import com.mygdx.gamedevgarage.main_actors.SellActor;
+import com.mygdx.gamedevgarage.main_actors.SellTable;
+import com.mygdx.gamedevgarage.stats.StatsTable;
 import com.mygdx.gamedevgarage.utils.DialogThread;
-
-import net.mgsx.gltf.loaders.gltf.GLTFLoader;
-import net.mgsx.gltf.scene3d.attributes.PBRCubemapAttribute;
-import net.mgsx.gltf.scene3d.attributes.PBRTextureAttribute;
-import net.mgsx.gltf.scene3d.scene.Scene;
-import net.mgsx.gltf.scene3d.scene.SceneAsset;
-import net.mgsx.gltf.scene3d.scene.SceneManager;
-import net.mgsx.gltf.scene3d.utils.IBLBuilder;
 
 public class MainScreen implements Screen {
 
-    private Game game;
-    private Assets assets;
-    private Skin skin;
+    private final Game game;
+    private final Assets assets;
+    private final Skin skin;
 
-    private SceneManager sceneManager;
-    private SceneAsset sceneAsset;
-    private Scene scene;
-    private PerspectiveCamera camera;
-    private Cubemap diffuseCubemap;
-    private Cubemap environmentCubemap;
-    private Cubemap specularCubemap;
-    private Texture brdfLUT;
-    private float time;
-    private DirectionalShadowLight light;
-    private ShadowMap shadowMap;
+    private PerspectiveCamera cam;
+    private ModelBatch modelBatch;
+    private Array<ModelInstance> instances = new Array<>();
+    private Environment environment;
 
     private Stage stage;
-    private TextButton buttonMakeGame;
-    private ProgressBar progressBarGameMaking;
-    private Label labelDesign;
-    private Label labelProgramming;
-    private Label labelGameDesign;
-    private Label labelExperience;
-    private Label labelMoney;
-    private Label labelLevel;
-    private Table statsTable;
+    private TextButton makeGameButton;
+    private Button upgradeButton;
+    private ProgressBar gameMakingProgressBar;
+    private StatsTable statsTable;
 
+    private AnimationController animationController;
+    private ModelInstance instance;
+
+    private float time;
     private boolean isGameStarted = false;
     private boolean isGameInProgress = false;
+
+    private DirectionalShadowLight shadowLight;
+    private ModelBatch shadowBatch;
+
 
     public MainScreen(Game game) {
         this.game = game;
         this.assets = game.getAssets();
         this.skin = assets.getSkin();
 
-        // create scene
-        sceneAsset = new GLTFLoader().load(Gdx.files.internal("models/mobile_game.gltf"));
-        Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
-        scene = new Scene(sceneAsset.scene);
-        sceneManager = new SceneManager();
-        sceneManager.addScene(scene);
-
-        // setup camera (The BoomBox model is very small so you may need to adapt camera settings for your scene)
-        camera = new PerspectiveCamera(60f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.near = 0.02f;
-        camera.far = 10f;
-        camera.position.set(0.8f, 1.7f, 1.2f);
-        camera.lookAt(-0.5f,0.9f,0);
-        sceneManager.setCamera(camera);
-
-        // setup light
-        light = new DirectionalShadowLight(1024, 1024, 10f, 10f, 1f, 20f);
-        light.set(0.8f, 0.8f, 0.8f, -.4f, -.4f, -.4f);
-        sceneManager.environment.add(light);
-
-        // setup quick IBL (image based lighting)
-        IBLBuilder iblBuilder = IBLBuilder.createOutdoor(light);
-        environmentCubemap = iblBuilder.buildEnvMap(1024);
-        diffuseCubemap = iblBuilder.buildIrradianceMap(256);
-        specularCubemap = iblBuilder.buildRadianceMap(10);
-        iblBuilder.dispose();
-
-        // This texture is provided by the library, no need to have it in your assets.
-        brdfLUT = new Texture(Gdx.files.classpath("net/mgsx/gltf/shaders/brdfLUT.png"));
-
-        sceneManager.setAmbientLight(1f);
-        sceneManager.environment.set(new PBRTextureAttribute(PBRTextureAttribute.BRDFLUTTexture, brdfLUT));
-        sceneManager.environment.set(PBRCubemapAttribute.createSpecularEnv(specularCubemap));
-        sceneManager.environment.set(PBRCubemapAttribute.createDiffuseEnv(diffuseCubemap));
-
         createUIElements();
         setupUIListeners();
+        createScene();
     }
 
-    @Override
-    public void show() {
-        scene.animationController.setAnimation("coding_loop", -1);
+    private void createScene(){
+        modelBatch = new ModelBatch();
+        modelBatch.getRenderContext().setCullFace(GL20.GL_BACK);
+        environment = new Environment();
+        environment.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.8f, 0.8f, 0.8f, 1f));
+        environment.add((shadowLight = new DirectionalShadowLight(2048, 2048,
+                60f, 60f, .1f, 20f))
+                .set(1f, 1f, 1f, -.5f, -2f, -3.5f));
+        environment.shadowMap = shadowLight;
 
-        stage = new Stage();
-        Gdx.input.setInputProcessor(stage);
+        shadowBatch = new ModelBatch(new DepthShaderProvider());
 
-        stage.addActor(buttonMakeGame);
-        stage.addActor(progressBarGameMaking);
-        stage.addActor(statsTable);
+        cam = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        cam.position.set(0.8f, 1.6f, 1.1f);
+        cam.lookAt(-0.5f,0.9f,0);
+        cam.near = 1f;
+        cam.far = 300f;
+        cam.update();
 
-        resume();
+        Model model = assets.model;
+
+        for (int i = 0; i < model.nodes.size; i++) {
+            String id = model.nodes.get(i).id;
+            try {
+                if(id.equals("girl")){
+                    this.instance = new ModelInstance(model, id, "Armature");
+                    animationController = new AnimationController(instance);
+                    instances.add(instance);
+                } else {
+                    ModelInstance instance = new ModelInstance(model, id);
+                    instances.add(instance);
+                }
+            } catch (NullPointerException e){
+                System.out.println("\n" + id);
+                e.printStackTrace();
+            }
+        }
     }
 
     private void createUIElements(){
-        buttonMakeGame = new TextButton("Make a game", skin, "white_18");
+        makeGameButton = createTextButton("Make a game", skin, "white_18");
+        upgradeButton = createButton(skin, "store_button");
+        gameMakingProgressBar = new ProgressBar(0, 100, 1, false, skin, "default-horizontal");
 
-        buttonMakeGame.setSize(Gdx.graphics.getWidth() - Gdx.graphics.getWidth() / 5f, Gdx.graphics.getHeight() / 7f);
-        buttonMakeGame.setPosition(Gdx.graphics.getWidth() / 2f, 0);
+        upgradeButton.setPosition(getWidthPercent(0.05f), getHeightPercent(0.8f));
+        upgradeButton.setSize(getWidthPercent(0.18f), getWidthPercent(0.18f));
 
-        progressBarGameMaking = new ProgressBar(0, 100, 1, false, skin, "default");
+        makeGameButton.setPosition(getWidthPercent(0.1f), getHeightPercent(0.02f));
+        makeGameButton.setSize(getWidthPercent(0.84f), getHeightPercent(0.15f));
 
-        progressBarGameMaking.setPosition(Gdx.graphics.getWidth() / 2f - Gdx.graphics.getWidth() / 10f, 550);
+        gameMakingProgressBar.setPosition(getWidthPercent(0.38f), getHeightPercent(0.58f));
+        gameMakingProgressBar.setSize(getWidthPercent(0.3f), getHeightPercent(0.1f));
 
-        labelDesign = new Label("design: " + 1, skin, "white_18");
-        labelProgramming = new Label("programming: " + 1, skin, "white_18");
-        labelGameDesign = new Label("game design: " + 1, skin, "white_18");
-        labelExperience = new Label("exp: " + 1, skin, "white_18");
-        labelMoney = new Label("money: " + 1, skin, "white_18");
-        labelLevel = new Label("lvl: " + 1, skin, "white_18");
+        debug();
+    }
 
-        statsTable = new Table();
-        statsTable.setWidth(Gdx.graphics.getWidth());
-        statsTable.top().padTop(10f);
-        statsTable.add(labelLevel).padRight(20f);
-        statsTable.add(labelExperience).padRight(20f);
-        statsTable.add(labelDesign).padRight(20f);
-        statsTable.add(labelProgramming).padRight(20f);
-        statsTable.add(labelGameDesign).padRight(20f);
-        statsTable.add(labelMoney);
+    SellTable sellTable;
 
-        statsTable.setPosition(0, Gdx.graphics.getHeight());
+    private void debug(){
+        SellActor sellActor = new SellActor(game, "Name", 120, 20f);
+        SellActor sellActor1 = new SellActor(game, "Name", 15, 10f);
+
+        sellTable = new SellTable(game);
+
+        sellTable.addSellActor(sellActor);
+        sellTable.addSellActor(sellActor1);
+
+        sellTable.setPosition(getWidthPercent(.6f), getHeightPercent(0.7f));
+        sellTable.setSize(getWidthPercent(0.3f), getHeightPercent(0.2f));
+
+        sellActor.startSelling();
+        sellActor1.startSelling();
     }
 
     private void setupUIListeners() {
-        buttonMakeGame.addListener(new ClickListener() {
+        makeGameButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                buttonMakeGame.setVisible(false);
-
                 DialogThread dialogThread = new DialogThread(game,
                         stage,
-                        assets,
-                        10,
-                        0.4,
-                        0.4,
-                        0.2);
+                        15,
+                        0.3,
+                        0.3,
+                        0.3);
 
                 dialogThread.start();
             }
         });
+
+        upgradeButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setUpgradeScreen();
+            }
+        });
+    }
+
+    @Override
+    public void show() {
+        stage = new Stage();
+        Gdx.input.setInputProcessor(stage);
+
+        statsTable = new StatsTable(assets, game.stats);
+
+        stage.addActor(makeGameButton);
+        stage.addActor(upgradeButton);
+        stage.addActor(gameMakingProgressBar);
+        stage.addActor(sellTable);
+        stage.addActor(statsTable);
+
+        resume();
     }
 
     float value = 0f;
 
     @Override
     public void render(float delta) {
-        float deltaTime = Gdx.graphics.getDeltaTime();
-        time += deltaTime;
+        shadowLight.begin(Vector3.Zero, cam.direction);
+        shadowBatch.begin(shadowLight.getCamera());
+        shadowBatch.render(instances);
+        shadowBatch.end();
+        shadowLight.end();
 
+        Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        Gdx.graphics.getGL20().glEnable(GL20.GL_BLEND);
-        sceneManager.update(deltaTime);
-        sceneManager.render();
+
+        float deltaTime = Gdx.graphics.getDeltaTime();
+
+        animationController.update(deltaTime);
 
         if(isGameInProgress) {
             if (Math.round(deltaTime) % 2 == 0) {
                 value += 0.1;
             }
 
-            progressBarGameMaking.setValue(value);
+            gameMakingProgressBar.setValue(value);
 
             if (value >= 100) {
                 value = 0;
             }
         }
 
-        stage.act(Gdx.graphics.getDeltaTime());
+        modelBatch.begin(cam);
+        modelBatch.render(instances, environment);
+        modelBatch.end();
+
+        stage.act(deltaTime);
         stage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        sceneManager.updateViewport(width, height);
-        float buttonX = (width - buttonMakeGame.getWidth()) / 2f;
-        float buttonY = (height - buttonMakeGame.getHeight()) / 25f ;
-        buttonMakeGame.setPosition(buttonX, buttonY);
+        stage.getViewport().update(width, height, true);
     }
 
     @Override
     public void pause() {
-        this.isGameInProgress = false;
+        isGameInProgress = false;
     }
 
     @Override
     public void resume() {
         if(isGameStarted){
-            this.isGameInProgress = true;
+            isGameInProgress = true;
         }
     }
 
     @Override
     public void hide() {
-        this.isGameInProgress = false;
+        isGameInProgress = false;
     }
 
     @Override
     public void dispose() {
-        sceneManager.dispose();
-        sceneAsset.dispose();
-        environmentCubemap.dispose();
-        diffuseCubemap.dispose();
-        specularCubemap.dispose();
-        brdfLUT.dispose();
-        stage.dispose();
+        modelBatch.dispose();
+        instances.clear();
         assets.dispose();
+        stage.dispose();
     }
 
     public void setGameStarted(){
         isGameStarted = true;
         isGameInProgress = true;
-        buttonMakeGame.setVisible(false);
+        makeGameButton.setVisible(false);
         System.out.println("Game started");
+        animationController.setAnimation("coding_loop", -1);
     }
 
     public void setGameEnded(){
-        buttonMakeGame.setVisible(true);
+        makeGameButton.setVisible(true);
         isGameStarted = false;
         isGameInProgress = false;
         System.out.println("Game ended");
+        gameMakingProgressBar.setValue(0);
+        animationController.current = null;
+
+        Timer.Task sellGameThread = new Timer.Task() {
+            @Override
+            public void run() {
+                System.out.println("SellGameThread started");
+            }
+        };
+
+    }
+
+    public void setGameCanceled(){
+        makeGameButton.setVisible(true);
+        isGameStarted = false;
+        isGameInProgress = false;
+        System.out.println("Game canceled");
+        gameMakingProgressBar.setValue(0);
+        animationController.current = null;
     }
 }

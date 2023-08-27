@@ -1,5 +1,8 @@
 package com.mygdx.gamedevgarage.mini_games.selection_actors;
 
+import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
+import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
+
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -22,8 +25,10 @@ public class CheckList extends Table {
 
     private void addItems() {
         for (CheckListItem item : items) {
-            add(item).row();
-            addClickListener(item);
+            if(item.isPurchased()) {
+                add(item).width(getWidthPercent(.8f)).height(getHeightPercent(.15f)).row();
+                addClickListener(item);
+            }
         }
     }
 

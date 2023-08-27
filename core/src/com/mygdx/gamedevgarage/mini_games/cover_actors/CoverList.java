@@ -1,6 +1,8 @@
 package com.mygdx.gamedevgarage.mini_games.cover_actors;
 
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
+import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
+
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -10,45 +12,51 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.gamedevgarage.Assets;
+import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 
 public class CoverList extends Table {
+
     private final Array<CoverListItem> items;
-    private final Image img;
+    private final Image coverImage;
     private final CoverMainActor parent;
 
-    public CoverList(Array<CoverListItem> items, final Image img, boolean isColorList, final CoverMainActor parent, final Assets assets) {
+    public CoverList(Game game, Image coverImage, boolean isColorList, CoverMainActor parent, Assets assets) {
         super(assets.getSkin());
 
-        this.items = items;
-        this.img = img;
+        this.coverImage = coverImage;
         this.parent = parent;
 
         if(isColorList){
+            items = DataArrayFactory.initColors(assets);
             addColorItems();
         } else {
-            addObjectItems(assets.designObjectsAtlas);
+            items = DataArrayFactory.createCoverObjects(game);
+            addObjectItems();
         }
     }
 
     private void addColorItems() {
         for (CoverListItem item : items) {
-            add(item).row();
+            add(item).width(getWidthPercent(.85f)).height(getHeightPercent(.2f))
+                    .row();
             addClickListener(item);
         }
     }
 
-    private void addObjectItems(TextureAtlas objectsAtlas) {
-        final Array<CoverListItem> objects = parent.initObjects(objectsAtlas);
-        final int itemsPerRow = 28;
+    private void addObjectItems() {
+        int itemsPerRow = 41;
 
         for (int i = 0; i < items.size; i++) {
-            final CoverListItem item = items.get(i);
-            add(item).padRight(20).padTop(8).padBottom(10);
+            CoverListItem item = items.get(i);
+            if(item.isPurchased()) {
+                add(item).pad(5).width(item.getImage().getWidth()).height(item.getImage().getHeight());
 
-            if (i % itemsPerRow == itemsPerRow - 1) {
-                row();
+                if (i % itemsPerRow == itemsPerRow - 1) {
+                    row();
+                }
+                addClickListenerForObjects(item);
             }
-            addClickListenerForObjects(item, objects);
         }
     }
 
@@ -56,13 +64,13 @@ public class CoverList extends Table {
         item.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                img.setDrawable(item.getImage().getDrawable());
+                coverImage.setDrawable(item.getImage().getDrawable());
                 parent.setSelectedColor(item.getText());
             }
         });
     }
 
-    private void addClickListenerForObjects(final CoverListItem item, final Array<CoverListItem> objects) {
+    private void addClickListenerForObjects(final CoverListItem item) {
         item.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -80,15 +88,8 @@ public class CoverList extends Table {
 
                 item.getImage().addAction(clickAnimation);
 
-                String imageName = item.getText();
-
-                for (CoverListItem objItem : objects) {
-                    if (objItem.getText().equals(imageName)) {
-                        img.setDrawable(objItem.getImage().getDrawable());
-                        parent.setSelectedObject(objItem.getText());
-                        break;
-                    }
-                }
+                coverImage.setDrawable(item.getImage().getDrawable());
+                parent.setSelectedObject(item.getText());
             }
 
             @Override

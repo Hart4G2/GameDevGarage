@@ -1,188 +1,188 @@
 
 primary_color-atlas.png
-size: 2048, 64
+size: 2048, 256
 format: RGBA8888
 filter: Linear, Linear
 repeat: none
 black
   rotate: false
-  xy: 2, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 920, 104
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 blue
   rotate: false
-  xy: 54, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 104, 104
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 brown
   rotate: false
-  xy: 106, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 818, 2
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 dark_blue
   rotate: false
-  xy: 158, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 2, 2
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 dark_brown
   rotate: false
-  xy: 210, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 818, 104
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 dark_green
   rotate: false
-  xy: 262, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 1124, 2
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 dark_grey
   rotate: false
-  xy: 314, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 1022, 2
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 dark_purple
   rotate: false
-  xy: 366, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 512, 2
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 dark_red
   rotate: false
-  xy: 418, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 206, 2
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 dark_yellow
   rotate: false
-  xy: 470, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 308, 2
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 green
   rotate: false
-  xy: 522, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 1226, 2
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 grey
   rotate: false
-  xy: 574, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 1124, 104
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 light_blue
   rotate: false
-  xy: 626, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 2, 104
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 light_brown
   rotate: false
-  xy: 678, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 716, 2
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 light_green
   rotate: false
-  xy: 730, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 1226, 104
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 light_grey
   rotate: false
-  xy: 782, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 1022, 104
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 light_pink
   rotate: false
-  xy: 834, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 614, 2
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 light_purple
   rotate: false
-  xy: 886, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 512, 104
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 light_red
   rotate: false
-  xy: 938, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 206, 104
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 orange
   rotate: false
-  xy: 990, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 410, 2
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 pink
   rotate: false
-  xy: 1042, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 716, 104
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 purple
   rotate: false
-  xy: 1094, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 614, 104
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 red
   rotate: false
-  xy: 1146, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 104, 2
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 sandy
   rotate: false
-  xy: 1198, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 410, 104
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 white
   rotate: false
-  xy: 1250, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 920, 2
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1
 yellow
   rotate: false
-  xy: 1302, 2
-  size: 50, 50
-  orig: 50, 50
+  xy: 308, 104
+  size: 100, 100
+  orig: 100, 100
   offset: 0, 0
   index: -1

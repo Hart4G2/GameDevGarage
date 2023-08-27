@@ -1,6 +1,9 @@
 package com.mygdx.gamedevgarage.mini_games.selection_actors;
 
-import com.badlogic.gdx.Gdx;
+import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
+import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
+import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
+
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -27,6 +30,7 @@ public class CheckListItem extends Group {
     private float stateTime;
     private TextureRegionDrawable frame1;
     private TextureRegionDrawable frame2;
+    private boolean isPurchased;
 
     public CheckListItem(String text, TextureRegionDrawable frame1, TextureRegionDrawable frame2,
                          Drawable bgUnselected, Drawable bgSelected, Drawable imageFrameUnselected,
@@ -40,8 +44,6 @@ public class CheckListItem extends Group {
         this.frame1 = frame1;
         this.frame2 = frame2;
 
-        setSize(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 6f);
-
         initAnimation();
         initUIElements();
     }
@@ -53,25 +55,33 @@ public class CheckListItem extends Group {
         animation.setPlayMode(Animation.PlayMode.LOOP);
 
         stateTime = 0f;
+
+        float imagePosition = getHeightPercent(.0025f);
+        float imageSize = getHeightPercent(0.0975f);
+
         image = new Image(animation.getKeyFrame(stateTime));
-        image.setPosition(0, 14);
+        image.setPosition(imagePosition, imagePosition);
+        image.setSize(imageSize, imageSize);
     }
 
     private void initUIElements(){
-        label = new Label(text, skin, "default_18");
+        label = createLabel(text, skin, "default");
+
+        float imageSize = getHeightPercent(0.1f);
 
         backgroundImage = new Image(imageFrameUnselected);
-        backgroundImage.setPosition(-5, 9);
+        backgroundImage.setSize(imageSize, imageSize);
 
         Group imageGroup = new Group();
-        imageGroup.addActor(backgroundImage);
         imageGroup.addActor(image);
+        imageGroup.addActor(backgroundImage);
 
         mainTable = new Table();
         mainTable.setFillParent(true);
         mainTable.setBackground(bgUnselected);
-        mainTable.add(label).left().width(getWidth() - Gdx.graphics.getWidth() / 4f);
-        mainTable.add(imageGroup).right().padTop(130);
+        mainTable.add(label).left().width(getWidthPercent(.32f)).height(getHeightPercent(.15f))
+                .padRight(getWidthPercent(.04f)).padLeft(getWidthPercent(.08f));
+        mainTable.add(imageGroup).right().width(imageSize).height(imageSize);
 
         addActor(mainTable);
     }
@@ -88,7 +98,7 @@ public class CheckListItem extends Group {
         isSelected = false;
         mainTable.setBackground(bgUnselected);
         backgroundImage.setDrawable(imageFrameUnselected);
-        label.setStyle(skin.get("default_18", Label.LabelStyle.class));
+        label.setStyle(skin.get("black_18", Label.LabelStyle.class));
     }
 
     public void setSelected() {
@@ -104,5 +114,13 @@ public class CheckListItem extends Group {
         TextureRegionDrawable currentFrame = animation.getKeyFrame(stateTime);
 
         image.setDrawable(currentFrame);
+    }
+
+    public boolean isPurchased() {
+        return isPurchased;
+    }
+
+    public void setPurchased(boolean purchased) {
+        isPurchased = purchased;
     }
 }
