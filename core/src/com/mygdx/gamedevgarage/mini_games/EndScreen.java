@@ -1,5 +1,6 @@
 package com.mygdx.gamedevgarage.mini_games;
 
+import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -18,24 +19,24 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.mini_games.end_actor.NumberActor;
-import com.mygdx.gamedevgarage.mini_games.reward.Reward;
 import com.mygdx.gamedevgarage.stats.StatsTable;
 import com.mygdx.gamedevgarage.utils.data.GameObject;
+import com.mygdx.gamedevgarage.utils.data.GameFactory;
+
+import java.util.HashSet;
 
 public class EndScreen implements Screen {
 
-    private Game game;
-    private Assets assets;
-    private Skin skin;
+    private final Game game;
+    private final Skin skin;
     private Stage stage;
 
     private StatsTable statsTable;
-    private NumberActor numberActor;
     private TextButton okButton;
 
     public EndScreen(Game game) {
         this.game = game;
-        assets = game.getAssets();
+        Assets assets = game.getAssets();
         skin = assets.getSkin();
     }
 
@@ -49,13 +50,13 @@ public class EndScreen implements Screen {
     }
 
     private void createUIElements(){
-        statsTable = new StatsTable(assets, game.stats);
+        statsTable = createStatsTable(game);
 
         okButton = createTextButton("OK", skin, "white_18");
         okButton.setDisabled(true);
 
         game.reward.calculateScores();
-        numberActor = new NumberActor(game);
+        NumberActor numberActor = new NumberActor(game);
 
         Table table = new Table(skin);
         table.setFillParent(true);
@@ -91,6 +92,7 @@ public class EndScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 if(!okButton.isDisabled()){
                     createGameObject();
+                    game.getMainScreen().setGameEnded();
                     game.setMainScreen();
                 }
             }
@@ -98,27 +100,30 @@ public class EndScreen implements Screen {
     }
 
     private void createGameObject(){
-        Reward reward = game.reward;
-
-        String name = reward.name;
-        String color = reward.color;
-        String object = reward.object;
-        String[] technologies = reward.technologies.toArray(new String[0]);
-        String[] mechanics = reward.mechanics.toArray(new String[0]);
-        String platform = reward.platform;
-        int score = reward.getScore();
-        int profitMoney = reward.getProfitMoney();
-        float sellTime = reward.getSellTime();
-
-        GameObject gameObject = new GameObject(game, name, color, object, technologies,
-                mechanics, platform, score, profitMoney, sellTime);
+        int id = calculateId();
+        GameObject gameObject = GameFactory.createGameObject(game, id);
         game.addGame(gameObject);
+        gameObject.startSelling();
+    }
+
+    private int calculateId() {
+        HashSet<GameObject> games = game.getGames();
+        int id = 0;
+
+        for(GameObject game : games){
+            if(game.getId() >= id) {
+                id = game.getId() + 1;
+            }
+        }
+        return id;
     }
 
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        statsTable.update();
 
         stage.act(delta);
         stage.draw();

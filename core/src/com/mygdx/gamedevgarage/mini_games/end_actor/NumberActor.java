@@ -3,20 +3,15 @@ package com.mygdx.gamedevgarage.mini_games.end_actor;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
-import com.mygdx.gamedevgarage.mini_games.reward.Reward;
+import com.mygdx.gamedevgarage.utils.reward.Reward;
 
 public class NumberActor extends Table {
 
-    private Game game;
-    private Assets assets;
-    private Skin skin;
+    private final Game game;
 
     private int score;
     private int design = 1;
@@ -28,8 +23,6 @@ public class NumberActor extends Table {
     public NumberActor(Game game) {
         super(game.getAssets().getSkin());
         this.game = game;
-        this.assets = game.getAssets();
-        this.skin = assets.getSkin();
 
         Reward reward = game.reward;
 
@@ -44,12 +37,14 @@ public class NumberActor extends Table {
     }
 
     private void createUIElements(){
-        Drawable scoreIcon = new TextureRegionDrawable(new Texture("stats/score.png"));
-        Drawable expIcon = new TextureRegionDrawable(new Texture("stats/exp.png"));
-        Drawable lvlIcon = new TextureRegionDrawable(new Texture("stats/lvl.png"));
-        Drawable designIcon = new TextureRegionDrawable(new Texture("stats/design.png"));
-        Drawable programingIcon = new TextureRegionDrawable(new Texture("stats/programing.png"));
-        Drawable gameDesignIcon = new TextureRegionDrawable(new Texture("stats/game_design.png"));
+        Skin skin = getSkin();
+
+        Drawable scoreIcon = skin.getDrawable("score");
+        Drawable expIcon = skin.getDrawable("exp");
+        Drawable lvlIcon = skin.getDrawable("lvl");
+        Drawable designIcon = skin.getDrawable("design");
+        Drawable programingIcon = skin.getDrawable("programing");
+        Drawable gameDesignIcon = skin.getDrawable("game_design");
 
         String labelStyle100 = "white_100";
         String labelStyle32 = "white_32";

@@ -11,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 
@@ -21,14 +20,13 @@ public class CoverList extends Table {
     private final Image coverImage;
     private final CoverMainActor parent;
 
-    public CoverList(Game game, Image coverImage, boolean isColorList, CoverMainActor parent, Assets assets) {
-        super(assets.getSkin());
-
+    public CoverList(Game game, Image coverImage, boolean isColorList, CoverMainActor parent) {
+        super(game.getAssets().getSkin());
         this.coverImage = coverImage;
         this.parent = parent;
 
         if(isColorList){
-            items = DataArrayFactory.initColors(assets);
+            items = DataArrayFactory.initColors(game.getAssets());
             addColorItems();
         } else {
             items = DataArrayFactory.createCoverObjects(game);

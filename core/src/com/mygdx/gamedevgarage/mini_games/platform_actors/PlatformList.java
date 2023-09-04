@@ -13,16 +13,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.mini_games.PlatformScreen;
 import com.mygdx.gamedevgarage.mini_games.cover_actors.CoverListItem;
 import com.mygdx.gamedevgarage.utils.Utils;
+import com.mygdx.gamedevgarage.utils.data.GameFactory;
 
 public class PlatformList extends Table {
 
     private final Game game;
-    private final Assets assets;
     private final Skin skin;
     private final PlatformScreen parent;
 
@@ -34,10 +33,9 @@ public class PlatformList extends Table {
 
     public PlatformList(Array<CoverListItem> items, Game game, PlatformScreen parent) {
         super(game.getAssets().getSkin());
+        skin = getSkin();
         this.game = game;
         this.parent = parent;
-        this.assets = game.getAssets();
-        this.skin = assets.getSkin();
         this.unSelected = new TextureRegionDrawable(new Texture(Gdx.files.internal("platform_item.png")));
         this.selected = new TextureRegionDrawable(new Texture(Gdx.files.internal("platform_item_selected.png")));
         this.items = items;
@@ -90,7 +88,7 @@ public class PlatformList extends Table {
         int money = game.stats.getMoney();
 
         if(money >= 10){
-            parent.getStatsTable().setMoney(money - 10);
+            game.stats.setMoney(money - 10);
 
             for (int i = 0; i < items.size; i++) {
                 CoverListItem item = items.get(i);
@@ -114,7 +112,7 @@ public class PlatformList extends Table {
     }
 
     private void selectPlatform(CoverListItem item){
-        String selectedPlatform = game.reward.platform;
+        String selectedPlatform = GameFactory.platform;
 
         if(selectedPlatform == null || !selectedPlatform.equals(item.getText())){
             for(CoverListItem platform : items){

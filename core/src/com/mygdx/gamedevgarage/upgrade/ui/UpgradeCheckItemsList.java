@@ -1,60 +1,76 @@
 package com.mygdx.gamedevgarage.upgrade.ui;
 
+import static com.mygdx.gamedevgarage.utils.constraints.Constants.UPGRADE_MECHANIC_COST;
+import static com.mygdx.gamedevgarage.utils.constraints.Constants.UPGRADE_TECHNOLOGY_COST;
+import static com.mygdx.gamedevgarage.utils.Utils.createBuyButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
+import static com.mygdx.gamedevgarage.utils.data.DataArrayFactory.createMechanics;
+import static com.mygdx.gamedevgarage.utils.data.DataArrayFactory.createTechnologies;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.mini_games.selection_actors.CheckListItem;
-import com.mygdx.gamedevgarage.stats.StatsTable;
-import com.mygdx.gamedevgarage.upgrade.UpgradeScreen;
-import com.mygdx.gamedevgarage.utils.Utils;
-import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 
 public class UpgradeCheckItemsList extends Table {
 
     private final Game game;
-    private final Assets assets;
     private final Skin skin;
-    private final StatsTable statsTable;
 
     private final boolean isTechnology;
     private final String buttonText;
+    private final Drawable buttonIcon;
 
-    private Array<CheckListItem> items;
-    private Array<TextButton> buttons;
+    private final Array<CheckListItem> items;
+    private final Array<TextButton> buttons;
 
-    public UpgradeCheckItemsList(Game game, UpgradeScreen parent, boolean isTechnology) {
+    public UpgradeCheckItemsList(Game game, boolean isTechnology) {
         super(game.getAssets().getSkin());
+        skin = getSkin();
         this.game = game;
-        this.assets = game.getAssets();
-        this.skin = assets.getSkin();
-        this.statsTable = parent.getStatsTable();
         this.isTechnology = isTechnology;
-        this.items = isTechnology ? DataArrayFactory.createTechnologies(game) : DataArrayFactory.createMechanics(game);
-        this.buttonText = isTechnology ? "2 P" : "2 GD";
+        this.items = isTechnology ? createTechnologies(game) : createMechanics(game);
+        this.buttonText = String.valueOf(isTechnology ? UPGRADE_TECHNOLOGY_COST : UPGRADE_MECHANIC_COST);
+        this.buttonIcon = isTechnology ? getSkin().getDrawable("programing") : getSkin().getDrawable("game_design");
 
         buttons = new Array<>();
-
         addItems();
     }
 
     private void addItems() {
         for (CheckListItem item : items) {
-            TextButton button = Utils.createBuyButton(buttonText, skin, item.getText());
-            buttons.add(button);
-            addClickListener(button);
-            add(item).width(getWidthPercent(.7f)).height(getHeightPercent(.15f))
-                    .padRight(getWidthPercent(.001f));
-            add(button).width(getWidthPercent(.2f)).height(getWidthPercent(.2f))
-                    .row();
+            if(!item.isPurchased()) {
+                TextButton button = createTextButton(item.getText());
+
+                buttons.add(button);
+                addClickListener(button);
+
+                add(item).width(getWidthPercent(.7f)).height(getHeightPercent(.15f))
+                        .padRight(getWidthPercent(.001f));
+                add(button).width(getWidthPercent(.21f)).height(getWidthPercent(.2f))
+                        .row();
+            }
         }
+    }
+
+    private TextButton createTextButton(String text){
+        TextButton button = createBuyButton(buttonText, skin, text);
+
+        Image image = new Image(buttonIcon);
+        float imageSize = getWidthPercent(.06f);
+
+        button.getLabelCell().width(imageSize).height(imageSize)
+                .fill(false).expand(false, false);
+        button.add(image).width(imageSize).height(imageSize);
+
+        return button;
     }
 
     private void addClickListener(final TextButton button) {
@@ -66,29 +82,36 @@ public class UpgradeCheckItemsList extends Table {
         });
     }
 
-    private void buttonClicked(final TextButton button){
+    private void buttonClicked(final TextButton button) {
         int property = isTechnology ? game.stats.getProgramming() : game.stats.getGameDesign();
+        int cost = isTechnology ? UPGRADE_TECHNOLOGY_COST : UPGRADE_MECHANIC_COST;
 
-        if(property >= 2){
+        if (property >= cost) {
             for (int i = 0; i < items.size; i++) {
                 CheckListItem item = items.get(i);
                 String itemText = item.getText();
 
-                if(itemText.equals(button.getName())){
-                    if(isTechnology){
-                        statsTable.setProgramming(property - 2);
+                if (itemText.equals(button.getName())) {
+                    if (isTechnology) {
+                        game.stats.setProgramming(property - cost);
                         game.setTechnologyPurchased(itemText);
                     } else {
-                        statsTable.setGameDesign(property - 2);
+                        game.stats.setGameDesign(property - cost);
                         game.setMechanicPurchased(itemText);
                     }
 
-                    removeActor(item);
-                    removeActor(button);
+                    removeActor(item, button);
                     break;
                 }
             }
         }
+    }
+
+    private void removeActor(CheckListItem actor, TextButton button) {
+        items.removeValue(actor, true);
+        buttons.removeValue(button, true);
+        clear();
+        addItems();
     }
 
     public void render(float delta){

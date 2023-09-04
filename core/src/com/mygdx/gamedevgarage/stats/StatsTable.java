@@ -6,13 +6,10 @@ import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.mygdx.gamedevgarage.Assets;
 
 public class StatsTable extends Table {
 
-    private Assets assets;
-    private Skin skin;
-    private Stats stats;
+    private final Stats stats;
 
     private Property lvl;
     private Property exp;
@@ -21,22 +18,22 @@ public class StatsTable extends Table {
     private Property programming;
     private Property gameDesign;
 
-    public StatsTable(Assets assets, Stats stats) {
-        super(assets.getSkin());
-        this.assets = assets;
-        this.skin = assets.getSkin();
+    public StatsTable(Skin skin, Stats stats) {
+        super(skin);
         this.stats = stats;
 
         createUIElements();
     }
 
     private void createUIElements(){
-        lvl = new Property("lvl", stats.getLevel(), assets);
-        exp = new Property("exp", stats.getExperience(), assets);
-        design = new Property("design", stats.getDesign(), assets);
-        programming = new Property("programing", stats.getProgramming(), assets);
-        gameDesign = new Property("game design", stats.getGameDesign(), assets);
-        money = new Property("money", stats.getMoney(), assets);
+        Skin skin = getSkin();
+
+        lvl = new Property("lvl", stats.getLevel(), skin);
+        exp = new Property("exp", stats.getExperience(), skin);
+        design = new Property("design", stats.getDesign(), skin);
+        programming = new Property("programing", stats.getProgramming(), skin);
+        gameDesign = new Property("game design", stats.getGameDesign(), skin);
+        money = new Property("money", stats.getMoney(), skin);
 
         setSize(getWidthPercent(.96f), getHeightPercent(.03f));
         setPosition(getWidthPercent(.04f), Gdx.graphics.getHeight());
@@ -59,33 +56,12 @@ public class StatsTable extends Table {
         money.setLabelStyle(style);
     }
 
-    public void setLvl(int value) {
-        lvl.setValue(value);
-        stats.setLevel(value);
-    }
-
-    public void setExp(int value) {
-        exp.setValue(value);
-        stats.setExperience(value);
-    }
-
-    public void setMoney(int value) {
-        money.setValue(value);
-        stats.setMoney(value);
-    }
-
-    public void setDesign(int value) {
-        design.setValue(value);
-        stats.setDesign(value);
-    }
-
-    public void setProgramming(int value) {
-        programming.setValue(value);
-        stats.setProgramming(value);
-    }
-
-    public void setGameDesign(int value) {
-        gameDesign.setValue(value);
-        stats.setGameDesign(value);
+    public void update() {
+        lvl.setValue(stats.getLevel());
+        exp.setValue(stats.getExperience());
+        money.setValue(stats.getMoney());
+        design.setValue(stats.getDesign());
+        programming.setValue(stats.getProgramming());
+        gameDesign.setValue(stats.getGameDesign());
     }
 }

@@ -16,7 +16,6 @@ public class CheckList extends Table {
 
     public CheckList(Array<CheckListItem> items, final MiniGameScreen parent, final Assets assets) {
         super(assets.getSkin());
-
         this.items = items;
         this.parent = parent;
 

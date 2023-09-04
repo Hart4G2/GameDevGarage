@@ -1,5 +1,7 @@
 package com.mygdx.gamedevgarage.mini_games;
 
+import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
+import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
@@ -10,13 +12,13 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
@@ -24,17 +26,19 @@ import com.mygdx.gamedevgarage.mini_games.selection_actors.CheckList;
 import com.mygdx.gamedevgarage.mini_games.selection_actors.CheckListItem;
 import com.mygdx.gamedevgarage.stats.StatsTable;
 import com.mygdx.gamedevgarage.utils.DialogThread;
+import com.mygdx.gamedevgarage.utils.data.GameFactory;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 
 import java.util.ArrayList;
 
 public class GameDesignScreen implements Screen, MiniGameScreen {
 
-    private Game game;
-    private Assets assets;
-    private Skin skin;
+    private final Game game;
+    private final Assets assets;
+    private final Skin skin;
     private Stage stage;
 
+    private Label headerLabel;
     private Button okButton;
     private Array<CheckListItem> mechanics;
     private CheckList mechanicList;
@@ -56,7 +60,7 @@ public class GameDesignScreen implements Screen, MiniGameScreen {
     }
 
     private void createUIElements(){
-        game.reward.mechanics = new ArrayList<>();
+        GameFactory.mechanics = new ArrayList<>();
         mechanics = DataArrayFactory.createMechanics(game);
 
         mechanicList = new CheckList(mechanics, this, assets);
@@ -65,6 +69,8 @@ public class GameDesignScreen implements Screen, MiniGameScreen {
         scrollPane.setFillParent(true);
         scrollPane.setScrollbarsVisible(true);
 
+        headerLabel = createLabel("Choose technologies", skin, "white_20");
+
         okButton = new TextButton("OK", skin, "white_18");
         okButton.setDisabled(true);
 
@@ -72,15 +78,21 @@ public class GameDesignScreen implements Screen, MiniGameScreen {
         group.addActor(scrollPane);
         group.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 1.15f);
 
-        statsTable = new StatsTable(assets, game.stats);
+        statsTable = createStatsTable(game);
         statsTable.setLabelsStyle("black_18");
 
         Table table = new Table(skin);
         table.setFillParent(true);
+        table.add(headerLabel)
+                .pad(getHeightPercent(.07f), 0, getHeightPercent(.003f), 0)
+                .colspan(2).center()
+                .row();
         table.add(group).width(getWidthPercent(1f)).height(getHeightPercent(.78f))
-                .pad(40, 0, 20, 0).row();
+                .pad(getHeightPercent(.001f), 0, getHeightPercent(.001f), 0)
+                .row();
         table.add(okButton).width(getWidthPercent(.5f)).height(getHeightPercent(.08f))
-                .colspan(2).center().row();
+                .colspan(2).center()
+                .row();
 
         stage.addActor(table);
         stage.addActor(statsTable);
@@ -94,8 +106,7 @@ public class GameDesignScreen implements Screen, MiniGameScreen {
             public void clicked(InputEvent event, float x, float y) {
                 if(!okButton.isDisabled()){
                     game.setMainScreen();
-                    DialogThread.getGameDesignThread().cancel();
-                    new Timer().scheduleTask(DialogThread.getPlatformThread(), DialogThread.getGameDesignTime());
+                    DialogThread.setPlatformThread();
                 }
             }
         });
@@ -107,6 +118,8 @@ public class GameDesignScreen implements Screen, MiniGameScreen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         mechanicList.render(delta);
+
+        statsTable.update();
 
         stage.act(delta);
         stage.draw();
@@ -139,15 +152,15 @@ public class GameDesignScreen implements Screen, MiniGameScreen {
 
     @Override
     public void addItem(String item) {
-        game.reward.mechanics.add(item);
+        GameFactory.mechanics.add(item);
         okButton.setDisabled(false);
     }
 
     @Override
     public void removeItem(String item) {
-        if(game.reward.mechanics.contains(item)){
-            game.reward.mechanics.remove(item);
-            if(game.reward.mechanics.size() == 0){
+        if(GameFactory.mechanics.contains(item)){
+            GameFactory.mechanics.remove(item);
+            if(GameFactory.mechanics.size() == 0){
                 okButton.setDisabled(true);
             }
         }

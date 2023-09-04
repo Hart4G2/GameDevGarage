@@ -4,13 +4,16 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.Json;
 import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.utils.constraints.GameState;
+import com.mygdx.gamedevgarage.utils.data.GameFactory;
+import com.mygdx.gamedevgarage.utils.data.GameObject;
 
 import java.util.HashMap;
 import java.util.HashSet;
 
 public class DataManager {
 
-    private Game game;
+    private final Game game;
 
     public DataManager(Game game) {
         this.game = game;
@@ -19,6 +22,8 @@ public class DataManager {
     public void save() {
         saveData();
         saveStats();
+        saveGameState();
+        saveGames();
     }
 
     private void saveData() {
@@ -57,6 +62,26 @@ public class DataManager {
         prefs.flush();
     }
 
+    public void saveGameState() {
+        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+
+        String json = new Json().toJson(game.gameState);
+        prefs.putString("gameState", json);
+        json = new Json().toJson(game.isGameStarted);
+        prefs.putString("isGameStarted", json);
+        json = new Json().toJson(GameFactory.getProcessData());
+        prefs.putString("gameData", json);
+        prefs.flush();
+    }
+
+    public void saveGames() {
+        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+
+        String jsonStr = new Json().toJson(game.getGames());
+        prefs.putString("games", jsonStr);
+        prefs.flush();
+    }
+
     public HashSet<String> getCovers() {
         return getData(HashSet.class, "purchasedCovers", new HashSet());
     }
@@ -75,6 +100,22 @@ public class DataManager {
 
     public HashMap<String, Integer> getStats() {
         return getData(HashMap.class, "stats", new HashMap<String, Integer>());
+    }
+
+    public boolean isGameStarted() {
+        return getData(Boolean.class, "isGameStarted", false);
+    }
+
+    public GameState getGameState() {
+        return getData(GameState.class, "gameState", null);
+    }
+
+    public HashMap<String, String> getGameData() {
+        return getData(HashMap.class, "gameData", new HashMap<String, String>());
+    }
+
+    public HashSet<GameObject> getGames() {
+        return getData(HashSet.class, "games", new HashSet<>());
     }
 
     private <T> T getData(Class<T> type, String prefKey, T defaultValue) {

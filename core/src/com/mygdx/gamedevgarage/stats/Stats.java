@@ -23,15 +23,15 @@ public class Stats {
     }
 
     public void setLevel(int level) {
-        this.level = level;
+        this.level = Math.min(level, 9);
     }
 
     public int getExperience() {
         return experience;
     }
 
-    public void setExperience(int experience) {
-        this.experience = experience;
+    public void setExperience(int experience, int requiredExp) {
+        this.experience = experience - requiredExp;
     }
 
     public int getDesign() {
@@ -39,9 +39,7 @@ public class Stats {
     }
 
     public void setDesign(int design) {
-        if(this.design <= 100){
-            this.design = design;
-        }
+        this.design = Math.min(design, 100);
     }
 
     public int getProgramming() {
@@ -49,9 +47,7 @@ public class Stats {
     }
 
     public void setProgramming(int programming) {
-        if(this.programming <= 100){
-            this.programming = programming;
-        }
+        this.programming = Math.min(programming, 100);
     }
 
     public int getGameDesign() {
@@ -59,9 +55,7 @@ public class Stats {
     }
 
     public void setGameDesign(int gameDesign) {
-        if(this.gameDesign <= 100){
-            this.gameDesign = gameDesign;
-        }
+        this.gameDesign = Math.min(gameDesign, 100);
     }
 
     public int getMoney() {
@@ -69,8 +63,6 @@ public class Stats {
     }
 
     public void setMoney(int money) {
-        this.money = money;
+        this.money = Math.min(money, 100);
     }
-
-
 }

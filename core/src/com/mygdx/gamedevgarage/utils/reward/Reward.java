@@ -1,9 +1,12 @@
-package com.mygdx.gamedevgarage.mini_games.reward;
+package com.mygdx.gamedevgarage.utils.reward;
+
+import static com.mygdx.gamedevgarage.utils.data.GameFactory.genre;
+import static com.mygdx.gamedevgarage.utils.data.GameFactory.object;
+import static com.mygdx.gamedevgarage.utils.data.GameFactory.theme;
 
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.utils.Utils;
 
-import java.util.List;
 import java.util.Random;
 
 public class Reward {
@@ -58,16 +61,7 @@ public class Reward {
             "Push to free web", "Buy a place in play store", "Create a site", "Buy a popular site"
     };
 
-    public String name;
-    public String theme;
-    public String genre;
-    public String color;
-    public String object;
-    public List<String> technologies;
-    public List<String> mechanics;
-    public String platform;
-
-    private Game game;
+    private final Game game;
 
     public Reward(Game game) {
         this.game = game;
@@ -78,6 +72,7 @@ public class Reward {
     private int gameDesign;
     private int score;
     private int exp;
+    private int requiredExp;
     private int lvl;
     private int profitMoney;
     private int sellTime;
@@ -529,42 +524,38 @@ public class Reward {
     }
 
     private void calculateLevel() {
-        int required;
-        int oldExp = game.stats.getExperience();
+        requiredExp = 0;
         int oldLvl = game.stats.getLevel();
 
         switch (oldLvl) {
             case 1:
-                required = 50;
+                requiredExp = 50;
                 break;
             case 2:
-                required = 75;
+                requiredExp = 75;
                 break;
             case 3:
-                required = 100;
+                requiredExp = 100;
                 break;
             case 4:
-                required = 150;
+                requiredExp = 150;
                 break;
             case 5:
-                required = 175;
+                requiredExp = 175;
                 break;
             default:
-                required = 200;
+                requiredExp = 200;
                 break;
         }
 
-        oldExp += exp;
-        setExp(oldExp, required);
-    }
+        int newExp = game.stats.getExperience() + exp;
 
-    private void setExp(int exp, int required) {
-        if (exp >= required) {
-            this.exp = exp - required;
+        if (newExp >= requiredExp) {
             lvl = game.stats.getLevel() + 1;
+        } else {
+            lvl = game.stats.getLevel();
+            requiredExp = 0;
         }
-        this.exp = exp;
-        lvl = game.stats.getLevel();
     }
 
     public int getDesign() {
@@ -604,6 +595,6 @@ public class Reward {
         game.stats.setProgramming(game.stats.getProgramming() + programming);
         game.stats.setGameDesign(game.stats.getGameDesign() + gameDesign);
         game.stats.setLevel(lvl);
-        game.stats.setExperience(exp);
+        game.stats.setExperience(game.stats.getExperience() + exp, requiredExp);
     }
 }

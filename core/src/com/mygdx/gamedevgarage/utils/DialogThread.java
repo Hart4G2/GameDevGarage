@@ -3,94 +3,81 @@ package com.mygdx.gamedevgarage.utils;
 import static com.badlogic.gdx.utils.Timer.Task;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Timer;
-import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
-import com.mygdx.gamedevgarage.MainScreen;
+import com.mygdx.gamedevgarage.utils.constraints.Constants;
+import com.mygdx.gamedevgarage.utils.constraints.GameState;
+import com.mygdx.gamedevgarage.utils.data.GameFactory;
 
 public class DialogThread {
 
     private static Game game;
-    private static Assets assets;
-    private static Stage stage;
 
-    private static MainScreen mainScreen;
-    private static long designTime;
-    private static long programmingTime;
-    private static long gameDesignTime;
-
-    public DialogThread(Game game, Stage stage, long mainTime, double designPercent,
-                        double programmingPercent, double gameDesignPercent) {
+    public DialogThread(Game game) {
         DialogThread.game = game;
-        DialogThread.stage = stage;
-        DialogThread.assets = game.getAssets();
-        DialogThread.mainScreen = game.getMainScreen();
-        designTime = Math.round(mainTime * designPercent);
-        programmingTime = Math.round(mainTime * programmingPercent);
-        gameDesignTime = Math.round(mainTime * gameDesignPercent);
     }
 
     public void start(){
         mainThread.run();
     }
 
-    private static Task mainThread = new Task() {
+    private static final Task mainThread = new Task() {
         @Override
         public void run() {
-            System.out.println("mainThread started");
-            mainScreen.setGameStarted();
+            game.getMainScreen().setGameStarted();
+            game.gameState = GameState.MAIN;
             openGameMakeDialog();
+            System.out.println("mainThread started");
         }
     };
 
-    private static Task designThread = new Task() {
+    private static final Task designThread = new Task() {
         @Override
         public void run() {
             game.setCoverScreen();
+            game.gameState = GameState.DESIGN;
             System.out.println("designThread started");
         }
     };
 
-    private static Task programmingThread = new Task() {
+    private static final Task programmingThread = new Task() {
         @Override
         public void run() {
             game.setTechScreen();
+            game.gameState = GameState.PROGRAMMING;
             System.out.println("programmingThread started");
         }
     };
 
-    private static Task gameDesignThread = new Task() {
+    private static final Task gameDesignThread = new Task() {
         @Override
         public void run() {
             game.setMechanicScreen();
-
+            game.gameState = GameState.GAMEDESIGN;
             System.out.println("gameDesignThread started");
         }
     };
 
-    private static Task platformThread = new Task() {
+    private static final Task platformThread = new Task() {
         @Override
         public void run() {
             game.setPlatformScreen();
-
+            game.gameState = GameState.PLATFORM;
             System.out.println("platformThread started");
         }
     };
 
-    private static Task endGameThread = new Task() {
+    private static final Task endGameThread = new Task() {
         @Override
         public void run() {
             game.setEndScreen();
-
+            game.gameState = GameState.END;
             System.out.println("EndGameThread started");
-            mainScreen.setGameEnded();
-            endGameThread.cancel();
         }
     };
 
@@ -112,10 +99,10 @@ public class DialogThread {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 dialog.hide();
-                new Timer().scheduleTask(designThread, 1);
-                game.reward.genre = genreSelectBox.getSelected();
-                game.reward.theme = themesSelectBox.getSelected();
-                game.reward.name = nameTextField.getText();
+                DialogThread.setDesignThread();
+                GameFactory.genre = genreSelectBox.getSelected();
+                GameFactory.theme = themesSelectBox.getSelected();
+                GameFactory.name = nameTextField.getText();
             }
         });
 
@@ -123,42 +110,30 @@ public class DialogThread {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 dialog.hide();
-                mainScreen.setGameCanceled();
+                game.getMainScreen().setGameCanceled();
             }
         });
 
-        dialog.show(stage);
+        dialog.show(game.getMainScreen().getStage());
     }
 
-    public static long getDesignTime() {
-        return designTime;
+    public static void setDesignThread() {
+        new Timer().scheduleTask(designThread, Constants.MAIN_TIME);
     }
 
-    public static long getProgrammingTime() {
-        return programmingTime;
+    public static void setProgrammingThread() {
+        new Timer().scheduleTask(programmingThread, Constants.DESIGN_TIME);
     }
 
-    public static long getGameDesignTime() {
-        return gameDesignTime;
+    public static void setGameDesignThread() {
+        new Timer().scheduleTask(gameDesignThread, Constants.PROGRAMING_TIME);
     }
 
-    public static Task getDesignThread() {
-        return designThread;
+    public static void setEndGameThread() {
+        new Timer().scheduleTask(endGameThread, Constants.MAIN_TIME);
     }
 
-    public static Task getProgrammingThread() {
-        return programmingThread;
-    }
-
-    public static Task getGameDesignThread() {
-        return gameDesignThread;
-    }
-
-    public static Task getEndGameThread() {
-        return endGameThread;
-    }
-
-    public static Task getPlatformThread() {
-        return platformThread;
+    public static void setPlatformThread() {
+        new Timer().scheduleTask(platformThread, Constants.GAME_DESIGN_TIME);
     }
 }

@@ -1,5 +1,8 @@
 package com.mygdx.gamedevgarage.mini_games;
 
+import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
+import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
+import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
@@ -10,13 +13,12 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
@@ -25,6 +27,7 @@ import com.mygdx.gamedevgarage.mini_games.selection_actors.CheckListItem;
 import com.mygdx.gamedevgarage.stats.StatsTable;
 import com.mygdx.gamedevgarage.utils.DialogThread;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
+import com.mygdx.gamedevgarage.utils.data.GameFactory;
 
 import java.util.ArrayList;
 
@@ -35,6 +38,7 @@ public class ProgrammingScreen implements Screen, MiniGameScreen {
     private Skin skin;
     private Stage stage;
 
+    private Label headerLabel;
     private Button okButton;
     private CheckList techList;
     private StatsTable statsTable;
@@ -57,7 +61,7 @@ public class ProgrammingScreen implements Screen, MiniGameScreen {
     }
 
     private void createUIElements(){
-        game.reward.technologies = new ArrayList<>();
+        GameFactory.technologies = new ArrayList<>();
         technologies = DataArrayFactory.createTechnologies(game);
 
         techList = new CheckList(technologies, this, assets);
@@ -66,21 +70,29 @@ public class ProgrammingScreen implements Screen, MiniGameScreen {
         scrollPane.setFillParent(true);
         scrollPane.setScrollbarsVisible(true);
 
-        okButton = new TextButton("OK", skin, "white_18");
+        headerLabel = createLabel("Choose technologies", skin, "white_20");
+
+        okButton = createTextButton("OK", skin, "white_18");
         okButton.setDisabled(true);
 
         Group group = new Group();
         group.addActor(scrollPane);
         group.setSize(getWidthPercent(1f), getHeightPercent(0.86f));
 
-        statsTable = new StatsTable(assets, game.stats);
+        statsTable = createStatsTable(game);
 
         Table table = new Table(skin);
         table.setFillParent(true);
+        table.add(headerLabel)
+                .pad(getHeightPercent(.07f), 0, getHeightPercent(.003f), 0)
+                .colspan(2).center()
+                .row();
         table.add(group).width(getWidthPercent(1f)).height(getHeightPercent(.78f))
-                .pad(40, 0, 20, 0).row();
+                .pad(getHeightPercent(.001f), 0, getHeightPercent(.001f), 0)
+                .row();
         table.add(okButton).width(getWidthPercent(.5f)).height(getHeightPercent(.08f))
-                .colspan(2).center().row();
+                .colspan(2).center()
+                .row();
 
         stage.addActor(table);
         stage.addActor(statsTable);
@@ -94,8 +106,7 @@ public class ProgrammingScreen implements Screen, MiniGameScreen {
             public void clicked(InputEvent event, float x, float y) {
                 if(!okButton.isDisabled()){
                     game.setMainScreen();
-                    DialogThread.getProgrammingThread().cancel();
-                    new Timer().scheduleTask(DialogThread.getGameDesignThread(), DialogThread.getProgrammingTime());
+                    DialogThread.setGameDesignThread();
                 }
             }
         });
@@ -107,6 +118,8 @@ public class ProgrammingScreen implements Screen, MiniGameScreen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         techList.render(delta);
+
+        statsTable.update();
 
         stage.act(delta);
         stage.draw();
@@ -139,15 +152,15 @@ public class ProgrammingScreen implements Screen, MiniGameScreen {
 
     @Override
     public void addItem(String item) {
-        game.reward.technologies.add(item);
+        GameFactory.technologies.add(item);
         okButton.setDisabled(false);
     }
 
     @Override
     public void removeItem(String item) {
-        if(game.reward.technologies.contains(item)){
-            game.reward.technologies.remove(item);
-            if(game.reward.technologies.size() == 0){
+        if(GameFactory.technologies.contains(item)){
+            GameFactory.technologies.remove(item);
+            if(GameFactory.technologies.size() == 0){
                 okButton.setDisabled(true);
             }
         }

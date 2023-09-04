@@ -3,7 +3,6 @@ package com.mygdx.gamedevgarage;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -34,6 +33,7 @@ public class Assets {
         assetManager = new AssetManager();
         loadAllAssets();
     }
+    //		characters: "0123456789!@#$%^&*()_+-=?/.><,`~'\";:|\\abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
 
     private void loadAllAssets() {
         AssetManager assetManager = new AssetManager();
@@ -53,12 +53,7 @@ public class Assets {
         platformAtlas = assetManager.get("design_items/platforms/platform-atlas.atlas", TextureAtlas.class);
         model = assetManager.get("models/mobile_game_background.g3db", Model.class);
 
-        transparent = new TextureRegionDrawable(new Texture("transparent.png"));
-        frame = new TextureRegionDrawable(new Texture("frame.png"));
-
         skin = new Skin(Gdx.files.internal("skin/skin.json")) {
-            //Override json loader to process FreeType fonts from skin JSON
-
             @Override
             protected Json getJsonLoader(final FileHandle skinFile) {
                 Json json = super.getJsonLoader(skinFile);
@@ -84,6 +79,7 @@ public class Assets {
                         jsonData.remove("magFilter");
 
                         FreeTypeFontParameter parameter = json.readValue(FreeTypeFontParameter.class, jsonData);
+                        parameter.size = Gdx.graphics.getHeight() / (900 / parameter.size);
                         parameter.hinting = hinting;
                         parameter.minFilter = minFilter;
                         parameter.magFilter = magFilter;
@@ -102,6 +98,9 @@ public class Assets {
                 return json;
             }
         };
+
+        transparent = (TextureRegionDrawable) skin.getDrawable("transparent");
+        frame = (TextureRegionDrawable) skin.getDrawable("frame");
     }
 
     // 0123456789!@#$%^&*()_+-=?/.><,`~'\";:|\\abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ

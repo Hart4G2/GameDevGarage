@@ -1,6 +1,7 @@
 package com.mygdx.gamedevgarage;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createButton;
+import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -22,15 +23,18 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Timer;
 import com.mygdx.gamedevgarage.main_actors.SellActor;
 import com.mygdx.gamedevgarage.main_actors.SellTable;
 import com.mygdx.gamedevgarage.stats.StatsTable;
-import com.mygdx.gamedevgarage.utils.DialogThread;
+import com.mygdx.gamedevgarage.utils.data.GameFactory;
+import com.mygdx.gamedevgarage.utils.data.GameObject;
+
+import java.util.ArrayList;
 
 public class MainScreen implements Screen {
 
@@ -40,20 +44,20 @@ public class MainScreen implements Screen {
 
     private PerspectiveCamera cam;
     private ModelBatch modelBatch;
-    private Array<ModelInstance> instances = new Array<>();
+    private final Array<ModelInstance> instances = new Array<>();
     private Environment environment;
 
     private Stage stage;
     private TextButton makeGameButton;
     private Button upgradeButton;
+    private Button collectionButton;
     private ProgressBar gameMakingProgressBar;
     private StatsTable statsTable;
+    private SellTable sellTable;
+    private ScrollPane sellScrollPane;
 
     private AnimationController animationController;
-    private ModelInstance instance;
 
-    private float time;
-    private boolean isGameStarted = false;
     private boolean isGameInProgress = false;
 
     private DirectionalShadowLight shadowLight;
@@ -94,14 +98,14 @@ public class MainScreen implements Screen {
         for (int i = 0; i < model.nodes.size; i++) {
             String id = model.nodes.get(i).id;
             try {
+                ModelInstance instance;
                 if(id.equals("girl")){
-                    this.instance = new ModelInstance(model, id, "Armature");
+                    instance = new ModelInstance(model, id, "Armature");
                     animationController = new AnimationController(instance);
-                    instances.add(instance);
                 } else {
-                    ModelInstance instance = new ModelInstance(model, id);
-                    instances.add(instance);
+                    instance = new ModelInstance(model, id);
                 }
+                instances.add(instance);
             } catch (NullPointerException e){
                 System.out.println("\n" + id);
                 e.printStackTrace();
@@ -112,10 +116,14 @@ public class MainScreen implements Screen {
     private void createUIElements(){
         makeGameButton = createTextButton("Make a game", skin, "white_18");
         upgradeButton = createButton(skin, "store_button");
+        collectionButton = createButton(skin, "collection_button");
         gameMakingProgressBar = new ProgressBar(0, 100, 1, false, skin, "default-horizontal");
 
-        upgradeButton.setPosition(getWidthPercent(0.05f), getHeightPercent(0.8f));
+        upgradeButton.setPosition(getWidthPercent(0.05f), getHeightPercent(0.78f));
         upgradeButton.setSize(getWidthPercent(0.18f), getWidthPercent(0.18f));
+
+        collectionButton.setPosition(getWidthPercent(0.05f), getHeightPercent(0.75f) - getWidthPercent(0.18f));
+        collectionButton.setSize(getWidthPercent(0.18f), getWidthPercent(0.18f));
 
         makeGameButton.setPosition(getWidthPercent(0.1f), getHeightPercent(0.02f));
         makeGameButton.setSize(getWidthPercent(0.84f), getHeightPercent(0.15f));
@@ -123,39 +131,50 @@ public class MainScreen implements Screen {
         gameMakingProgressBar.setPosition(getWidthPercent(0.38f), getHeightPercent(0.58f));
         gameMakingProgressBar.setSize(getWidthPercent(0.3f), getHeightPercent(0.1f));
 
-        debug();
+        sellTable = new SellTable(game);
+        sellScrollPane = new ScrollPane(sellTable, skin);
+        sellScrollPane.setFadeScrollBars(false);
+
+        sellScrollPane.setPosition(getWidthPercent(.55f), getHeightPercent(0.6f));
+        sellScrollPane.setSize(getWidthPercent(0.4f), getHeightPercent(0.3f));
     }
 
-    SellTable sellTable;
-
-    private void debug(){
-        SellActor sellActor = new SellActor(game, "Name", 120, 20f);
-        SellActor sellActor1 = new SellActor(game, "Name", 15, 10f);
-
-        sellTable = new SellTable(game);
-
+    public void startSellGame(GameObject gameObject){
+        SellActor sellActor = new SellActor(game, gameObject);
+        sellActor.setName(String.valueOf(gameObject.getId()));
         sellTable.addSellActor(sellActor);
-        sellTable.addSellActor(sellActor1);
-
-        sellTable.setPosition(getWidthPercent(.6f), getHeightPercent(0.7f));
-        sellTable.setSize(getWidthPercent(0.3f), getHeightPercent(0.2f));
-
         sellActor.startSelling();
-        sellActor1.startSelling();
+    }
+
+    public void gameSold(GameObject gameObject){
+        gameObject.setSold(true);
+        game.setGameSold(gameObject);
+        SellActor sellActor = sellTable.findActor(String.valueOf(gameObject.getId()));
+        sellTable.removeActor(sellActor);
+    }
+
+    public void debug(){
+        ArrayList<String> technologies = new ArrayList<>();
+        technologies.add("Surround sound");
+        ArrayList<String> mechanics = new ArrayList<>();
+        mechanics.add("Nonlinear plot");
+
+        GameObject gameObject1 = GameFactory.createGameObjectDebug(game, 0, "", "Light Blue",
+                "Aviation_2", technologies, mechanics, "Create a site",
+                7, 105, 35, false, 0 , 0);
+        GameObject gameObject2 = GameFactory.createGameObjectDebug(game, 1, "", "Light Blue",
+                "Aviation_2", technologies, mechanics, "Create a site",
+                7, 105, 35, false, 14, 73);
+
+        startSellGame(gameObject1);
+        startSellGame(gameObject2);
     }
 
     private void setupUIListeners() {
         makeGameButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                DialogThread dialogThread = new DialogThread(game,
-                        stage,
-                        15,
-                        0.3,
-                        0.3,
-                        0.3);
-
-                dialogThread.start();
+                game.dialogThread.start();
             }
         });
 
@@ -165,6 +184,13 @@ public class MainScreen implements Screen {
                 game.setUpgradeScreen();
             }
         });
+
+        collectionButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                game.setCollectionScreen();
+            }
+        });
     }
 
     @Override
@@ -172,12 +198,13 @@ public class MainScreen implements Screen {
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 
-        statsTable = new StatsTable(assets, game.stats);
+        statsTable = createStatsTable(game);
 
         stage.addActor(makeGameButton);
         stage.addActor(upgradeButton);
+        stage.addActor(collectionButton);
         stage.addActor(gameMakingProgressBar);
-        stage.addActor(sellTable);
+        stage.addActor(sellScrollPane);
         stage.addActor(statsTable);
 
         resume();
@@ -216,6 +243,8 @@ public class MainScreen implements Screen {
         modelBatch.render(instances, environment);
         modelBatch.end();
 
+        statsTable.update();
+
         stage.act(deltaTime);
         stage.draw();
     }
@@ -232,7 +261,7 @@ public class MainScreen implements Screen {
 
     @Override
     public void resume() {
-        if(isGameStarted){
+        if(game.isGameStarted){
             isGameInProgress = true;
         }
     }
@@ -251,7 +280,7 @@ public class MainScreen implements Screen {
     }
 
     public void setGameStarted(){
-        isGameStarted = true;
+        game.isGameStarted = true;
         isGameInProgress = true;
         makeGameButton.setVisible(false);
         System.out.println("Game started");
@@ -260,27 +289,23 @@ public class MainScreen implements Screen {
 
     public void setGameEnded(){
         makeGameButton.setVisible(true);
-        isGameStarted = false;
+        game.isGameStarted = false;
         isGameInProgress = false;
         System.out.println("Game ended");
         gameMakingProgressBar.setValue(0);
         animationController.current = null;
-
-        Timer.Task sellGameThread = new Timer.Task() {
-            @Override
-            public void run() {
-                System.out.println("SellGameThread started");
-            }
-        };
-
     }
 
     public void setGameCanceled(){
         makeGameButton.setVisible(true);
-        isGameStarted = false;
+        game.isGameStarted = false;
         isGameInProgress = false;
         System.out.println("Game canceled");
         gameMakingProgressBar.setValue(0);
         animationController.current = null;
+    }
+
+    public Stage getStage() {
+        return stage;
     }
 }

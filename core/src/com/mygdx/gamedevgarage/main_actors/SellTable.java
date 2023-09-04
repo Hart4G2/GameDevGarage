@@ -1,39 +1,35 @@
 package com.mygdx.gamedevgarage.main_actors;
 
+import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
+import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
+
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 
 public class SellTable extends Table {
-
-    private Game game;
-    private Assets assets;
-
-    private Array<SellActor> sellActors;
+    private final Array<SellActor> sellActors = new Array<>();
 
     public SellTable(Game game) {
         super(game.getAssets().getSkin());
-        this.game = game;
-        this.assets = game.getAssets();
-        this.sellActors = new Array<>();
     }
 
     public void addSellActor(SellActor sellActor) {
-        this.sellActors.add(sellActor);
-        addSellActorToTable(sellActor);
+        add(sellActor).width(getWidthPercent(0.35f)).height(getHeightPercent(0.13f))
+                .row();
+        sellActors.add(sellActor);
     }
 
-    private void addSellActorToTable(SellActor sellActor) {
-        add(sellActor).row();
+    public void removeActor(SellActor actor) {
+        sellActors.removeValue(actor, true);
+        clear();
+        addItems();
     }
 
-    public void removeSellActor(SellActor sellActor) {
-        this.sellActors.removeValue(sellActor, false);
-        removeSellActorFromTable(sellActor);
-    }
-
-    private void removeSellActorFromTable(SellActor sellActor) {
-        removeActor(sellActor);
+    private void addItems() {
+        for(SellActor sellActor : sellActors) {
+            add(sellActor).width(getWidthPercent(0.35f)).height(getHeightPercent(0.13f))
+                    .row();
+        }
     }
 }

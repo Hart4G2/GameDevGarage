@@ -1,6 +1,7 @@
 package com.mygdx.gamedevgarage.upgrade;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createButton;
+import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -67,20 +68,20 @@ public class UpgradeScreen implements Screen {
     }
 
     private void createUIElements(){
-        statsTable = new StatsTable(assets, game.stats);
+        statsTable = createStatsTable(game);
 
-        coverList = new UpgradeCoverObjectsList(game, this);
+        coverList = new UpgradeCoverObjectsList(game);
         coverObjectsScrollPane = new ScrollPane(coverList, skin);
         coverObjectsScrollPane.setFillParent(true);
         coverObjectsScrollPane.setScrollbarsVisible(true);
 
-        techList = new UpgradeCheckItemsList(game, this,true);
+        techList = new UpgradeCheckItemsList(game,true);
         technologiesScrollPane = new ScrollPane(techList, skin);
         technologiesScrollPane.setFillParent(true);
         technologiesScrollPane.setScrollbarsVisible(true);
         technologiesScrollPane.setVisible(false);
 
-        mechanicList = new UpgradeCheckItemsList(game, this,false);
+        mechanicList = new UpgradeCheckItemsList(game,false);
         mechanicsScrollPane = new ScrollPane(mechanicList, skin);
         mechanicsScrollPane.setFillParent(true);
         mechanicsScrollPane.setScrollbarsVisible(true);
@@ -92,9 +93,9 @@ public class UpgradeScreen implements Screen {
         group.addActor(mechanicsScrollPane);
         group.setSize(getWidthPercent(.95f), getHeightPercent(.8f));
 
-        showCover = createTextButton("Covers", skin, "white_16", SHOW_COVER_BUTTON);
-        showTech = createTextButton("Technologies", skin, "white_16", SHOW_TECH_BUTTON);
-        showMechanic = createTextButton("Mechanics", skin, "white_16", SHOW_MECHANIC_BUTTON);
+        showCover = createTextButton("Covers", skin, "default", SHOW_COVER_BUTTON);
+        showTech = createTextButton("Technologies", skin, "default", SHOW_TECH_BUTTON);
+        showMechanic = createTextButton("Mechanics", skin, "default", SHOW_MECHANIC_BUTTON);
         backButton = createButton(skin, "back_button");
         showCover.setDisabled(true);
 
@@ -106,18 +107,23 @@ public class UpgradeScreen implements Screen {
 
         buttonClicked(SHOW_COVER_BUTTON);
 
+        float buttonPad = getWidthPercent(.01f);
+        float topPad = getHeightPercent(.07f);
+
         Table table = new Table();
         table.setFillParent(true);
-        table.add(backButton).width(getWidthPercent(0.15f)).height(getWidthPercent(0.15f))
-                .pad(0, getWidthPercent(0.01f), getHeightPercent(0.01f), getWidthPercent(0.01f));
-        table.add(showCover).width(getWidthPercent(0.25f)).height(getHeightPercent(0.06f))
-                .pad(0, getWidthPercent(0.01f), getHeightPercent(0.01f), getWidthPercent(0.01f));
-        table.add(showTech).width(getWidthPercent(0.28f)).height(getHeightPercent(0.06f))
-                .pad(0, getWidthPercent(0.01f), getHeightPercent(0.01f), getWidthPercent(0.01f));
-        table.add(showMechanic).width(getWidthPercent(0.25f)).height(getHeightPercent(0.06f))
-                .pad(0, getWidthPercent(0.01f), getHeightPercent(0.01f), getWidthPercent(0.01f)).row();
+        table.add(backButton).width(getWidthPercent(.15f)).height(getWidthPercent(.15f))
+                .pad(topPad, buttonPad, buttonPad, buttonPad);
+        table.add(showCover).width(getWidthPercent(.25f)).height(getHeightPercent(.06f))
+                .pad(topPad, buttonPad, buttonPad, buttonPad);
+        table.add(showTech).width(getWidthPercent(.28f)).height(getHeightPercent(.06f))
+                .pad(topPad, buttonPad, buttonPad, buttonPad);
+        table.add(showMechanic).width(getWidthPercent(.25f)).height(getHeightPercent(.06f))
+                .pad(topPad, buttonPad, buttonPad, buttonPad)
+                .row();
         table.add(group).colspan(4)
-                .pad(0, getWidthPercent(0.01f), getHeightPercent(0.01f), getWidthPercent(0.01f)).row();
+                .pad(0, buttonPad, getHeightPercent(0.01f), buttonPad)
+                .row();
 
         stage.addActor(table);
         stage.addActor(statsTable);
@@ -152,6 +158,7 @@ public class UpgradeScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        statsTable.update();
         techList.render(delta);
         mechanicList.render(delta);
 
@@ -197,9 +204,5 @@ public class UpgradeScreen implements Screen {
         coverObjectsScrollPane.setVisible(panelToShow == coverObjectsScrollPane);
         technologiesScrollPane.setVisible(panelToShow == technologiesScrollPane);
         mechanicsScrollPane.setVisible(panelToShow == mechanicsScrollPane);
-    }
-
-    public StatsTable getStatsTable() {
-        return statsTable;
     }
 }

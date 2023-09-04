@@ -8,7 +8,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.badlogic.gdx.utils.Array;
+import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.stats.StatsTable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Utils {
 
@@ -79,11 +83,26 @@ public class Utils {
         return false;
     }
 
+    public static StatsTable createStatsTable(Game game){
+        return new StatsTable(game.getAssets().getSkin(), game.stats);
+    }
+
     public static float getWidthPercent(float percent) {
         return Gdx.graphics.getWidth() * percent;
     }
 
     public static float getHeightPercent(float percent) {
         return Gdx.graphics.getHeight() * percent;
+    }
+
+    public static ArrayList<String> convertStringToList(String input) {
+        String cleanedInput = input.substring(1, input.length() - 1).trim();
+
+        String[] elements = cleanedInput.split(",");
+        for (int i = 0; i < elements.length; i++) {
+            elements[i] = elements[i].trim();
+        }
+
+        return new ArrayList<>(Arrays.asList(elements));
     }
 }

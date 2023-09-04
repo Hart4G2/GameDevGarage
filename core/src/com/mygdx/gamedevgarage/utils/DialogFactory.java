@@ -34,7 +34,7 @@ public class DialogFactory {
 
         String[] gameLevels = game.reward.gameLevels;
 
-        final TextField nameTextField = createTextField(null, skin, "white_24",
+        final TextField nameTextField = createTextField(null, skin, "default",
                 Align.center, "nameTextField");
 
         final SelectBox<String> genreSelectBox = createSelectBox(skin, "default",

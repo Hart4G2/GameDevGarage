@@ -3,6 +3,8 @@ package com.mygdx.gamedevgarage.utils.data;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.gamedevgarage.Assets;
@@ -10,18 +12,17 @@ import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.mini_games.cover_actors.CoverListItem;
 import com.mygdx.gamedevgarage.mini_games.selection_actors.CheckListItem;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Locale;
 
 public class DataArrayFactory {
 
     public static Array<CoverListItem> createCoverObjects(Game game){
         HashSet<String> objectSet = game.getCoverObjects();
-
         Array<CoverListItem> objects = initObjects(game);
 
-        for(int i = 0; i < objects.size; i++){
-            CoverListItem item = objects.get(i);
-
+        for (CoverListItem item : objects) {
             item.setPurchased(objectSet.contains(item.getText()));
         }
 
@@ -32,9 +33,7 @@ public class DataArrayFactory {
         Array<CheckListItem> technologies = initTechnologies(game);
         HashSet<String> technologySet = game.getTechnologies();
 
-        for(int i = 0; i < technologies.size; i++){
-            CheckListItem item = technologies.get(i);
-
+        for (CheckListItem item : technologies) {
             item.setPurchased(technologySet.contains(item.getText()));
         }
 
@@ -45,9 +44,7 @@ public class DataArrayFactory {
         Array<CheckListItem> mechanics = initMechanics(game);
         HashSet<String> mechanicsSet = game.getMechanics();
 
-        for(int i = 0; i < mechanics.size; i++){
-            CheckListItem mechanic = mechanics.get(i);
-
+        for (CheckListItem mechanic : mechanics) {
             mechanic.setPurchased(mechanicsSet.contains(mechanic.getText()));
         }
 
@@ -58,9 +55,7 @@ public class DataArrayFactory {
         Array<CoverListItem> platforms = initPlatforms(game);
         HashSet<String> platformSet = game.getPlatforms();
 
-        for(int i = 0; i < platforms.size; i++){
-            CoverListItem platform = platforms.get(i);
-
+        for (CoverListItem platform : platforms) {
             platform.setPurchased(platformSet.contains(platform.getText()));
         }
 
@@ -80,41 +75,21 @@ public class DataArrayFactory {
     }
 
     public static HashSet<String> createDataTechnologiesSet(Game game){
-        HashSet<String> technologies = new HashSet<>();
-
         String[] technologyNames = game.reward.techNames;
 
-        for (int i = 0; i < 5; i++) {
-            technologies.add(technologyNames[i]);
-        }
-
-        return technologies;
+        return new HashSet<>(Arrays.asList(technologyNames).subList(0, 5));
     }
 
     public static HashSet<String> createDataMechanicsSet(Game game){
-        HashSet<String> mechanics = new HashSet<>();
-
         String[] mechanicNames = game.reward.mechanicNames;
 
-
-        for (int i = 0; i < 5; i++) {
-            mechanics.add(mechanicNames[i]);
-        }
-
-        return mechanics;
+        return new HashSet<>(Arrays.asList(mechanicNames).subList(0, 5));
     }
 
     public static HashSet<String> createDataPlatformsSet(Game game){
-        HashSet<String> platforms = new HashSet<>();
-
         String[] platformNames = game.reward.platformNames;
 
-
-        for (int i = 0; i < 1; i++) {
-            platforms.add(platformNames[i]);
-        }
-
-        return platforms;
+        return new HashSet<>(Arrays.asList(platformNames).subList(0, 1));
     }
 
     private static Array<CoverListItem> initObjects(Game game){
@@ -134,8 +109,9 @@ public class DataArrayFactory {
         };
 
         for (int i = 0; i < objectNames.length; i++) {
-            TextureRegionDrawable drawable1 = new TextureRegionDrawable(atlas.findRegion(objectRegions[i], 1));
-            TextureRegionDrawable drawable2 = new TextureRegionDrawable(atlas.findRegion(objectRegions[i], 2));
+            TextureRegionDrawable drawable1 = createDrawable(atlas, objectRegions[i], 1);
+            TextureRegionDrawable drawable2 = createDrawable(atlas, objectRegions[i], 2);
+
             objects.add(new CoverListItem(objectNames[i] + "_1", drawable1));
             objects.add(new CoverListItem(objectNames[i] + "_2", drawable2));
         }
@@ -143,30 +119,28 @@ public class DataArrayFactory {
         return objects;
     }
 
+    private static TextureRegionDrawable createDrawable(TextureAtlas atlas, String regionName, int index) {
+        return new TextureRegionDrawable(atlas.findRegion(regionName, index));
+    }
+
     private static Array<CheckListItem> initTechnologies(Game game){
         Assets assets = game.getAssets();
+        Skin skin = assets.getSkin();
 
         Array<CheckListItem> objects = new Array<>();
 
         String[] objectNames = game.reward.techNames;
 
-        TextureRegionDrawable bgUnselected = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("programming_item.png")));
-
-        TextureRegionDrawable bgSelected = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("programming_item_selected.png")));
-
-        TextureRegionDrawable imageFrameUnselected = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("item_image_bg.png")));
-
-        TextureRegionDrawable imageFrameSelected = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("item_image_bg_selected.png")));
+        Drawable bgUnselected = skin.getDrawable("programming_item");
+        Drawable bgSelected = skin.getDrawable("programming_item_selected");
+        Drawable imageFrameUnselected = skin.getDrawable("item_image_bg");
+        Drawable imageFrameSelected = skin.getDrawable("item_image_bg_selected");
 
         TextureRegionDrawable frame1Texture = new TextureRegionDrawable(new Texture(Gdx.files.internal("frame1.png")));
         TextureRegionDrawable  frame2Texture = new TextureRegionDrawable(new Texture(Gdx.files.internal("frame2.png")));
 
-        for (int i = 0; i < objectNames.length; i++) {
-            objects.add(new CheckListItem(objectNames[i], frame1Texture, frame2Texture, bgUnselected, bgSelected,
+        for (String objectName : objectNames) {
+            objects.add(new CheckListItem(objectName, frame1Texture, frame2Texture, bgUnselected, bgSelected,
                     imageFrameUnselected, imageFrameSelected, assets.getSkin()));
         }
 
@@ -175,28 +149,22 @@ public class DataArrayFactory {
 
     private static Array<CheckListItem> initMechanics(Game game){
         Assets assets = game.getAssets();
+        Skin skin = assets.getSkin();
 
         Array<CheckListItem> objects = new Array<>();
 
         String[] mechanicNames = game.reward.mechanicNames;
 
-        TextureRegionDrawable bgUnselected = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("game_design_item.png")));
-
-        TextureRegionDrawable bgSelected = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("game_design_item_selected.png")));
-
-        TextureRegionDrawable imageFrameUnselected = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("item_image_bg.png")));
-
-        TextureRegionDrawable imageFrameSelected = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("item_image_bg_selected.png")));
+        Drawable bgUnselected = skin.getDrawable("game_design_item");
+        Drawable bgSelected = skin.getDrawable("game_design_item_selected");
+        Drawable imageFrameUnselected = skin.getDrawable("item_image_bg");
+        Drawable imageFrameSelected = skin.getDrawable("item_image_bg_selected");
 
         TextureRegionDrawable frame1Texture = new TextureRegionDrawable(new Texture(Gdx.files.internal("frame1.png")));
         TextureRegionDrawable  frame2Texture = new TextureRegionDrawable(new Texture(Gdx.files.internal("frame2.png")));
 
-        for (int i = 0; i < mechanicNames.length; i++) {
-            objects.add(new CheckListItem(mechanicNames[i], frame1Texture, frame2Texture, bgUnselected, bgSelected,
+        for (String mechanicName : mechanicNames) {
+            objects.add(new CheckListItem(mechanicName, frame1Texture, frame2Texture, bgUnselected, bgSelected,
                     imageFrameUnselected, imageFrameSelected, assets.getSkin()));
         }
 
@@ -204,6 +172,7 @@ public class DataArrayFactory {
     }
 
     public static Array<CoverListItem> initColors(Assets assets) {
+        Skin skin = assets.getSkin();
         Array<CoverListItem> colors = new Array<>();
 
         String[] colorNames = {
@@ -218,11 +187,9 @@ public class DataArrayFactory {
                 "black", "white", "light_grey", "dark_grey", "grey", "dark_green", "light_green", "green"
         };
 
-        TextureRegionDrawable background = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("design_item.png")));
+        Drawable background = skin.getDrawable("design_item");
 
-        TextureRegionDrawable imageBackground = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("item_image_bg.png")));
+        Drawable imageBackground = skin.getDrawable("item_image_bg");
 
         for (int i = 0; i < colorNames.length; i++) {
             TextureRegionDrawable item = new TextureRegionDrawable(assets.designColorsAtlas.findRegion(colorRegions[i]));
@@ -234,6 +201,7 @@ public class DataArrayFactory {
 
     private static Array<CoverListItem> initPlatforms(Game game) {
         Assets assets = game.getAssets();
+        Skin skin = assets.getSkin();
         Array<CoverListItem> platforms = new Array<>();
 
         String[] platformNames = game.reward.platformNames;
@@ -242,11 +210,9 @@ public class DataArrayFactory {
                 "free_web", "steam", "ubisoft", "google_play"
         };
 
-        TextureRegionDrawable background = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("platform_item.png")));
+        Drawable background = skin.getDrawable("platform_item");
 
-        TextureRegionDrawable imageBackground = new TextureRegionDrawable(
-                new Texture(Gdx.files.internal("transparent.png")));
+        Drawable imageBackground = skin.getDrawable("transparent");
 
         for (int i = 0; i < platformNames.length; i++) {
             TextureRegionDrawable item = new TextureRegionDrawable(assets.platformAtlas.findRegion(platformRegions[i]));
@@ -254,5 +220,19 @@ public class DataArrayFactory {
         }
 
         return platforms;
+    }
+
+    public static Drawable getColor(Assets assets, String name){
+        name = name.toLowerCase(Locale.ROOT).replace(" ", "_");
+        return new TextureRegionDrawable(assets.designColorsAtlas.findRegion(name));
+    }
+
+    public static Drawable getObject(Assets assets, String name){
+        TextureAtlas atlas = assets.designObjectsAtlas;
+
+        String drawableName = name.toLowerCase(Locale.ROOT).substring(0, name.length() - 2);
+        int drawableIndex = name.charAt(name.length() - 1) == '2' ? 1 : 2;
+
+        return new TextureRegionDrawable(atlas.findRegion(drawableName, drawableIndex));
     }
 }

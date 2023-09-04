@@ -17,8 +17,6 @@ import java.util.Random;
 
 public class ScoreItem extends Table {
 
-    private final Skin skin;
-
     private String labelStyle;
 
     private Drawable icon;
@@ -27,7 +25,7 @@ public class ScoreItem extends Table {
     private Label scoreLabel;
 
     public ScoreItem(Skin skin, Drawable drawable, int score, String labelStyle) {
-        this.skin = skin;
+        super(skin);
         icon = drawable;
         this.score = score;
         this.labelStyle = labelStyle;
@@ -38,7 +36,7 @@ public class ScoreItem extends Table {
     private void createUIElements(){
         iconImage = new Image(icon);
         iconImage.setVisible(false);
-        scoreLabel = createLabel(String.valueOf(this.score), skin, labelStyle);
+        scoreLabel = createLabel(String.valueOf(this.score), getSkin(), labelStyle);
 
         float imageSize = getWidthPercent(.15f);
         float pad = getWidthPercent(.05f);
@@ -123,8 +121,6 @@ public class ScoreItem extends Table {
 
     public void setLabelStyle(String labelStyle){
         this.labelStyle = labelStyle;
-        if(!skin.has(labelStyle, Label.LabelStyle.class))
-            throw new NullPointerException("LabelStyle " + labelStyle + " not found");
-        scoreLabel.setStyle(skin.get(labelStyle, Label.LabelStyle.class));
+        scoreLabel.setStyle(getSkin().get(labelStyle, Label.LabelStyle.class));
     }
 }

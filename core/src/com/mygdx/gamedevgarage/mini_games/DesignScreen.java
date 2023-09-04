@@ -1,5 +1,7 @@
 package com.mygdx.gamedevgarage.mini_games;
 
+import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
+import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
@@ -9,16 +11,17 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Timer;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.mini_games.cover_actors.CoverMainActor;
 import com.mygdx.gamedevgarage.stats.StatsTable;
 import com.mygdx.gamedevgarage.utils.DialogThread;
 import com.mygdx.gamedevgarage.utils.Utils;
+import com.mygdx.gamedevgarage.utils.data.GameFactory;
 
 public class DesignScreen implements Screen {
 
@@ -27,6 +30,7 @@ public class DesignScreen implements Screen {
     private Skin skin;
     private Stage stage;
 
+    private Label headerLabel;
     private Button okButton;
     private StatsTable statsTable;
 
@@ -45,10 +49,53 @@ public class DesignScreen implements Screen {
         setupUIListeners();
     }
 
+    private void createUIElements() {
+        CoverMainActor coverListActor = new CoverMainActor(game, this);
+
+        headerLabel = Utils.createLabel("Create a game cover", skin, "black_20");
+
+        okButton = createTextButton("OK", skin, "white_18");
+        okButton.setDisabled(true);
+
+        statsTable = createStatsTable(game);
+        statsTable.setLabelsStyle("black_18");
+
+        Table table = new Table(skin);
+        table.setFillParent(true);
+        table.add(headerLabel)
+                .pad(getHeightPercent(.1f), 0, getHeightPercent(.005f), 0)
+                .center().row();
+        table.add(coverListActor).width(getWidthPercent(1f)).height(getHeightPercent(.75f))
+                .pad(0, 0, getHeightPercent(.005f), 0)
+                .row();
+        table.add(okButton).width(getWidthPercent(.5f)).height(getHeightPercent(.08f))
+                .padBottom(getHeightPercent(.05f))
+                .center().row();
+
+        stage.addActor(table);
+        stage.addActor(statsTable);
+
+        table.setBackground("window_yellow");
+    }
+
+    private void setupUIListeners() {
+        okButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if(!okButton.isDisabled()){
+                    game.setMainScreen();
+                    DialogThread.setProgrammingThread();
+                }
+            }
+        });
+    }
+
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        statsTable.update();
 
         stage.act(delta);
         stage.draw();
@@ -79,46 +126,9 @@ public class DesignScreen implements Screen {
         stage.dispose();
     }
 
-    private void createUIElements() {
-        CoverMainActor coverListActor = new CoverMainActor(game, this);
-
-        okButton = Utils.createTextButton("OK", skin, "white_18");
-        okButton.setDisabled(true);
-
-        statsTable = new StatsTable(assets, game.stats);
-        statsTable.setLabelsStyle("black_18");
-
-        Table table = new Table(skin);
-        table.setFillParent(true);
-        table.add(coverListActor).width(getWidthPercent(1f)).height(getHeightPercent(.78f))
-                .pad(getHeightPercent(.03f), getHeightPercent(.1f), getHeightPercent(.02f), getHeightPercent(.1f))
-                .row();
-        table.add(okButton).width(getWidthPercent(.5f)).height(getHeightPercent(.08f))
-                .padBottom(getHeightPercent(.006f))
-                .center().row();
-
-        stage.addActor(table);
-        stage.addActor(statsTable);
-
-        table.setBackground("window_yellow");
-    }
-
-    private void setupUIListeners() {
-        okButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if(!okButton.isDisabled()){
-                    game.setMainScreen();
-                    DialogThread.getDesignThread().cancel();
-                    new Timer().scheduleTask(DialogThread.getProgrammingThread(), DialogThread.getDesignTime());
-                }
-            }
-        });
-    }
-
     public void setSelectedCoverItems(String selectedColor, String selectedObject) {
-        game.reward.color = selectedColor;
-        game.reward.object = selectedObject;
+        GameFactory.color = selectedColor;
+        GameFactory.object = selectedObject;
 
         okButton.setDisabled(false);
     }

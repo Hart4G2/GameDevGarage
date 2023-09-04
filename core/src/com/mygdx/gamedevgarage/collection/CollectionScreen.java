@@ -1,51 +1,43 @@
-package com.mygdx.gamedevgarage.mini_games;
+package com.mygdx.gamedevgarage.collection;
 
+import static com.mygdx.gamedevgarage.utils.Utils.createButton;
 import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
-import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Array;
-import com.mygdx.gamedevgarage.Assets;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Game;
-import com.mygdx.gamedevgarage.mini_games.cover_actors.CoverListItem;
-import com.mygdx.gamedevgarage.mini_games.platform_actors.PlatformList;
+import com.mygdx.gamedevgarage.collection.actors.GameList;
 import com.mygdx.gamedevgarage.stats.StatsTable;
-import com.mygdx.gamedevgarage.utils.DialogThread;
-import com.mygdx.gamedevgarage.utils.data.GameFactory;
-import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 
-public class PlatformScreen implements Screen {
+public class CollectionScreen implements Screen {
 
-    private Game game;
-    private Assets assets;
-    private Skin skin;
+    private final Game game;
+    private final Skin skin;
     private Stage stage;
 
-    private Button okButton;
-    private PlatformList platformsList;
     private StatsTable statsTable;
+    private Button backButton;
 
-    private Array<CoverListItem> platforms;
-
-    public PlatformScreen(Game game) {
+    public CollectionScreen(Game game) {
         this.game = game;
-        this.assets = game.getAssets();
-        this.skin = assets.getSkin();
+        skin = game.getAssets().getSkin();
     }
 
     @Override
     public void show() {
-        stage = new Stage();
+        stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
         createUIElements();
@@ -53,35 +45,37 @@ public class PlatformScreen implements Screen {
     }
 
     private void createUIElements(){
-        GameFactory.platform = "";
-        platforms = DataArrayFactory.createPlatform(game);
-
-        platformsList = new PlatformList(platforms, game, this);
-
-        okButton = createTextButton("OK", skin, "white_18");
-        okButton.setDisabled(true);
-
         statsTable = createStatsTable(game);
 
-        Table table = new Table(skin);
+        GameList gameList = new GameList(game);
+        ScrollPane gamesScrollPane = new ScrollPane(gameList, skin);
+        gamesScrollPane.setFillParent(true);
+        gamesScrollPane.setScrollbarsVisible(true);
+
+        Group scrollPaneContainer = new Group();
+        scrollPaneContainer.addActor(gamesScrollPane);
+        scrollPaneContainer.setSize(getWidthPercent(.95f), getHeightPercent(0.7f));
+
+        backButton = createButton(skin, "back_button");
+
+        Table table = new Table();
         table.setFillParent(true);
-        table.add(platformsList).width(getWidthPercent(1f)).height(getHeightPercent(.8f))
-                .row();
-        table.add(okButton).width(getWidthPercent(.5f)).height(getHeightPercent(.08f))
-                .center().row();
+        table.add(backButton).width(getWidthPercent(.15f)).height(getWidthPercent(.15f))
+                .left().row();
+        table.add(scrollPaneContainer)
+                .center();
 
         stage.addActor(table);
         stage.addActor(statsTable);
 
-        table.setBackground("window_purple");
+        table.setBackground(skin.getDrawable("window_purple"));
     }
 
     private void setupUIListeners(){
-        okButton.addCaptureListener(new ClickListener(){
+        backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.setMainScreen();
-                DialogThread.setEndGameThread();
             }
         });
     }
@@ -120,10 +114,5 @@ public class PlatformScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
-    }
-
-    public void setPlatform(String platform) {
-        GameFactory.platform = platform;
-        okButton.setDisabled(false);
     }
 }

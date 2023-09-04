@@ -32,10 +32,10 @@ public class CoverImage extends Group {
         objectImage = new Image(transparent);
         frameImage = new Image(frame);
 
-        float frameSize = getHeightPercent(.4f);
+        float frameSize = getHeightPercent(.35f);
         float colorPad = frameSize * .02f;
         float colorSize = frameSize - (colorPad * 2);
-        float objectPad = frameSize * .05f;
+        float objectPad = frameSize * .1f;
         float objectSize = frameSize - (objectPad * 2);
 
         colorImage.setBounds(colorPad, colorPad,
