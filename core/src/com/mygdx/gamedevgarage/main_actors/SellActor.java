@@ -1,53 +1,55 @@
 package com.mygdx.gamedevgarage.main_actors;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
+import static com.mygdx.gamedevgarage.utils.Utils.createProgressBar;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Timer;
+import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.stats.Stats;
 import com.mygdx.gamedevgarage.utils.data.GameObject;
 
 
 public class SellActor extends Table {
 
     private final Game game;
+    private final Stats stats;
+
+    private final GameObject gameObject;
 
     private Label priceLabel;
     private ProgressBar progressBar;
 
-    private final GameObject gameObject;
-
     private final float iterationTime;
     private int i;
 
-    public SellActor(Game game, GameObject gameObject){
-        super(game.getAssets().getSkin());
-        this.game = game;
+    public SellActor(GameObject gameObject){
+        super(Assets.getInstance().getSkin());
+        this.game = Game.getInstance();
+        this.stats = Stats.getInstance();
         this.gameObject = gameObject;
-        this.iterationTime = gameObject.getSellTime() / 5;
+        this.iterationTime = gameObject.getSellTime() / 10;
         i = (int) (gameObject.getSoldTime() / iterationTime);
 
         createUIElements();
     }
 
     private void createUIElements(){
-        String name = gameObject.getName();
-        if(name.isEmpty())
-            name = "game" + gameObject.getId();
+        String name = validName(gameObject.getName());
 
-        Label nameLabel = createLabel(name, getSkin(), "white_18");
-        priceLabel = createLabel("", getSkin(), "white_16");
-        progressBar = new ProgressBar(0, gameObject.getProfitMoney(), 1,
-                false, getSkin(), "default-horizontal");
+        Label nameLabel = createLabel(name, "white_18");
+        priceLabel = createLabel("", "white_16");
+        progressBar = createProgressBar(0, gameObject.getProfitMoney());
         progressBar.setValue(gameObject.getSoldMoney());
 
         add(nameLabel)
                 .padBottom(5).colspan(2)
                 .row();
-        add(progressBar).width(getWidthPercent(0.2f))
+        add(progressBar).width(getWidthPercent(0.25f))
                 .padLeft(getWidthPercent(0.05f));
         add(priceLabel).width(getWidthPercent(0.07f))
                 .padLeft(getWidthPercent(0.02f)).padRight(getWidthPercent(0.02f));
@@ -59,7 +61,7 @@ public class SellActor extends Table {
         new Timer().scheduleTask(sellTask, iterationTime);
     }
 
-    float[] coefficients = new float[]{.4f, .3f, .15f, .1f, .05f};
+    float[] coefficients = new float[]{.16f, .14f, .13f, .12f, .1f, .09f, .08f, .07f, .06f, .05f};
 
     private final Timer.Task sellTask = new Timer.Task() {
         @Override
@@ -79,6 +81,7 @@ public class SellActor extends Table {
         }
     };
 
+
     private void sell(int i){
         int profitMoney = gameObject.getProfitMoney();
         int soldMoney = gameObject.getSoldMoney();
@@ -90,6 +93,17 @@ public class SellActor extends Table {
 
         gameObject.setSoldMoney(soldMoney + value);
 
-        game.stats.setMoney(game.stats.getMoney() + value);
+        stats.setMoney(stats.getMoney() + value);
+    }
+
+    private String validName(String name){
+        if(name.isEmpty()){
+            name = "game" + gameObject.getId();
+        }
+
+        if(name.length() > 20){
+            name = name.substring(0, 20) + "...";
+        }
+        return name;
     }
 }

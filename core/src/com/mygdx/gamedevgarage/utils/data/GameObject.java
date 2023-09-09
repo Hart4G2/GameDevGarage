@@ -7,9 +7,7 @@ import com.mygdx.gamedevgarage.Game;
 import java.util.List;
 import java.util.Objects;
 
-public class GameObject implements Json.Serializable{
-
-    private Game game;
+public class GameObject implements Json.Serializable {
 
     private int id;
     private String name;
@@ -28,10 +26,9 @@ public class GameObject implements Json.Serializable{
 
     public GameObject() {}
 
-    public GameObject(Game game, int id, String name, String color, String object,
+    public GameObject(int id, String name, String color, String object,
                       List<String> technologies, List<String> mechanics, String platform,
                       int score, int profitMoney, float sellTime, boolean isSold, float soldTime, int soldMoney) {
-        this.game = game;
         this.id = id;
         this.name = name;
         this.color = color;
@@ -104,7 +101,7 @@ public class GameObject implements Json.Serializable{
     }
 
     public void startSelling(){
-        game.getMainScreen().startSellGame(this);
+        Game.getInstance().getMainScreen().startSellGame(this);
     }
 
     public void setId(int id) {
@@ -117,10 +114,6 @@ public class GameObject implements Json.Serializable{
 
     public void setPlatform(String platform) {
         this.platform = platform;
-    }
-
-    public void setGame(Game game) {
-        this.game = game;
     }
 
     @Override
@@ -155,24 +148,6 @@ public class GameObject implements Json.Serializable{
         soldMoney = json.readValue("soldMoney", Integer.class, jsonData);
         sellTime = json.readValue("sellTime", Float.class, jsonData);
         soldTime = json.readValue("soldTime", Float.class, jsonData);
-    }
-
-    @Override
-    public String toString() {
-        return "GameObject{" +
-                "game=" + game +
-                ", id=" + id +
-                ", name='" + name + '\'' +
-                ", color='" + color + '\'' +
-                ", object='" + object + '\'' +
-                ", technologies=" + technologies +
-                ", mechanics=" + mechanics +
-                ", platform='" + platform + '\'' +
-                ", score=" + score +
-                ", isSold=" + isSold +
-                ", profitMoney=" + profitMoney +
-                ", sellTime=" + sellTime +
-                '}';
     }
 
     @Override

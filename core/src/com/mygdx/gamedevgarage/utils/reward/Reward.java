@@ -4,67 +4,27 @@ import static com.mygdx.gamedevgarage.utils.data.GameFactory.genre;
 import static com.mygdx.gamedevgarage.utils.data.GameFactory.object;
 import static com.mygdx.gamedevgarage.utils.data.GameFactory.theme;
 
-import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.stats.Stats;
 import com.mygdx.gamedevgarage.utils.Utils;
 
 import java.util.Random;
 
 public class Reward {
 
-    public final String[] themes = {
-            "Aliens", "Aviation", "Business", "Cinema", "City", "Comedy", "Construction",
-            "Cooking", "Criminal", "Cyberpunk", "Dance", "Detective", "Fantasy", "Farm",
-            "Fashion", "Game development", "Government", "Hacker", "Horror", "Hospital",
-            "Hunting", "Life", "Medieval", "Music", "Ninja", "Pirates", "Prison", "Race",
-            "Romantic", "Rhythm", "School", "Space", "Sport", "Superheros", "Time traveling",
-            "Transport", "Vampires", "Virtual animals", "War", "Wild west", "Zombie"
-    };
 
-    public final String[] genres = {
-            "Shooter", "Arcade", "Strategy", "RPG", "Platform", "Stealth",
-            "Survival", "Action", "Quest"
-    };
 
-    public final String[] gameLevels = {
-            "Flash game", "AA game", "AAA game"
-    };
+    private final Stats stats;
+    private static Reward instance;
 
-    public final String[] objectNames = {
-            "Aliens", "Aviation", "Business", "Cinema", "City", "Comedy", "Construction",
-            "Cooking", "Criminal", "Cyberpunk", "Dance", "Detective", "Fantasy", "Farm",
-            "Fashion", "Game development", "Government", "Hacker", "Horror", "Hospital",
-            "Hunting", "Life", "Medieval", "Music", "Ninja", "Pirates", "Prison", "Race",
-            "Romantic", "Rhythm", "School", "Space", "Sport", "Superheros", "Time traveling",
-            "Transport", "Vampires", "Virtual animals", "War", "Wild west", "Zombie"
-    };
+    public Reward() {
+        stats = Stats.getInstance();
+    }
 
-    public final String[] techNames = {
-            "Physics of motion", "Procedural level \ngeneration", "Artificial intelligence", "Surround sound",
-            "Photorealism", "Virtual reality", "Multiplayer", "Photomode", "Animated videos",
-            "Realistic illumination", "Realistic destruction physics", "Volumetric Effects",
-            "Interactive sound", "Add gamepad vibration", "Procedural animation",
-            "Gesture control system", "Integration with cloud services", "Reactive environment",
-            "Dynamic change of time of day", "Loading screens"
-    };
-
-    public final String[] mechanicNames = {
-            "Free movement on the map", "Time slows down", "First person camera control",
-            "Nonlinear plot", "Dodging and blocking", "Multiplayer on one screen",
-            "Dialogue selection system", "Stealth/Invisibility", "Lots of playable characters",
-            "Environmental influence", "Squad formation", "Change of perspective", "Base leveling",
-            "Split-dresser mode", "Identity substitution", "Time attack", "Character evolution",
-            "Online multiplayer", "Creation of unique game elements by the player", "Hospital",
-            "Complete destruction of the environment"
-    };
-
-    public final String[] platformNames = {
-            "Push to free web", "Buy a place in play store", "Create a site", "Buy a popular site"
-    };
-
-    private final Game game;
-
-    public Reward(Game game) {
-        this.game = game;
+    public static Reward getInstance(){
+        if(instance == null){
+            instance = new Reward();
+        }
+        return instance;
     }
 
     private int design;
@@ -525,7 +485,7 @@ public class Reward {
 
     private void calculateLevel() {
         requiredExp = 0;
-        int oldLvl = game.stats.getLevel();
+        int oldLvl = stats.getLevel();
 
         switch (oldLvl) {
             case 1:
@@ -548,12 +508,12 @@ public class Reward {
                 break;
         }
 
-        int newExp = game.stats.getExperience() + exp;
+        int newExp = stats.getExperience() + exp;
 
         if (newExp >= requiredExp) {
-            lvl = game.stats.getLevel() + 1;
+            lvl = stats.getLevel() + 1;
         } else {
-            lvl = game.stats.getLevel();
+            lvl = stats.getLevel();
             requiredExp = 0;
         }
     }
@@ -591,10 +551,10 @@ public class Reward {
     }
 
     public void setNewValues(){
-        game.stats.setDesign(game.stats.getDesign() + design);
-        game.stats.setProgramming(game.stats.getProgramming() + programming);
-        game.stats.setGameDesign(game.stats.getGameDesign() + gameDesign);
-        game.stats.setLevel(lvl);
-        game.stats.setExperience(game.stats.getExperience() + exp, requiredExp);
+        stats.setDesign(stats.getDesign() + design);
+        stats.setProgramming(stats.getProgramming() + programming);
+        stats.setGameDesign(stats.getGameDesign() + gameDesign);
+        stats.setLevel(lvl);
+        stats.setExperience(stats.getExperience() + exp, requiredExp);
     }
 }

@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.mygdx.gamedevgarage.Assets;
@@ -25,20 +24,10 @@ import com.mygdx.gamedevgarage.utils.data.GameFactory;
 
 public class DesignScreen implements Screen {
 
-    private Game game;
-    private Assets assets;
-    private Skin skin;
     private Stage stage;
 
-    private Label headerLabel;
     private Button okButton;
     private StatsTable statsTable;
-
-    public DesignScreen(Game game) {
-        this.game = game;
-        this.assets = game.getAssets();
-        this.skin = assets.getSkin();
-    }
 
     @Override
     public void show() {
@@ -50,17 +39,17 @@ public class DesignScreen implements Screen {
     }
 
     private void createUIElements() {
-        CoverMainActor coverListActor = new CoverMainActor(game, this);
+        CoverMainActor coverListActor = new CoverMainActor(this);
 
-        headerLabel = Utils.createLabel("Create a game cover", skin, "black_20");
+        Label headerLabel = Utils.createLabel("Create a game cover", "black_20");
 
-        okButton = createTextButton("OK", skin, "white_18");
+        okButton = createTextButton("OK", "white_18");
         okButton.setDisabled(true);
 
-        statsTable = createStatsTable(game);
+        statsTable = createStatsTable();
         statsTable.setLabelsStyle("black_18");
 
-        Table table = new Table(skin);
+        Table table = new Table(Assets.getInstance().getSkin());
         table.setFillParent(true);
         table.add(headerLabel)
                 .pad(getHeightPercent(.1f), 0, getHeightPercent(.005f), 0)
@@ -83,8 +72,8 @@ public class DesignScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if(!okButton.isDisabled()){
-                    game.setMainScreen();
-                    DialogThread.setProgrammingThread();
+                    Game.getInstance().setMainScreen();
+                    DialogThread.getInstance().setProgrammingThread();
                 }
             }
         });

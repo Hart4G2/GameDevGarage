@@ -1,28 +1,26 @@
 package com.mygdx.gamedevgarage.mini_games.platform_actors;
 
+import static com.mygdx.gamedevgarage.utils.Utils.createBuyButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.mini_games.PlatformScreen;
 import com.mygdx.gamedevgarage.mini_games.cover_actors.CoverListItem;
-import com.mygdx.gamedevgarage.utils.Utils;
+import com.mygdx.gamedevgarage.stats.Stats;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
 
 public class PlatformList extends Table {
 
     private final Game game;
-    private final Skin skin;
+    private final Stats stats;
     private final PlatformScreen parent;
 
     private final Array<CoverListItem> items;
@@ -31,13 +29,13 @@ public class PlatformList extends Table {
     private final Drawable selected;
     private final Drawable unSelected;
 
-    public PlatformList(Array<CoverListItem> items, Game game, PlatformScreen parent) {
-        super(game.getAssets().getSkin());
-        skin = getSkin();
-        this.game = game;
+    public PlatformList(Array<CoverListItem> items, PlatformScreen parent) {
+        super(Assets.getInstance().getSkin());
+        this.stats = Stats.getInstance();
+        this.game = Game.getInstance();
         this.parent = parent;
-        this.unSelected = new TextureRegionDrawable(new Texture(Gdx.files.internal("platform_item.png")));
-        this.selected = new TextureRegionDrawable(new Texture(Gdx.files.internal("platform_item_selected.png")));
+        this.unSelected = getSkin().getDrawable("platform_item");
+        this.selected = getSkin().getDrawable("platform_item_selected");
         this.items = items;
 
         buttons = new Array<>();
@@ -48,9 +46,10 @@ public class PlatformList extends Table {
     private void addItems() {
         for (CoverListItem item : items) {
             if(!item.isPurchased()) {
-                TextButton button = Utils.createBuyButton("10 M", skin, item.getText());
+                TextButton button = createBuyButton("10 M", item.getText());
                 addClickListener(button);
                 buttons.add(button);
+
                 add(item).width(getWidthPercent(.8f)).height(getHeightPercent(.15f))
                         .padRight(getWidthPercent(.01f));
                 add(button).width(getWidthPercent(.17f)).height(getWidthPercent(.17f)).row();
@@ -68,6 +67,7 @@ public class PlatformList extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 if(item.isPurchased()){
                     selectPlatform(item);
+                    playSound("buying_platform");
                 } else {
                     buyPlatform(item.getText());
                 }
@@ -85,10 +85,12 @@ public class PlatformList extends Table {
     }
 
     private void buyPlatform(String itemName){
-        int money = game.stats.getMoney();
+        int money = stats.getMoney();
 
         if(money >= 10){
-            game.stats.setMoney(money - 10);
+            playSound("buying_platform");
+
+            stats.setMoney(money - 10);
 
             for (int i = 0; i < items.size; i++) {
                 CoverListItem item = items.get(i);
@@ -108,6 +110,8 @@ public class PlatformList extends Table {
                     break;
                 }
             }
+        } else {
+            playSound("platform_unavailable");
         }
     }
 
@@ -124,5 +128,9 @@ public class PlatformList extends Table {
             item.setBackground(selected);
             parent.setPlatform(item.getText());
         }
+    }
+
+    private void playSound(String name) {
+        Assets.getInstance().setSound(name);
     }
 }

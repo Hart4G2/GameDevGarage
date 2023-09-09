@@ -4,6 +4,9 @@ import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -11,15 +14,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.mygdx.gamedevgarage.Assets;
-import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.utils.Utils;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 import com.mygdx.gamedevgarage.utils.data.GameObject;
 
 public class GameItem extends Table {
 
-    private final Game game;
-    private final Assets assets;
     private final GameObject gameObject;
 
     private Label nameLabel;
@@ -29,10 +31,8 @@ public class GameItem extends Table {
     private Image priceImage;
     private Image scoreImage;
 
-    public GameItem(Game game, GameObject gameObject) {
-        super(game.getAssets().getSkin());
-        this.game = game;
-        this.assets = game.getAssets();
+    public GameItem(GameObject gameObject) {
+        super(Assets.getInstance().getSkin());
         this.gameObject = gameObject;
 
         setName(String.valueOf(gameObject.getId()));
@@ -42,28 +42,30 @@ public class GameItem extends Table {
 
     private void createUIElements(){
         Skin skin = getSkin();
-
-        String name = gameObject.getName();
-        if(name.isEmpty()){
-            name = "Game" + gameObject.getId();
-        }
+        String name = validName(gameObject.getName());
 
         String score = String.valueOf(gameObject.getScore());
         String price = String.valueOf(gameObject.getProfitMoney());
         String colorName = gameObject.getColor();
         String objectName = gameObject.getObject();
 
-        Drawable colorDrawable = DataArrayFactory.getColor(assets, colorName);
-        Drawable object = DataArrayFactory.getObject(assets, objectName);
+        Drawable object = DataArrayFactory.getObject(objectName);
         Drawable priceIcon = skin.getDrawable("money");
         Drawable scoreIcon = skin.getDrawable("score");
 
-        nameLabel = createLabel(name, skin, "white_24");
-        scoreLabel = createLabel(score, skin, "white_20");
-        priceLabel = createLabel(price, skin, "white_20");
+        String headerStyle = "white_24";
+        String labelStyle = "white_20";
+
+        if(!Utils.isColorDark(colorName)){
+            headerStyle = "black_24";
+            labelStyle = "black_20";
+        }
+
+        nameLabel = createLabel(name, headerStyle);
+        scoreLabel = createLabel(score, labelStyle);
+        priceLabel = createLabel(price, labelStyle);
         priceImage = new Image(priceIcon);
         scoreImage = new Image(scoreIcon);
-
         objectImage = new Image(object);
 
         float objectSize = getHeightPercent(.15f);
@@ -81,10 +83,10 @@ public class GameItem extends Table {
                 .padRight(getWidthPercent(.02f));
         table.add(scoreLabel);
 
-        add(table).padRight(getWidthPercent(.2f));
+        add(table).padRight(getWidthPercent(.1f));
         add(objectImage).width(objectSize).height(objectSize);
 
-        setBackground(colorDrawable);
+        setBackground(createBackground());
 
         if(!gameObject.isSold()){
             startAnimation();
@@ -123,5 +125,35 @@ public class GameItem extends Table {
                     }
                 })
         );
+    }
+
+    private String validName(String name){
+        if(name.isEmpty()){
+            name = "game" + gameObject.getId();
+        }
+
+        if(name.length() > 15){
+            name = name.substring(0, 15).trim() + "...";
+        }
+        return name;
+    }
+
+    private NinePatchDrawable createBackground(){
+        int backgroundWidth = (int) getWidthPercent(.8f);
+        int backgroundHeight = (int) getHeightPercent(.2f);
+        int cornerRadius = (int) getWidthPercent(.05f);
+
+        Pixmap pixmap = new Pixmap(backgroundWidth, backgroundHeight, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Utils.convertColor(gameObject.getColor()));
+        pixmap.fillRectangle(0, cornerRadius, backgroundWidth, backgroundHeight - 2 * cornerRadius);
+        pixmap.fillRectangle(cornerRadius, 0, backgroundWidth - 2 * cornerRadius, backgroundHeight);
+        pixmap.fillCircle(cornerRadius, cornerRadius, cornerRadius);
+        pixmap.fillCircle(backgroundWidth - cornerRadius, cornerRadius, cornerRadius);
+        pixmap.fillCircle(cornerRadius, backgroundHeight - cornerRadius, cornerRadius);
+        pixmap.fillCircle(backgroundWidth - cornerRadius, backgroundHeight - cornerRadius, cornerRadius);
+
+        NinePatch ninePatch = new NinePatch(new Texture(pixmap), cornerRadius, cornerRadius, cornerRadius, cornerRadius);
+
+        return new NinePatchDrawable(ninePatch);
     }
 }

@@ -11,12 +11,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.mini_games.DesignScreen;
 
 public class CoverMainActor extends Table {
 
-    private final Game game;
     private final DesignScreen screen;
 
     private CoverImage coverImage;
@@ -28,9 +27,8 @@ public class CoverMainActor extends Table {
 
     private String selectedColor;
 
-    public CoverMainActor(Game game, DesignScreen screen) {
-        super(game.getAssets().getSkin());
-        this.game = game;
+    public CoverMainActor(DesignScreen screen) {
+        super(Assets.getInstance().getSkin());
         this.screen = screen;
 
         createUIElements();
@@ -38,17 +36,17 @@ public class CoverMainActor extends Table {
     }
 
     private void createUIElements() {
-        backButton = createButton(getSkin(), "back_button");
+        backButton = createButton("back_button");
         backButton.setSize(getWidthPercent(.18f), getWidthPercent(.18f));
         backButton.setVisible(false);
 
-        coverImage = new CoverImage(game.getAssets());
+        coverImage = new CoverImage();
 
         Image colorImage = coverImage.getColorImage();
         Image objectImage = coverImage.getObjectImage();
 
-        colorList = new CoverList(game, colorImage, true, this);
-        objectList = new CoverList(game, objectImage, false, this);
+        colorList = new CoverList(colorImage, true, this);
+        objectList = new CoverList(objectImage, false, this);
 
         colorScrollPane = new ScrollPane(colorList, getSkin());
         colorScrollPane.setFillParent(true);

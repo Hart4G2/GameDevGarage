@@ -8,10 +8,10 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.mygdx.gamedevgarage.Assets;
 
 public class Property extends Table {
 
@@ -22,8 +22,8 @@ public class Property extends Table {
     private Label valueLabel;
     private Label hintLabel;
 
-    public Property(String text, int value, Skin skin) {
-        super(skin);
+    public Property(String text, int value) {
+        super(Assets.getInstance().getSkin());
         this.value = value;
         this.text = text;
 
@@ -36,10 +36,10 @@ public class Property extends Table {
 
     private void createUIElements(){
         image = new Image(icon);
-        valueLabel = createLabel(String.valueOf(value), getSkin(), "white_18");
+        valueLabel = createLabel(String.valueOf(value), "white_18");
         valueLabel.setSize(getWidthPercent(.016f), getHeightPercent(.01f));
 
-        hintLabel = createLabel(text, getSkin(), "white_16");
+        hintLabel = createLabel(text, "white_16");
         hintLabel.setVisible(false);
 
         add(image).width(getWidthPercent(.06f)).height(getWidthPercent(.06f))

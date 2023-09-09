@@ -31,11 +31,9 @@ import com.mygdx.gamedevgarage.utils.data.GameFactory;
 
 import java.util.ArrayList;
 
-public class ProgrammingScreen implements Screen, MiniGameScreen {
+public class ProgrammingScreen implements Screen {
 
-    private Game game;
-    private Assets assets;
-    private Skin skin;
+    private final Skin skin;
     private Stage stage;
 
     private Label headerLabel;
@@ -43,12 +41,8 @@ public class ProgrammingScreen implements Screen, MiniGameScreen {
     private CheckList techList;
     private StatsTable statsTable;
 
-    private Array<CheckListItem> technologies;
-
-    public ProgrammingScreen(Game game) {
-        this.game = game;
-        this.assets = game.getAssets();
-        this.skin = assets.getSkin();
+    public ProgrammingScreen() {
+        this.skin = Assets.getInstance().getSkin();
     }
 
     @Override
@@ -62,24 +56,24 @@ public class ProgrammingScreen implements Screen, MiniGameScreen {
 
     private void createUIElements(){
         GameFactory.technologies = new ArrayList<>();
-        technologies = DataArrayFactory.createTechnologies(game);
+        Array<CheckListItem> technologies = DataArrayFactory.createTechnologies();
 
-        techList = new CheckList(technologies, this, assets);
+        techList = new CheckList(technologies);
 
         ScrollPane scrollPane = new ScrollPane(techList, skin);
         scrollPane.setFillParent(true);
         scrollPane.setScrollbarsVisible(true);
 
-        headerLabel = createLabel("Choose technologies", skin, "white_20");
+        headerLabel = createLabel("Choose technologies", "white_20");
 
-        okButton = createTextButton("OK", skin, "white_18");
+        okButton = createTextButton("OK", "white_18");
         okButton.setDisabled(true);
 
         Group group = new Group();
         group.addActor(scrollPane);
         group.setSize(getWidthPercent(1f), getHeightPercent(0.86f));
 
-        statsTable = createStatsTable(game);
+        statsTable = createStatsTable();
 
         Table table = new Table(skin);
         table.setFillParent(true);
@@ -105,9 +99,16 @@ public class ProgrammingScreen implements Screen, MiniGameScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if(!okButton.isDisabled()){
-                    game.setMainScreen();
-                    DialogThread.setGameDesignThread();
+                    Game.getInstance().setMainScreen();
+                    DialogThread.getInstance().setGameDesignThread();
                 }
+            }
+        });
+
+        techList.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                okButton.setDisabled(techList.getSelectedItems().size == 0);
             }
         });
     }
@@ -148,21 +149,5 @@ public class ProgrammingScreen implements Screen, MiniGameScreen {
     @Override
     public void dispose() {
         stage.dispose();
-    }
-
-    @Override
-    public void addItem(String item) {
-        GameFactory.technologies.add(item);
-        okButton.setDisabled(false);
-    }
-
-    @Override
-    public void removeItem(String item) {
-        if(GameFactory.technologies.contains(item)){
-            GameFactory.technologies.remove(item);
-            if(GameFactory.technologies.size() == 0){
-                okButton.setDisabled(true);
-            }
-        }
     }
 }

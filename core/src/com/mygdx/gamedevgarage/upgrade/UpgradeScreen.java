@@ -30,8 +30,6 @@ import java.util.Map;
 
 public class UpgradeScreen implements Screen {
 
-    private final Game game;
-    private final Assets assets;
     private final Skin skin;
     private Stage stage;
 
@@ -52,10 +50,8 @@ public class UpgradeScreen implements Screen {
     private static final String SHOW_TECH_BUTTON = "showTech";
     private static final String SHOW_MECHANIC_BUTTON = "showMechanic";
 
-    public UpgradeScreen(Game game) {
-        this.game = game;
-        this.assets = game.getAssets();
-        this.skin = assets.getSkin();
+    public UpgradeScreen() {
+        this.skin = Assets.getInstance().getSkin();
     }
 
     @Override
@@ -68,20 +64,20 @@ public class UpgradeScreen implements Screen {
     }
 
     private void createUIElements(){
-        statsTable = createStatsTable(game);
+        statsTable = createStatsTable();
 
-        coverList = new UpgradeCoverObjectsList(game);
+        coverList = new UpgradeCoverObjectsList();
         coverObjectsScrollPane = new ScrollPane(coverList, skin);
         coverObjectsScrollPane.setFillParent(true);
         coverObjectsScrollPane.setScrollbarsVisible(true);
 
-        techList = new UpgradeCheckItemsList(game,true);
+        techList = new UpgradeCheckItemsList(true);
         technologiesScrollPane = new ScrollPane(techList, skin);
         technologiesScrollPane.setFillParent(true);
         technologiesScrollPane.setScrollbarsVisible(true);
         technologiesScrollPane.setVisible(false);
 
-        mechanicList = new UpgradeCheckItemsList(game,false);
+        mechanicList = new UpgradeCheckItemsList(false);
         mechanicsScrollPane = new ScrollPane(mechanicList, skin);
         mechanicsScrollPane.setFillParent(true);
         mechanicsScrollPane.setScrollbarsVisible(true);
@@ -93,10 +89,10 @@ public class UpgradeScreen implements Screen {
         group.addActor(mechanicsScrollPane);
         group.setSize(getWidthPercent(.95f), getHeightPercent(.8f));
 
-        showCover = createTextButton("Covers", skin, "default", SHOW_COVER_BUTTON);
-        showTech = createTextButton("Technologies", skin, "default", SHOW_TECH_BUTTON);
-        showMechanic = createTextButton("Mechanics", skin, "default", SHOW_MECHANIC_BUTTON);
-        backButton = createButton(skin, "back_button");
+        showCover = createTextButton("Covers", "default", SHOW_COVER_BUTTON);
+        showTech = createTextButton("Technologies", "default", SHOW_TECH_BUTTON);
+        showMechanic = createTextButton("Mechanics", "default", SHOW_MECHANIC_BUTTON);
+        backButton = createButton("back_button");
         showCover.setDisabled(true);
 
         buttonPanelMap = new HashMap<>();
@@ -110,7 +106,7 @@ public class UpgradeScreen implements Screen {
         float buttonPad = getWidthPercent(.01f);
         float topPad = getHeightPercent(.07f);
 
-        Table table = new Table();
+        Table table = new Table(skin);
         table.setFillParent(true);
         table.add(backButton).width(getWidthPercent(.15f)).height(getWidthPercent(.15f))
                 .pad(topPad, buttonPad, buttonPad, buttonPad);
@@ -128,14 +124,14 @@ public class UpgradeScreen implements Screen {
         stage.addActor(table);
         stage.addActor(statsTable);
 
-        table.setBackground(skin.getDrawable("window_red"));
+        table.setBackground("window_red");
     }
 
     private void setupUIListeners(){
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setMainScreen();
+                Game.getInstance().setMainScreen();
             }
         });
 

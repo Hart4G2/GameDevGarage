@@ -1,6 +1,7 @@
 package com.mygdx.gamedevgarage;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createButton;
+import static com.mygdx.gamedevgarage.utils.Utils.createProgressBar;
 import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
@@ -24,23 +25,19 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.gamedevgarage.main_actors.SellActor;
 import com.mygdx.gamedevgarage.main_actors.SellTable;
 import com.mygdx.gamedevgarage.stats.StatsTable;
-import com.mygdx.gamedevgarage.utils.data.GameFactory;
+import com.mygdx.gamedevgarage.utils.DialogThread;
 import com.mygdx.gamedevgarage.utils.data.GameObject;
-
-import java.util.ArrayList;
 
 public class MainScreen implements Screen {
 
     private final Game game;
     private final Assets assets;
-    private final Skin skin;
 
     private PerspectiveCamera cam;
     private ModelBatch modelBatch;
@@ -64,10 +61,9 @@ public class MainScreen implements Screen {
     private ModelBatch shadowBatch;
 
 
-    public MainScreen(Game game) {
-        this.game = game;
-        this.assets = game.getAssets();
-        this.skin = assets.getSkin();
+    public MainScreen() {
+        this.game = Game.getInstance();
+        this.assets = Assets.getInstance();
 
         createUIElements();
         setupUIListeners();
@@ -114,10 +110,10 @@ public class MainScreen implements Screen {
     }
 
     private void createUIElements(){
-        makeGameButton = createTextButton("Make a game", skin, "white_18");
-        upgradeButton = createButton(skin, "store_button");
-        collectionButton = createButton(skin, "collection_button");
-        gameMakingProgressBar = new ProgressBar(0, 100, 1, false, skin, "default-horizontal");
+        makeGameButton = createTextButton("Make a game", "white_18");
+        upgradeButton = createButton("store_button");
+        collectionButton = createButton("collection_button");
+        gameMakingProgressBar = createProgressBar(0, 100);
 
         upgradeButton.setPosition(getWidthPercent(0.05f), getHeightPercent(0.78f));
         upgradeButton.setSize(getWidthPercent(0.18f), getWidthPercent(0.18f));
@@ -131,50 +127,35 @@ public class MainScreen implements Screen {
         gameMakingProgressBar.setPosition(getWidthPercent(0.38f), getHeightPercent(0.58f));
         gameMakingProgressBar.setSize(getWidthPercent(0.3f), getHeightPercent(0.1f));
 
-        sellTable = new SellTable(game);
-        sellScrollPane = new ScrollPane(sellTable, skin);
+        sellTable = new SellTable();
+        sellScrollPane = new ScrollPane(sellTable, assets.getSkin());
         sellScrollPane.setFadeScrollBars(false);
 
-        sellScrollPane.setPosition(getWidthPercent(.55f), getHeightPercent(0.6f));
-        sellScrollPane.setSize(getWidthPercent(0.4f), getHeightPercent(0.3f));
+        sellScrollPane.setPosition(getWidthPercent(.45f), getHeightPercent(0.6f));
+        sellScrollPane.setSize(getWidthPercent(0.5f), getHeightPercent(0.3f));
     }
 
     public void startSellGame(GameObject gameObject){
-        SellActor sellActor = new SellActor(game, gameObject);
+        SellActor sellActor = new SellActor(gameObject);
         sellActor.setName(String.valueOf(gameObject.getId()));
         sellTable.addSellActor(sellActor);
         sellActor.startSelling();
     }
 
     public void gameSold(GameObject gameObject){
+        assets.setSound("game_sold");
+
         gameObject.setSold(true);
         game.setGameSold(gameObject);
         SellActor sellActor = sellTable.findActor(String.valueOf(gameObject.getId()));
         sellTable.removeActor(sellActor);
     }
 
-    public void debug(){
-        ArrayList<String> technologies = new ArrayList<>();
-        technologies.add("Surround sound");
-        ArrayList<String> mechanics = new ArrayList<>();
-        mechanics.add("Nonlinear plot");
-
-        GameObject gameObject1 = GameFactory.createGameObjectDebug(game, 0, "", "Light Blue",
-                "Aviation_2", technologies, mechanics, "Create a site",
-                7, 105, 35, false, 0 , 0);
-        GameObject gameObject2 = GameFactory.createGameObjectDebug(game, 1, "", "Light Blue",
-                "Aviation_2", technologies, mechanics, "Create a site",
-                7, 105, 35, false, 14, 73);
-
-        startSellGame(gameObject1);
-        startSellGame(gameObject2);
-    }
-
     private void setupUIListeners() {
         makeGameButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.dialogThread.start();
+                DialogThread.getInstance().start();
             }
         });
 
@@ -198,7 +179,7 @@ public class MainScreen implements Screen {
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 
-        statsTable = createStatsTable(game);
+        statsTable = createStatsTable();
 
         stage.addActor(makeGameButton);
         stage.addActor(upgradeButton);
@@ -275,7 +256,6 @@ public class MainScreen implements Screen {
     public void dispose() {
         modelBatch.dispose();
         instances.clear();
-        assets.dispose();
         stage.dispose();
     }
 

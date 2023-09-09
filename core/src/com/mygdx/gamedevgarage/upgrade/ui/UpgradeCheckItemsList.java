@@ -1,10 +1,10 @@
 package com.mygdx.gamedevgarage.upgrade.ui;
 
-import static com.mygdx.gamedevgarage.utils.constraints.Constants.UPGRADE_MECHANIC_COST;
-import static com.mygdx.gamedevgarage.utils.constraints.Constants.UPGRADE_TECHNOLOGY_COST;
 import static com.mygdx.gamedevgarage.utils.Utils.createBuyButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
+import static com.mygdx.gamedevgarage.utils.constraints.Constants.UPGRADE_MECHANIC_COST;
+import static com.mygdx.gamedevgarage.utils.constraints.Constants.UPGRADE_TECHNOLOGY_COST;
 import static com.mygdx.gamedevgarage.utils.data.DataArrayFactory.createMechanics;
 import static com.mygdx.gamedevgarage.utils.data.DataArrayFactory.createTechnologies;
 
@@ -16,13 +16,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.mini_games.selection_actors.CheckListItem;
+import com.mygdx.gamedevgarage.stats.Stats;
 
 public class UpgradeCheckItemsList extends Table {
 
     private final Game game;
-    private final Skin skin;
+    private final Stats stats;
 
     private final boolean isTechnology;
     private final String buttonText;
@@ -31,14 +33,16 @@ public class UpgradeCheckItemsList extends Table {
     private final Array<CheckListItem> items;
     private final Array<TextButton> buttons;
 
-    public UpgradeCheckItemsList(Game game, boolean isTechnology) {
-        super(game.getAssets().getSkin());
-        skin = getSkin();
-        this.game = game;
+    public UpgradeCheckItemsList(boolean isTechnology) {
+        super(Assets.getInstance().getSkin());
+        this.game = Game.getInstance();
+        this.stats = Stats.getInstance();
         this.isTechnology = isTechnology;
-        this.items = isTechnology ? createTechnologies(game) : createMechanics(game);
+        this.items = isTechnology ? createTechnologies() : createMechanics();
         this.buttonText = String.valueOf(isTechnology ? UPGRADE_TECHNOLOGY_COST : UPGRADE_MECHANIC_COST);
-        this.buttonIcon = isTechnology ? getSkin().getDrawable("programing") : getSkin().getDrawable("game_design");
+
+        Skin skin = getSkin();
+        this.buttonIcon = isTechnology ? skin.getDrawable("programing") : skin.getDrawable("game_design");
 
         buttons = new Array<>();
         addItems();
@@ -61,7 +65,7 @@ public class UpgradeCheckItemsList extends Table {
     }
 
     private TextButton createTextButton(String text){
-        TextButton button = createBuyButton(buttonText, skin, text);
+        TextButton button = createBuyButton(buttonText, text);
 
         Image image = new Image(buttonIcon);
         float imageSize = getWidthPercent(.06f);
@@ -78,12 +82,13 @@ public class UpgradeCheckItemsList extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 buttonClicked(button);
+                playSound(isTechnology ? "buying_tech" : "buying_mech");
             }
         });
     }
 
     private void buttonClicked(final TextButton button) {
-        int property = isTechnology ? game.stats.getProgramming() : game.stats.getGameDesign();
+        int property = isTechnology ? stats.getProgramming() : stats.getGameDesign();
         int cost = isTechnology ? UPGRADE_TECHNOLOGY_COST : UPGRADE_MECHANIC_COST;
 
         if (property >= cost) {
@@ -93,10 +98,10 @@ public class UpgradeCheckItemsList extends Table {
 
                 if (itemText.equals(button.getName())) {
                     if (isTechnology) {
-                        game.stats.setProgramming(property - cost);
+                        stats.setProgramming(property - cost);
                         game.setTechnologyPurchased(itemText);
                     } else {
-                        game.stats.setGameDesign(property - cost);
+                        stats.setGameDesign(property - cost);
                         game.setMechanicPurchased(itemText);
                     }
 
@@ -118,5 +123,9 @@ public class UpgradeCheckItemsList extends Table {
         for(CheckListItem item : items){
             item.render(delta);
         }
+    }
+
+    private void playSound(String sound){
+        Assets.getInstance().setSound(sound);
     }
 }

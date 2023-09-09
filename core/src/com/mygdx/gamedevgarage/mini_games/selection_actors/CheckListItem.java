@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.mygdx.gamedevgarage.Assets;
 
 public class CheckListItem extends Group {
 
@@ -34,8 +35,8 @@ public class CheckListItem extends Group {
 
     public CheckListItem(String text, TextureRegionDrawable frame1, TextureRegionDrawable frame2,
                          Drawable bgUnselected, Drawable bgSelected, Drawable imageFrameUnselected,
-                         Drawable imageFrameSelected, Skin skin) {
-        this.skin = skin;
+                         Drawable imageFrameSelected) {
+        this.skin = Assets.getInstance().getSkin();
         this.text = text;
         this.bgSelected = bgSelected;
         this.bgUnselected = bgUnselected;
@@ -49,7 +50,7 @@ public class CheckListItem extends Group {
     }
 
     private void initAnimation(){
-        float frameDuration = 0.5f;
+        float frameDuration = 1f;
 
         animation = new Animation<>(frameDuration, frame1, frame2);
         animation.setPlayMode(Animation.PlayMode.LOOP);
@@ -65,7 +66,7 @@ public class CheckListItem extends Group {
     }
 
     private void initUIElements(){
-        label = createLabel(text, skin, "default");
+        label = createLabel(text, "default");
 
         float imageSize = getHeightPercent(0.1f);
 

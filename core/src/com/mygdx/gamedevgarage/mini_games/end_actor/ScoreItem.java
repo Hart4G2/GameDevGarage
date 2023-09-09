@@ -7,11 +7,13 @@ import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.RepeatAction;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.mygdx.gamedevgarage.Assets;
 
 import java.util.Random;
 
@@ -19,13 +21,13 @@ public class ScoreItem extends Table {
 
     private String labelStyle;
 
-    private Drawable icon;
+    private final Drawable icon;
     private int score;
     private Image iconImage;
     private Label scoreLabel;
 
-    public ScoreItem(Skin skin, Drawable drawable, int score, String labelStyle) {
-        super(skin);
+    public ScoreItem(Drawable drawable, int score, String labelStyle) {
+        super(Assets.getInstance().getSkin());
         icon = drawable;
         this.score = score;
         this.labelStyle = labelStyle;
@@ -36,13 +38,13 @@ public class ScoreItem extends Table {
     private void createUIElements(){
         iconImage = new Image(icon);
         iconImage.setVisible(false);
-        scoreLabel = createLabel(String.valueOf(this.score), getSkin(), labelStyle);
+        scoreLabel = createLabel(String.valueOf(this.score), labelStyle);
 
         float imageSize = getWidthPercent(.15f);
         float pad = getWidthPercent(.05f);
         float labelHeight = getHeightPercent(.15f);
 
-        Table imageTable = new Table();
+        Table imageTable = new Table(getSkin());
         imageTable.add(iconImage).width(imageSize).height(imageSize);
 
         add(imageTable)
@@ -51,13 +53,44 @@ public class ScoreItem extends Table {
     }
 
     public void startAnimation() {
-        final Label label = scoreLabel;
         final Image image = iconImage;
-        final int targetScore = score;
+
+        if(getName() != null && getName().equals("lvlItem")){
+            scoreLabel.addAction(Actions.sequence(
+                    createLabelAnimation(),
+                    createLvlLabelAnimation()
+            ));
+        } else {
+            scoreLabel.addAction(createLabelAnimation());
+        }
+
+        image.setScale(.9f);
+
+        iconImage.addAction(Actions.sequence(
+                Actions.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        image.setVisible(true);
+                    }
+                }),
+                Actions.alpha(0f, 0f),
+                Actions.moveBy(100, 0),
+                Actions.delay(.5f),
+                Actions.parallel(
+                        Actions.fadeIn(1.2f),
+                        Actions.moveBy(-100, 0, 1.5f),
+                        Actions.scaleTo(1f, 1f, 1.5f, Interpolation.slowFast)
+                )
+        ));
+    }
+
+    private SequenceAction createLabelAnimation(){
         float animationDuration = 40f;
+        final Label label = scoreLabel;
+        final int targetScore = score;
         final int[] value = {targetScore};
 
-        label.addAction(Actions.sequence(
+        return Actions.sequence(
                 Actions.run(new Runnable() {
                     @Override
                     public void run() {
@@ -97,26 +130,30 @@ public class ScoreItem extends Table {
                             }
                         }
                 )
-        ));
+        );
+    }
 
-        image.setScale(.9f);
-
-        iconImage.addAction(Actions.sequence(
+    private RepeatAction createLvlLabelAnimation(){
+        return Actions.forever(
                 Actions.run(new Runnable() {
+
+                    final String[] fontColors = new String[]{"green", "red", "yellow", "blue"};
+                    int cur = 0;
+
                     @Override
                     public void run() {
-                        image.setVisible(true);
+                        int r = cur;
+
+                        while(r == cur){
+                            r = new Random().nextInt(fontColors.length);
+                        }
+
+                        cur = r;
+
+                        setLabelStyle(fontColors[cur] + "_32");
                     }
-                }),
-                Actions.alpha(0f, 0f),
-                Actions.moveBy(100, 0),
-                Actions.delay(.5f),
-                Actions.parallel(
-                        Actions.fadeIn(1.2f),
-                        Actions.moveBy(-100, 0, 1.5f),
-                        Actions.scaleTo(1f, 1f, 1.5f, Interpolation.slowFast)
-                )
-        ));
+                })
+        );
     }
 
     public void setLabelStyle(String labelStyle){

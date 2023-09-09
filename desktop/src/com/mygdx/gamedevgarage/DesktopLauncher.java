@@ -9,6 +9,6 @@ public class DesktopLauncher {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setWindowedMode(600, 900);
 		config.setTitle("GameDevGarage");
-		new Lwjgl3Application(new Game(), config);
+		new Lwjgl3Application(Game.getInstance(), config);
 	}
 }

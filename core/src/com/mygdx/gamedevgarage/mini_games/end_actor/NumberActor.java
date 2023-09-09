@@ -6,12 +6,14 @@ import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.Assets;
+import com.mygdx.gamedevgarage.stats.Stats;
 import com.mygdx.gamedevgarage.utils.reward.Reward;
 
 public class NumberActor extends Table {
 
-    private final Game game;
+    private final Stats stats;
+    private final Reward reward;
 
     private int score;
     private int design = 1;
@@ -20,11 +22,10 @@ public class NumberActor extends Table {
     private int exp = 3;
     private int lvl = 1;
 
-    public NumberActor(Game game) {
-        super(game.getAssets().getSkin());
-        this.game = game;
-
-        Reward reward = game.reward;
+    public NumberActor() {
+        super(Assets.getInstance().getSkin());
+        this.stats = Stats.getInstance();
+        this.reward = Reward.getInstance();
 
         score = reward.getScore();
         design = reward.getDesign();
@@ -49,15 +50,16 @@ public class NumberActor extends Table {
         String labelStyle100 = "white_100";
         String labelStyle32 = "white_32";
 
-        ScoreItem scoreItem = new ScoreItem(skin, scoreIcon, score, labelStyle100);
-        ScoreItem designItem = new ScoreItem(skin, designIcon, design, labelStyle32);
-        ScoreItem programmingItem = new ScoreItem(skin, programingIcon, programming, labelStyle32);
-        ScoreItem gameDesignItem = new ScoreItem(skin, gameDesignIcon, gameDesign, labelStyle32);
-        ScoreItem expItem = new ScoreItem(skin, expIcon, exp, labelStyle32);
-        ScoreItem lvlItem = new ScoreItem(skin, lvlIcon, lvl, labelStyle32);
+        ScoreItem scoreItem = new ScoreItem(scoreIcon, score, labelStyle100);
+        ScoreItem designItem = new ScoreItem(designIcon, design, labelStyle32);
+        ScoreItem programmingItem = new ScoreItem(programingIcon, programming, labelStyle32);
+        ScoreItem gameDesignItem = new ScoreItem(gameDesignIcon, gameDesign, labelStyle32);
+        ScoreItem expItem = new ScoreItem(expIcon, exp, labelStyle32);
+        ScoreItem lvlItem = new ScoreItem(lvlIcon, lvl, labelStyle32);
 
-        if(game.stats.getLevel() < lvl){
+        if(stats.getLevel() < lvl){
             lvlItem.setLabelStyle("green_32");
+            lvlItem.setName("lvlItem");
         }
 
         add(scoreItem).width(getWidthPercent(.9f)).height(getHeightPercent(.15f))
@@ -89,6 +91,6 @@ public class NumberActor extends Table {
         expItem.startAnimation();
         lvlItem.startAnimation();
 
-        game.reward.setNewValues();
+        reward.setNewValues();
     }
 }

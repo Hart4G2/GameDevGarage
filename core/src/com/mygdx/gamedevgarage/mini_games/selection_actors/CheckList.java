@@ -8,16 +8,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.gamedevgarage.Assets;
-import com.mygdx.gamedevgarage.mini_games.MiniGameScreen;
 
 public class CheckList extends Table {
-    private final Array<CheckListItem> items;
-    private final MiniGameScreen parent;
 
-    public CheckList(Array<CheckListItem> items, final MiniGameScreen parent, final Assets assets) {
-        super(assets.getSkin());
+    private final Array<CheckListItem> items;
+    private final Array<CheckListItem> selectedItems;
+
+    public CheckList(Array<CheckListItem> items) {
+        super(Assets.getInstance().getSkin());
         this.items = items;
-        this.parent = parent;
+        selectedItems = new Array<>();
 
         addItems();
     }
@@ -43,10 +43,10 @@ public class CheckList extends Table {
     private void itemClicked(CheckListItem item){
         if(item.isSelected()){
             item.setUnselected();
-            parent.removeItem(item.getText());
+            removeItem(item);
         } else {
             item.setSelected();
-            parent.addItem(item.getText());
+            addItem(item);
         }
     }
 
@@ -54,5 +54,25 @@ public class CheckList extends Table {
         for(CheckListItem item : items){
             item.render(delta);
         }
+    }
+
+    public Array<CheckListItem> getSelectedItems() {
+        return selectedItems;
+    }
+
+    private void removeItem(CheckListItem item){
+        if(selectedItems.contains(item, true)){
+            selectedItems.removeValue(item, true);
+            playSound("item_unchecked");
+        }
+    }
+
+    private void addItem(CheckListItem item){
+        selectedItems.add(item);
+        playSound("item_checked");
+    }
+
+    private void playSound(String name){
+        Assets.getInstance().setSound(name);
     }
 }

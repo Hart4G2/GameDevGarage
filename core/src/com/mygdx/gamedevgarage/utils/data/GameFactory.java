@@ -1,8 +1,10 @@
 package com.mygdx.gamedevgarage.utils.data;
 
 import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.utils.reward.Reward;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public class GameFactory {
@@ -16,20 +18,36 @@ public class GameFactory {
     public static List<String> mechanics;
     public static String platform;
 
-    public static GameObject createGameObject(Game game, int id) {
-        return new GameObject(game, id, name, color, object, technologies, mechanics, platform,
-                game.reward.getScore(), game.reward.getProfitMoney(), game.reward.getSellTime(),
+    public static GameObject createGameObject() {
+        Reward reward = Reward.getInstance();
+
+        int id = calculateId();
+
+        return new GameObject(id, name, color, object, technologies, mechanics, platform,
+                reward.getScore(), reward.getProfitMoney(), reward.getSellTime(),
                 false, 0, 0);
     }
 
-    public static GameObject createGameObjectDebug(Game game, int id, String name, String color,
+    public static GameObject createGameObjectDebug(int id, String name, String color,
                                                    String object, List<String> technologies,
                                                    List<String> mechanics, String platform,
                                                    int score, int profitMoney, float sellTime,
                                                    boolean isSold, float soldTime, int soldMoney
     ) {
-        return new GameObject(game, id, name, color, object, technologies, mechanics, platform,
+        return new GameObject(id, name, color, object, technologies, mechanics, platform,
                 score, profitMoney, sellTime, isSold, soldTime, soldMoney);
+    }
+
+    private static int calculateId() {
+        HashSet<GameObject> games = Game.getInstance().getGames();
+        int id = 0;
+
+        for(GameObject game : games){
+            if(game.getId() >= id) {
+                id = game.getId() + 1;
+            }
+        }
+        return id;
     }
 
     public static HashMap<String, String> getProcessData() {

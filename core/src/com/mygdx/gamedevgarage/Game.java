@@ -9,7 +9,6 @@ import com.mygdx.gamedevgarage.mini_games.EndScreen;
 import com.mygdx.gamedevgarage.mini_games.GameDesignScreen;
 import com.mygdx.gamedevgarage.mini_games.PlatformScreen;
 import com.mygdx.gamedevgarage.mini_games.ProgrammingScreen;
-import com.mygdx.gamedevgarage.stats.Stats;
 import com.mygdx.gamedevgarage.upgrade.UpgradeScreen;
 import com.mygdx.gamedevgarage.utils.DataManager;
 import com.mygdx.gamedevgarage.utils.DialogThread;
@@ -17,16 +16,13 @@ import com.mygdx.gamedevgarage.utils.constraints.GameState;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
 import com.mygdx.gamedevgarage.utils.data.GameObject;
-import com.mygdx.gamedevgarage.utils.reward.Reward;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
 
 public class Game extends com.badlogic.gdx.Game {
 
-    private Assets assets;
     private MainScreen mainScreen;
 
     private HashSet<String> coverObjects;
@@ -37,64 +33,39 @@ public class Game extends com.badlogic.gdx.Game {
 
     public boolean isGameStarted = false;
     public GameState gameState;
+    private DataManager dataManager;
 
-    public Stats stats;
-    public Reward reward;
-    public DataManager dataManager;
-    public DialogThread dialogThread;
+    private static Game instance;
+
+    public static Game getInstance(){
+        if(instance == null){
+            instance = new Game();
+        }
+        return instance;
+    }
 
     @Override
     public void create() {
-        assets = new Assets();
-        dataManager = new DataManager(this);
-        reward = new Reward(this);
+        dataManager = DataManager.getInstance();
 
         initData();
         setMainScreen();
         getSavedGameState();
-
-        debug();
-//        mainScreen.debug();
-    }
-
-    private void debug(){
-        ArrayList<String> technologies = new ArrayList<>();
-        technologies.add("Surround sound");
-        ArrayList<String> mechanics = new ArrayList<>();
-        mechanics.add("Nonlinear plot");
-
-        GameObject gameObject1 = GameFactory.createGameObjectDebug(this, 0, "Aviation_2", "Light Blue",
-                "Aviation_2", technologies, mechanics, "Create a site",
-                7, 105, 35, false, 0 , 0);
-
-        games.add(gameObject1);
     }
 
     private void initData(){
         games = dataManager.getGames();
 
-        HashMap<String, Integer> statsMap = dataManager.getStats();
-        if(statsMap.isEmpty()){
-            stats = new Stats(1, 49, 10, 10, 10, 1);
-        } else {
-            stats = new Stats(statsMap.get("level"), statsMap.get("exp"),
-                    statsMap.get("design"), statsMap.get("programming"),
-                    statsMap.get("gameDesign"), statsMap.get("money"));
-        }
-
-        mainScreen = new MainScreen(this);
-        dialogThread = new DialogThread(this);
+        mainScreen = new MainScreen();
 
         if(!getSavedData()) {
-            coverObjects = DataArrayFactory.createDataObjectsSet(this);
-            technologies = DataArrayFactory.createDataTechnologiesSet(this);
-            mechanics = DataArrayFactory.createDataMechanicsSet(this);
-            platforms = DataArrayFactory.createDataPlatformsSet(this);
+            coverObjects = DataArrayFactory.createDataObjectsSet();
+            technologies = DataArrayFactory.createDataTechnologiesSet();
+            mechanics = DataArrayFactory.createDataMechanicsSet();
+            platforms = DataArrayFactory.createDataPlatformsSet();
         }
 
         for(GameObject gameObject : games){
-            System.out.println(gameObject);
-            gameObject.setGame(this);
             if(!gameObject.isSold()){
                 mainScreen.startSellGame(gameObject);
             }
@@ -120,7 +91,7 @@ public class Game extends com.badlogic.gdx.Game {
     @Override
     public void dispose() {
         dataManager.save();
-        assets.dispose();
+        Assets.getInstance().dispose();
     }
 
     private boolean getSavedData(){
@@ -130,6 +101,7 @@ public class Game extends com.badlogic.gdx.Game {
         technologies = dataManager.getTechnologies();
         mechanics = dataManager.getMechanics();
         platforms = dataManager.getPlatforms();
+
         return true;
     }
 
@@ -158,36 +130,34 @@ public class Game extends com.badlogic.gdx.Game {
     private void setGameState(){
         setSavedGameData();
 
+        DialogThread dialogThread = DialogThread.getInstance();
+
         switch (gameState){
             case MAIN: {
                 dialogThread.start();
                 break;
             }
             case DESIGN: {
-                DialogThread.setDesignThread();
+                dialogThread.setDesignThread();
                 break;
             }
             case PROGRAMMING: {
-                DialogThread.setProgrammingThread();
+                dialogThread.setProgrammingThread();
                 break;
             }
             case GAMEDESIGN: {
-                DialogThread.setGameDesignThread();
+                dialogThread.setGameDesignThread();
                 break;
             }
             case PLATFORM: {
-                DialogThread.setPlatformThread();
+                dialogThread.setPlatformThread();
                 break;
             }
             case END: {
-                DialogThread.setEndGameThread();
+                dialogThread.setEndGameThread();
                 break;
             }
         }
-    }
-
-    public Assets getAssets() {
-        return assets;
     }
 
     public MainScreen getMainScreen() {
@@ -199,31 +169,31 @@ public class Game extends com.badlogic.gdx.Game {
     }
 
     public void setCoverScreen() {
-        setScreen(new DesignScreen(this));
+        setScreen(new DesignScreen());
     }
 
     public void setTechScreen() {
-        setScreen(new ProgrammingScreen(this));
+        setScreen(new ProgrammingScreen());
     }
 
     public void setMechanicScreen() {
-        setScreen(new GameDesignScreen(this));
+        setScreen(new GameDesignScreen());
     }
 
     public void setPlatformScreen() {
-        setScreen(new PlatformScreen(this));
+        setScreen(new PlatformScreen());
     }
 
     public void setUpgradeScreen() {
-        setScreen(new UpgradeScreen(this));
+        setScreen(new UpgradeScreen());
     }
 
     public void setCollectionScreen() {
-        setScreen(new CollectionScreen(this));
+        setScreen(new CollectionScreen());
     }
 
     public void setEndScreen() {
-        setScreen(new EndScreen(this));
+        setScreen(new EndScreen());
     }
 
     public HashSet<String> getCoverObjects() {

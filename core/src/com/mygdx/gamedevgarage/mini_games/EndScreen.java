@@ -19,25 +19,27 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.mini_games.end_actor.NumberActor;
+import com.mygdx.gamedevgarage.stats.Stats;
 import com.mygdx.gamedevgarage.stats.StatsTable;
-import com.mygdx.gamedevgarage.utils.data.GameObject;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
-
-import java.util.HashSet;
+import com.mygdx.gamedevgarage.utils.data.GameObject;
+import com.mygdx.gamedevgarage.utils.reward.Reward;
 
 public class EndScreen implements Screen {
 
     private final Game game;
+    private final Reward reward;
     private final Skin skin;
     private Stage stage;
 
     private StatsTable statsTable;
     private TextButton okButton;
 
-    public EndScreen(Game game) {
-        this.game = game;
-        Assets assets = game.getAssets();
-        skin = assets.getSkin();
+    public EndScreen() {
+        game = Game.getInstance();
+        Stats stats = Stats.getInstance();
+        reward = Reward.getInstance();
+        skin = Assets.getInstance().getSkin();
     }
 
     @Override
@@ -45,18 +47,40 @@ public class EndScreen implements Screen {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
+        reward.calculateScores();
+
         createUIElements();
         setupUIListeners();
+
+        playSound("end_screen");
     }
 
     private void createUIElements(){
-        statsTable = createStatsTable(game);
+        statsTable = createStatsTable();
 
-        okButton = createTextButton("OK", skin, "white_18");
+        okButton = createTextButton("OK", "white_18");
         okButton.setDisabled(true);
 
-        game.reward.calculateScores();
-        NumberActor numberActor = new NumberActor(game);
+        final boolean isSoundNeeded = Stats.getInstance().getLevel() < reward.getLvl();
+
+            okButton.addAction(
+                Actions.sequence(
+                        Actions.delay(2.5f),
+                        Actions.run(
+                                new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        okButton.setDisabled(false);
+
+                                        if(isSoundNeeded) {
+                                            playSound("lvl_up");
+                                        }
+                                    }
+                                }
+                        )
+                ));
+
+        NumberActor numberActor = new NumberActor();
 
         Table table = new Table(skin);
         table.setFillParent(true);
@@ -71,19 +95,6 @@ public class EndScreen implements Screen {
         stage.addActor(statsTable);
 
         table.setBackground("window_lightblue");
-
-        okButton.addAction(
-                Actions.sequence(
-                        Actions.delay(2.5f),
-                        Actions.run(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        okButton.setDisabled(false);
-                                    }
-                                }
-                        )
-                ));
     }
 
     private void setupUIListeners(){
@@ -100,22 +111,9 @@ public class EndScreen implements Screen {
     }
 
     private void createGameObject(){
-        int id = calculateId();
-        GameObject gameObject = GameFactory.createGameObject(game, id);
+        GameObject gameObject = GameFactory.createGameObject();
         game.addGame(gameObject);
         gameObject.startSelling();
-    }
-
-    private int calculateId() {
-        HashSet<GameObject> games = game.getGames();
-        int id = 0;
-
-        for(GameObject game : games){
-            if(game.getId() >= id) {
-                id = game.getId() + 1;
-            }
-        }
-        return id;
     }
 
     @Override
@@ -152,5 +150,9 @@ public class EndScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
+    }
+
+    private void playSound(String name){
+        Assets.getInstance().setSound(name);
     }
 }

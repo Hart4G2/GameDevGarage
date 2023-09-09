@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
@@ -21,14 +20,11 @@ import com.mygdx.gamedevgarage.mini_games.cover_actors.CoverListItem;
 import com.mygdx.gamedevgarage.mini_games.platform_actors.PlatformList;
 import com.mygdx.gamedevgarage.stats.StatsTable;
 import com.mygdx.gamedevgarage.utils.DialogThread;
-import com.mygdx.gamedevgarage.utils.data.GameFactory;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
+import com.mygdx.gamedevgarage.utils.data.GameFactory;
 
 public class PlatformScreen implements Screen {
 
-    private Game game;
-    private Assets assets;
-    private Skin skin;
     private Stage stage;
 
     private Button okButton;
@@ -36,12 +32,6 @@ public class PlatformScreen implements Screen {
     private StatsTable statsTable;
 
     private Array<CoverListItem> platforms;
-
-    public PlatformScreen(Game game) {
-        this.game = game;
-        this.assets = game.getAssets();
-        this.skin = assets.getSkin();
-    }
 
     @Override
     public void show() {
@@ -54,16 +44,16 @@ public class PlatformScreen implements Screen {
 
     private void createUIElements(){
         GameFactory.platform = "";
-        platforms = DataArrayFactory.createPlatform(game);
+        platforms = DataArrayFactory.createPlatform();
 
-        platformsList = new PlatformList(platforms, game, this);
+        platformsList = new PlatformList(platforms, this);
 
-        okButton = createTextButton("OK", skin, "white_18");
+        okButton = createTextButton("OK", "white_18");
         okButton.setDisabled(true);
 
-        statsTable = createStatsTable(game);
+        statsTable = createStatsTable();
 
-        Table table = new Table(skin);
+        Table table = new Table(Assets.getInstance().getSkin());
         table.setFillParent(true);
         table.add(platformsList).width(getWidthPercent(1f)).height(getHeightPercent(.8f))
                 .row();
@@ -80,8 +70,8 @@ public class PlatformScreen implements Screen {
         okButton.addCaptureListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setMainScreen();
-                DialogThread.setEndGameThread();
+                Game.getInstance().setMainScreen();
+                DialogThread.getInstance().setEndGameThread();
             }
         });
     }

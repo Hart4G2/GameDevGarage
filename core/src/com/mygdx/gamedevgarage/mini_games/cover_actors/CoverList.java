@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 
 public class CoverList extends Table {
@@ -20,16 +20,16 @@ public class CoverList extends Table {
     private final Image coverImage;
     private final CoverMainActor parent;
 
-    public CoverList(Game game, Image coverImage, boolean isColorList, CoverMainActor parent) {
-        super(game.getAssets().getSkin());
+    public CoverList(Image coverImage, boolean isColorList, CoverMainActor parent) {
+        super(Assets.getInstance().getSkin());
         this.coverImage = coverImage;
         this.parent = parent;
 
         if(isColorList){
-            items = DataArrayFactory.initColors(game.getAssets());
+            items = DataArrayFactory.initColors();
             addColorItems();
         } else {
-            items = DataArrayFactory.createCoverObjects(game);
+            items = DataArrayFactory.createCoverObjects();
             addObjectItems();
         }
     }
@@ -62,6 +62,7 @@ public class CoverList extends Table {
         item.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                playSound();
                 coverImage.setDrawable(item.getImage().getDrawable());
                 parent.setSelectedColor(item.getText());
             }
@@ -88,6 +89,8 @@ public class CoverList extends Table {
 
                 coverImage.setDrawable(item.getImage().getDrawable());
                 parent.setSelectedObject(item.getText());
+
+                playSound();
             }
 
             @Override
@@ -122,5 +125,9 @@ public class CoverList extends Table {
                 item.getImage().addAction(clickAnimation);
             }
         });
+    }
+
+    private void playSound(){
+        Assets.getInstance().setSound("buying_cover");
     }
 }

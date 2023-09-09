@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.Json;
 import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.stats.Stats;
 import com.mygdx.gamedevgarage.utils.constraints.GameState;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
 import com.mygdx.gamedevgarage.utils.data.GameObject;
@@ -14,9 +15,17 @@ import java.util.HashSet;
 public class DataManager {
 
     private final Game game;
+    private static DataManager instance;
 
-    public DataManager(Game game) {
-        this.game = game;
+    public DataManager() {
+        this.game = Game.getInstance();
+    }
+
+    public static DataManager getInstance() {
+        if (instance == null) {
+            instance = new DataManager();
+        }
+        return instance;
     }
 
     public void save() {
@@ -49,13 +58,15 @@ public class DataManager {
     private void saveStats() {
         Preferences prefs = Gdx.app.getPreferences("my-game-data");
 
+        Stats stats = Stats.getInstance();
+
         HashMap<String, Integer> statsMap = new HashMap<>();
-        statsMap.put("level", game.stats.getLevel());
-        statsMap.put("exp", game.stats.getExperience());
-        statsMap.put("money", game.stats.getMoney());
-        statsMap.put("design", game.stats.getDesign());
-        statsMap.put("programming", game.stats.getProgramming());
-        statsMap.put("gameDesign", game.stats.getGameDesign());
+        statsMap.put("level", stats.getLevel());
+        statsMap.put("exp", stats.getExperience());
+        statsMap.put("money", stats.getMoney());
+        statsMap.put("design", stats.getDesign());
+        statsMap.put("programming", stats.getProgramming());
+        statsMap.put("gameDesign", stats.getGameDesign());
 
         String purchasedItemsJson = new Json().toJson(statsMap);
         prefs.putString("stats", purchasedItemsJson);

@@ -17,22 +17,21 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.collection.actors.GameList;
 import com.mygdx.gamedevgarage.stats.StatsTable;
 
 public class CollectionScreen implements Screen {
 
-    private final Game game;
     private final Skin skin;
     private Stage stage;
 
     private StatsTable statsTable;
     private Button backButton;
 
-    public CollectionScreen(Game game) {
-        this.game = game;
-        skin = game.getAssets().getSkin();
+    public CollectionScreen() {
+        skin = Assets.getInstance().getSkin();
     }
 
     @Override
@@ -45,18 +44,18 @@ public class CollectionScreen implements Screen {
     }
 
     private void createUIElements(){
-        statsTable = createStatsTable(game);
+        statsTable = createStatsTable();
 
-        GameList gameList = new GameList(game);
+        GameList gameList = new GameList();
         ScrollPane gamesScrollPane = new ScrollPane(gameList, skin);
         gamesScrollPane.setFillParent(true);
         gamesScrollPane.setScrollbarsVisible(true);
 
         Group scrollPaneContainer = new Group();
         scrollPaneContainer.addActor(gamesScrollPane);
-        scrollPaneContainer.setSize(getWidthPercent(.95f), getHeightPercent(0.7f));
+        scrollPaneContainer.setSize(getWidthPercent(.99f), getHeightPercent(0.7f));
 
-        backButton = createButton(skin, "back_button");
+        backButton = createButton("back_button");
 
         Table table = new Table();
         table.setFillParent(true);
@@ -75,7 +74,7 @@ public class CollectionScreen implements Screen {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setMainScreen();
+                Game.getInstance().setMainScreen();
             }
         });
     }

@@ -16,7 +16,9 @@ public class CoverImage extends Group {
     private Image objectImage;
     private Image frameImage;
 
-    public CoverImage(Assets assets) {
+    public CoverImage() {
+        Assets assets = Assets.getInstance();
+
         this.transparent = assets.transparent;
         this.frame = assets.frame;
 

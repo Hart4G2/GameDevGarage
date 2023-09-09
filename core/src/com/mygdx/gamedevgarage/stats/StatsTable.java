@@ -4,8 +4,8 @@ import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.mygdx.gamedevgarage.Assets;
 
 public class StatsTable extends Table {
 
@@ -18,22 +18,20 @@ public class StatsTable extends Table {
     private Property programming;
     private Property gameDesign;
 
-    public StatsTable(Skin skin, Stats stats) {
-        super(skin);
-        this.stats = stats;
+    public StatsTable() {
+        super(Assets.getInstance().getSkin());
+        this.stats = Stats.getInstance();
 
         createUIElements();
     }
 
     private void createUIElements(){
-        Skin skin = getSkin();
-
-        lvl = new Property("lvl", stats.getLevel(), skin);
-        exp = new Property("exp", stats.getExperience(), skin);
-        design = new Property("design", stats.getDesign(), skin);
-        programming = new Property("programing", stats.getProgramming(), skin);
-        gameDesign = new Property("game design", stats.getGameDesign(), skin);
-        money = new Property("money", stats.getMoney(), skin);
+        lvl = new Property("lvl", stats.getLevel());
+        exp = new Property("exp", stats.getExperience());
+        design = new Property("design", stats.getDesign());
+        programming = new Property("programing", stats.getProgramming());
+        gameDesign = new Property("game design", stats.getGameDesign());
+        money = new Property("money", stats.getMoney());
 
         setSize(getWidthPercent(.96f), getHeightPercent(.03f));
         setPosition(getWidthPercent(.04f), Gdx.graphics.getHeight());

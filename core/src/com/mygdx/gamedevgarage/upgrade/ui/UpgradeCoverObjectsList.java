@@ -1,36 +1,37 @@
 package com.mygdx.gamedevgarage.upgrade.ui;
 
-import static com.mygdx.gamedevgarage.utils.constraints.Constants.UPGRADE_OBJECT_COST;
 import static com.mygdx.gamedevgarage.utils.Utils.createBuyButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
+import static com.mygdx.gamedevgarage.utils.constraints.Constants.UPGRADE_OBJECT_COST;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.mini_games.cover_actors.CoverListItem;
+import com.mygdx.gamedevgarage.stats.Stats;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 
 public class UpgradeCoverObjectsList extends Table {
 
     private final Game game;
-    private final Skin skin;
+    private final Stats stats;
 
     private final Array<CoverListItem> items;
     private final Array<TextButton> buttons;
     private final Drawable buttonIcon;
 
-    public UpgradeCoverObjectsList(Game game) {
-        super(game.getAssets().getSkin());
-        skin = getSkin();
-        this.game = game;
-        this.items = DataArrayFactory.createCoverObjects(game);
+    public UpgradeCoverObjectsList() {
+        super(Assets.getInstance().getSkin());
+        this.game = Game.getInstance();
+        this.stats = Stats.getInstance();
+        this.items = DataArrayFactory.createCoverObjects();
         this.buttonIcon = getSkin().getDrawable("design");
 
         buttons = new Array<>();
@@ -54,7 +55,7 @@ public class UpgradeCoverObjectsList extends Table {
     }
 
     private TextButton createTextButton(String itemName){
-        TextButton button = createBuyButton(String.valueOf(UPGRADE_OBJECT_COST), skin, itemName);
+        TextButton button = createBuyButton(String.valueOf(UPGRADE_OBJECT_COST), itemName);
 
         Image image = new Image(buttonIcon);
         float imageSize = getWidthPercent(.06f);
@@ -70,11 +71,13 @@ public class UpgradeCoverObjectsList extends Table {
         button.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                int design = game.stats.getDesign();
+                playSound("buying_cover");
+
+                int design = stats.getDesign();
                 int cost = UPGRADE_OBJECT_COST;
 
                 if(design >= cost){
-                    game.stats.setDesign(design - cost);
+                    stats.setDesign(design - cost);
 
                     for (int i = 0; i < items.size; i++) {
                         CoverListItem item = items.get(i);
@@ -97,5 +100,9 @@ public class UpgradeCoverObjectsList extends Table {
         buttons.removeValue(button, true);
         clear();
         addItems();
+    }
+
+    private void playSound(String sound){
+        Assets.getInstance().setSound(sound);
     }
 }

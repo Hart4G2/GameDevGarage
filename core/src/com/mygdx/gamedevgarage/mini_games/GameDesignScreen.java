@@ -2,6 +2,7 @@ package com.mygdx.gamedevgarage.mini_games;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
 import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
+import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
@@ -16,7 +17,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -26,28 +26,22 @@ import com.mygdx.gamedevgarage.mini_games.selection_actors.CheckList;
 import com.mygdx.gamedevgarage.mini_games.selection_actors.CheckListItem;
 import com.mygdx.gamedevgarage.stats.StatsTable;
 import com.mygdx.gamedevgarage.utils.DialogThread;
-import com.mygdx.gamedevgarage.utils.data.GameFactory;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
+import com.mygdx.gamedevgarage.utils.data.GameFactory;
 
 import java.util.ArrayList;
 
-public class GameDesignScreen implements Screen, MiniGameScreen {
+public class GameDesignScreen implements Screen {
 
-    private final Game game;
-    private final Assets assets;
     private final Skin skin;
     private Stage stage;
 
-    private Label headerLabel;
     private Button okButton;
-    private Array<CheckListItem> mechanics;
     private CheckList mechanicList;
     private StatsTable statsTable;
 
-    public GameDesignScreen(Game game) {
-        this.game = game;
-        this.assets = game.getAssets();
-        this.skin = assets.getSkin();
+    public GameDesignScreen() {
+        this.skin = Assets.getInstance().getSkin();
     }
 
     @Override
@@ -61,24 +55,24 @@ public class GameDesignScreen implements Screen, MiniGameScreen {
 
     private void createUIElements(){
         GameFactory.mechanics = new ArrayList<>();
-        mechanics = DataArrayFactory.createMechanics(game);
+        Array<CheckListItem> mechanics = DataArrayFactory.createMechanics();
 
-        mechanicList = new CheckList(mechanics, this, assets);
+        mechanicList = new CheckList(mechanics);
 
         ScrollPane scrollPane = new ScrollPane(mechanicList, skin);
         scrollPane.setFillParent(true);
         scrollPane.setScrollbarsVisible(true);
 
-        headerLabel = createLabel("Choose technologies", skin, "white_20");
+        Label headerLabel = createLabel("Choose technologies", "white_20");
 
-        okButton = new TextButton("OK", skin, "white_18");
+        okButton = createTextButton("OK", "white_18");
         okButton.setDisabled(true);
 
         Group group = new Group();
         group.addActor(scrollPane);
         group.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 1.15f);
 
-        statsTable = createStatsTable(game);
+        statsTable = createStatsTable();
         statsTable.setLabelsStyle("black_18");
 
         Table table = new Table(skin);
@@ -105,9 +99,16 @@ public class GameDesignScreen implements Screen, MiniGameScreen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if(!okButton.isDisabled()){
-                    game.setMainScreen();
-                    DialogThread.setPlatformThread();
+                    Game.getInstance().setMainScreen();
+                    DialogThread.getInstance().setPlatformThread();
                 }
+            }
+        });
+
+        mechanicList.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                okButton.setDisabled(mechanicList.getSelectedItems().size == 0);
             }
         });
     }
@@ -150,19 +151,4 @@ public class GameDesignScreen implements Screen, MiniGameScreen {
         stage.dispose();
     }
 
-    @Override
-    public void addItem(String item) {
-        GameFactory.mechanics.add(item);
-        okButton.setDisabled(false);
-    }
-
-    @Override
-    public void removeItem(String item) {
-        if(GameFactory.mechanics.contains(item)){
-            GameFactory.mechanics.remove(item);
-            if(GameFactory.mechanics.size() == 0){
-                okButton.setDisabled(true);
-            }
-        }
-    }
 }

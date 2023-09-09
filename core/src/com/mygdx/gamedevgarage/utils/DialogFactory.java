@@ -1,11 +1,11 @@
 package com.mygdx.gamedevgarage.utils;
 
-import static com.mygdx.gamedevgarage.utils.Utils.*;
 import static com.mygdx.gamedevgarage.utils.Utils.createDialog;
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
 import static com.mygdx.gamedevgarage.utils.Utils.createSelectBox;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextField;
+import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
@@ -17,38 +17,34 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.Align;
 import com.mygdx.gamedevgarage.Assets;
-import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 
 public class DialogFactory {
 
-    public static Dialog createMakeGameDialog(Game game) {
-        Assets assets = game.getAssets();
-        Skin skin = assets.getSkin();
-
-        final Dialog dialog = createDialog(skin);
+    public static Dialog createMakeGameDialog() {
+        Skin skin = Assets.getInstance().getSkin();
+        final Dialog dialog = createDialog();
 
         // content table
-        String[] genres = game.reward.genres;
+        String[] genres = DataArrayFactory.genres;
+        String[] themes = DataArrayFactory.themes;
+        String[] gameLevels = DataArrayFactory.gameLevels;
 
-        String[] themes = game.reward.themes;
-
-        String[] gameLevels = game.reward.gameLevels;
-
-        final TextField nameTextField = createTextField(null, skin, "default",
+        final TextField nameTextField = createTextField(null, "default",
                 Align.center, "nameTextField");
 
-        final SelectBox<String> genreSelectBox = createSelectBox(skin, "default",
+        final SelectBox<String> genreSelectBox = createSelectBox("default",
                 genres, Align.center, "genreSelectBox", true);
-        final SelectBox<String> themesSelectBox = createSelectBox(skin, "default",
+        final SelectBox<String> themesSelectBox = createSelectBox("default",
                 themes, Align.center, "themesSelectBox", true);
-        final SelectBox<String> levelSelectBox = createSelectBox(skin, "default",
+        final SelectBox<String> levelSelectBox = createSelectBox("default",
                 gameLevels, Align.center, "levelSelectBox", false);
 
-        Label headerLabel = createLabel("Create Game", skin, "black_32");
-        Label nameLabel = createLabel("Name:", skin, "black_24");
-        Label genreLabel = createLabel("Genre:", skin, "black_24");
-        Label platformLabel = createLabel("Theme:", skin, "black_24");
-        Label levelLabel = createLabel("Level:", skin, "black_24");
+        Label headerLabel = createLabel("Create Game", "black_32");
+        Label nameLabel = createLabel("Name:", "black_24");
+        Label genreLabel = createLabel("Genre:", "black_24");
+        Label platformLabel = createLabel("Theme:", "black_24");
+        Label levelLabel = createLabel("Level:", "black_24");
 
         float labelWidth = getWidthPercent(.2f);
         float labelHeight = getHeightPercent(.05f);
@@ -93,8 +89,8 @@ public class DialogFactory {
         float buttonHeight = getHeightPercent(.08f);
         float buttonPad = getWidthPercent(.03f);
 
-        TextButton okButton = createTextButton("OK", skin, "white_18", "okButton");
-        TextButton cancelButton = createTextButton("Cancel", skin, "white_18", "cancelButton");
+        TextButton okButton = createTextButton("OK", "white_18", "okButton");
+        TextButton cancelButton = createTextButton("Cancel", "white_18", "cancelButton");
 
         Table buttonTable = dialog.getButtonTable();
 
