@@ -16,6 +16,8 @@ import com.mygdx.gamedevgarage.utils.data.GameFactory;
 
 public class DialogThread {
 
+    private static final Timer currentTimer = new Timer();
+
     private static DialogThread instance;
 
     public static DialogThread getInstance(){
@@ -133,22 +135,30 @@ public class DialogThread {
     }
 
     public void setDesignThread() {
-        new Timer().scheduleTask(designThread, Constants.MAIN_TIME);
+        currentTimer.scheduleTask(designThread, Constants.MAIN_TIME);
     }
 
     public void setProgrammingThread() {
-        new Timer().scheduleTask(programmingThread, Constants.DESIGN_TIME);
+        currentTimer.scheduleTask(programmingThread, Constants.DESIGN_TIME);
     }
 
     public void setGameDesignThread() {
-        new Timer().scheduleTask(gameDesignThread, Constants.PROGRAMING_TIME);
+        currentTimer.scheduleTask(gameDesignThread, Constants.PROGRAMING_TIME);
     }
 
     public void setEndGameThread() {
-        new Timer().scheduleTask(endGameThread, Constants.MAIN_TIME);
+        currentTimer.scheduleTask(endGameThread, Constants.MAIN_TIME);
     }
 
     public void setPlatformThread() {
-        new Timer().scheduleTask(platformThread, Constants.GAME_DESIGN_TIME);
+        currentTimer.scheduleTask(platformThread, Constants.GAME_DESIGN_TIME);
+    }
+
+    public void pause() {
+        currentTimer.stop();
+    }
+
+    public void resume() {
+        currentTimer.start();
     }
 }

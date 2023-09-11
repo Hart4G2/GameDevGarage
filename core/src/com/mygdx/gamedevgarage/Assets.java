@@ -176,7 +176,7 @@ public class Assets {
 
     private void setMusic(){
         Music music = Gdx.audio.newMusic(Gdx.files.internal("music/" + song + ".mp3"));
-        music.setVolume(0.25f);
+        music.setVolume(0.1f);
         music.play();
 
         music.setOnCompletionListener(new Music.OnCompletionListener() {

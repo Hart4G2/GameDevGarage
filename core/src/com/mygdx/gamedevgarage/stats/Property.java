@@ -1,5 +1,6 @@
 package com.mygdx.gamedevgarage.stats;
 
+import static com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -58,30 +59,7 @@ public class Property extends Table {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                if(isPressed) return;
-
-                isPressed = true;
-                hintLabel.addAction(Actions.sequence(
-                        Actions.run(new Runnable() {
-                            @Override
-                            public void run() {
-                                hintLabel.addAction(Actions.alpha(0f, .001f));
-                                hintLabel.setVisible(true);
-                            }
-                        }),
-                        Actions.delay(.01f),
-                        Actions.fadeIn(.2f),
-                        Actions.delay(1.5f),
-                        Actions.fadeOut(.3f),
-                        Actions.delay(.1f),
-                        Actions.run(new Runnable() {
-                            @Override
-                            public void run() {
-                                hintLabel.setVisible(false);
-                                isPressed = false;
-                            }
-                        })
-                ));
+                showHint();
             }
         };
 
@@ -89,12 +67,68 @@ public class Property extends Table {
         valueLabel.addListener(listener);
     }
 
+    private void showHint(){
+        if(isPressed) return;
+
+        isPressed = true;
+        hintLabel.addAction(Actions.sequence(
+                Actions.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        hintLabel.addAction(Actions.alpha(0f, .001f));
+                        hintLabel.setVisible(true);
+                    }
+                }),
+                Actions.delay(.01f),
+                Actions.fadeIn(.2f),
+                Actions.delay(1.5f),
+                Actions.fadeOut(.3f),
+                Actions.delay(.1f),
+                Actions.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        hintLabel.setVisible(false);
+                        isPressed = false;
+                    }
+                })
+        ));
+    }
+
     public void setValue(int value) {
         this.value = value;
         valueLabel.setText(String.valueOf(value));
     }
 
-    public void setLabelStyle(String style){
-        valueLabel.setStyle(getSkin().get(style, Label.LabelStyle.class));
+    public void setValueLabelStyle(String style){
+        valueLabel.setStyle(getSkin().get(style, LabelStyle.class));
+    }
+
+    public void setHintLabelStyle(String style){
+        hintLabel.setStyle(getSkin().get(style, LabelStyle.class));
+    }
+
+    public void setHint(String hint, String style){
+        hintLabel.clearActions();
+        isPressed = false;
+
+        final LabelStyle previousStyle = hintLabel.getStyle();
+
+        hintLabel.setStyle(getSkin().get(style, LabelStyle.class));
+        hintLabel.setText(hint);
+
+        showHint();
+
+        hintLabel.addAction(
+                Actions.sequence(
+                        Actions.delay(2.5f),
+                        Actions.run(new Runnable() {
+                            @Override
+                            public void run() {
+                                hintLabel.setText(text);
+                                hintLabel.setStyle(previousStyle);
+                            }
+                        })
+                )
+        );
     }
 }

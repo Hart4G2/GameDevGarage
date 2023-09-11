@@ -28,16 +28,6 @@ public class GameFactory {
                 false, 0, 0);
     }
 
-    public static GameObject createGameObjectDebug(int id, String name, String color,
-                                                   String object, List<String> technologies,
-                                                   List<String> mechanics, String platform,
-                                                   int score, int profitMoney, float sellTime,
-                                                   boolean isSold, float soldTime, int soldMoney
-    ) {
-        return new GameObject(id, name, color, object, technologies, mechanics, platform,
-                score, profitMoney, sellTime, isSold, soldTime, soldMoney);
-    }
-
     private static int calculateId() {
         HashSet<GameObject> games = Game.getInstance().getGames();
         int id = 0;

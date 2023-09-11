@@ -6,6 +6,10 @@ import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.gamedevgarage.Assets;
+import com.mygdx.gamedevgarage.utils.constraints.Currency;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class StatsTable extends Table {
 
@@ -18,20 +22,28 @@ public class StatsTable extends Table {
     private Property programming;
     private Property gameDesign;
 
+    public static List<StatsTable> tables;
+
     public StatsTable() {
         super(Assets.getInstance().getSkin());
         this.stats = Stats.getInstance();
 
         createUIElements();
+
+        if(tables == null){
+            tables = new ArrayList<>();
+        }
+
+        tables.add(this);
     }
 
     private void createUIElements(){
-        lvl = new Property("lvl", stats.getLevel());
-        exp = new Property("exp", stats.getExperience());
-        design = new Property("design", stats.getDesign());
-        programming = new Property("programing", stats.getProgramming());
-        gameDesign = new Property("game design", stats.getGameDesign());
-        money = new Property("money", stats.getMoney());
+        lvl = new Property("lvl", stats.getStat(Currency.LEVEL));
+        exp = new Property("exp", stats.getStat(Currency.EXPERIENCE));
+        design = new Property("design", stats.getStat(Currency.DESIGN));
+        programming = new Property("programing", stats.getStat(Currency.PROGRAMMING));
+        gameDesign = new Property("game design", stats.getStat(Currency.GAME_DESIGN));
+        money = new Property("money", stats.getStat(Currency.MONEY));
 
         setSize(getWidthPercent(.96f), getHeightPercent(.03f));
         setPosition(getWidthPercent(.04f), Gdx.graphics.getHeight());
@@ -45,21 +57,49 @@ public class StatsTable extends Table {
         add(money).expand();
     }
 
-    public void setLabelsStyle(String style){
-        lvl.setLabelStyle(style);
-        exp.setLabelStyle(style);
-        design.setLabelStyle(style);
-        programming.setLabelStyle(style);
-        gameDesign.setLabelStyle(style);
-        money.setLabelStyle(style);
+    public void setValueLabelsStyle(String style){
+        lvl.setValueLabelStyle(style);
+        exp.setValueLabelStyle(style);
+        design.setValueLabelStyle(style);
+        programming.setValueLabelStyle(style);
+        gameDesign.setValueLabelStyle(style);
+        money.setValueLabelStyle(style);
+    }
+
+    public void setHintLabelsStyle(String style){
+        lvl.setHintLabelStyle(style);
+        exp.setHintLabelStyle(style);
+        design.setHintLabelStyle(style);
+        programming.setHintLabelStyle(style);
+        gameDesign.setHintLabelStyle(style);
+        money.setHintLabelStyle(style);
     }
 
     public void update() {
-        lvl.setValue(stats.getLevel());
-        exp.setValue(stats.getExperience());
-        money.setValue(stats.getMoney());
-        design.setValue(stats.getDesign());
-        programming.setValue(stats.getProgramming());
-        gameDesign.setValue(stats.getGameDesign());
+        lvl.setValue(stats.getStat(Currency.LEVEL));
+        exp.setValue(stats.getStat(Currency.EXPERIENCE));
+        money.setValue(stats.getStat(Currency.MONEY));
+        design.setValue(stats.getStat(Currency.DESIGN));
+        programming.setValue(stats.getStat(Currency.PROGRAMMING));
+        gameDesign.setValue(stats.getStat(Currency.GAME_DESIGN));
+    }
+
+    public Property getProperty(String name) {
+        switch (name) {
+            case "lvl":
+                return lvl;
+            case "exp":
+                return exp;
+            case "money":
+                return money;
+            case "design":
+                return design;
+            case "programing":
+                return programming;
+            case "gameDesign":
+                return gameDesign;
+            default:
+                return null;
+        }
     }
 }

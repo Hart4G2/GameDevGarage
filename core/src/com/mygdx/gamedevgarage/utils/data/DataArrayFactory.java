@@ -6,16 +6,20 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
-import com.mygdx.gamedevgarage.mini_games.cover_actors.CoverListItem;
-import com.mygdx.gamedevgarage.mini_games.selection_actors.CheckListItem;
+import com.mygdx.gamedevgarage.screens.mini_games.cover_actors.CoverListItem;
+import com.mygdx.gamedevgarage.screens.mini_games.selection_actors.CheckListItem;
+import com.mygdx.gamedevgarage.utils.Cost;
+import com.mygdx.gamedevgarage.utils.constraints.Currency;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
-import java.util.function.Function;
 
 public class DataArrayFactory {
 
@@ -69,48 +73,221 @@ public class DataArrayFactory {
             "Push to free web", "Buy a place in play store", "Order an expensive site", "Order an advertising campaign"
     };
 
-    public static Array<CoverListItem> createCoverObjects(){
-        Array<CoverListItem> objects = initObjects();
-        HashSet<String> objectSet = Game.getInstance().getCoverObjects();
+    public static List<CoverObject> objects;
+    public static List<CheckObject> technologies;
+    public static List<CheckObject> mechanics;
+    public static List<CoverObject> platforms;
+    public static List<CoverObject> colors;
 
-        for (CoverListItem item : objects) {
-            item.setPurchased(objectSet.contains(item.getText()));
-        }
+    public static void initialise(){
+        Assets assets = Assets.getInstance();
 
-        return objects;
+        String objectsJson = Gdx.files.internal("objects.json").readString();
+        String technologiesJson = Gdx.files.internal("technologies.json").readString();
+        String mechanicsJson = Gdx.files.internal("mechanics.json").readString();
+        String platformsJson = Gdx.files.internal("platforms.json").readString();
+        String colorsJson = Gdx.files.internal("colors.json").readString();
+
+        objects = readCoverObjectsFromJson(objectsJson, assets.designObjectsAtlas, Game.getInstance().getCoverObjects());
+        technologies = readCheckObjectsFromJson(technologiesJson, assets.techAtlas, Game.getInstance().getTechnologies());
+        mechanics = readMechanicsFromJson(mechanicsJson);
+        platforms = readCoverObjectsFromJson(platformsJson, assets.platformAtlas, Game.getInstance().getPlatforms());
+        colors = readCoverObjectsWithoutCostFromJson(colorsJson, assets.designColorsAtlas);
     }
 
-    public static Array<CheckListItem> createTechnologies(){
-        Array<CheckListItem> technologies = initTechnologies();
-        HashSet<String> technologySet = Game.getInstance().getTechnologies();
+    public static List<CheckObject> readCheckObjectsFromJson(String json, TextureAtlas atlas, HashSet<String> purchasedSet) {
+        List<CheckObject> result = new ArrayList<>();
 
-        for (CheckListItem item : technologies) {
-            item.setPurchased(technologySet.contains(item.getText()));
+        JsonReader reader = new JsonReader();
+        JsonValue value = reader.parse(json);
+
+        for (JsonValue item : value) {
+            String name = item.getString("name");
+            String description = item.getString("description");
+
+            String regionName = name.replace("\n", "");
+            TextureRegionDrawable frame1 = createDrawable(atlas, regionName, 1);
+            TextureRegionDrawable frame2 = createDrawable(atlas, regionName, 2);
+
+            JsonValue costJson = item.get("cost");
+            JsonValue valueArrayJson = costJson.get("value");
+
+            int[] values = new int[valueArrayJson.size];
+            for (int i = 0; i < valueArrayJson.size; i++) {
+                values[i] = valueArrayJson.getInt(i);
+            }
+
+            JsonValue currencyArrayJson = costJson.get("currency");
+            Currency[] currencies = new Currency[currencyArrayJson.size];
+            for (int i = 0; i < currencyArrayJson.size; i++) {
+                currencies[i] = Currency.fromString(currencyArrayJson.getString(i));
+            }
+
+            Cost cost = new Cost(currencies, values);
+
+            CheckObject checkObject = new CheckObject(name, description, frame1, frame2, cost);
+            checkObject.setPurchased(purchasedSet.contains(name));
+
+            result.add(checkObject);
         }
 
-        return technologies;
+        return result;
     }
 
-    public static Array<CheckListItem> createMechanics(){
-        Array<CheckListItem> mechanics = initMechanics();
+    public static List<CheckObject> readMechanicsFromJson(String json) {
+        List<CheckObject> result = new ArrayList<>();
+        HashSet<String> purchasedSet = Game.getInstance().getMechanics();
+
+        JsonReader reader = new JsonReader();
+        JsonValue value = reader.parse(json);
+
+        for (JsonValue item : value) {
+            String name = item.getString("name");
+            String description = item.getString("description");
+
+            TextureRegionDrawable frame1 = new TextureRegionDrawable(new Texture(Gdx.files.internal("frame1.png")));
+            TextureRegionDrawable  frame2 = new TextureRegionDrawable(new Texture(Gdx.files.internal("frame2.png")));
+
+            JsonValue costJson = item.get("cost");
+            JsonValue valueArrayJson = costJson.get("value");
+
+            int[] values = new int[valueArrayJson.size];
+            for (int i = 0; i < valueArrayJson.size; i++) {
+                values[i] = valueArrayJson.getInt(i);
+            }
+
+            JsonValue currencyArrayJson = costJson.get("currency");
+            Currency[] currencies = new Currency[currencyArrayJson.size];
+            for (int i = 0; i < currencyArrayJson.size; i++) {
+                currencies[i] = Currency.fromString(currencyArrayJson.getString(i));
+            }
+
+            Cost cost = new Cost(currencies, values);
+
+            CheckObject checkObject = new CheckObject(name, description, frame1, frame2, cost);
+            checkObject.setPurchased(purchasedSet.contains(name));
+
+            result.add(checkObject);
+        }
+
+        return result;
+    }
+
+    public static List<CoverObject> readCoverObjectsFromJson(String json, TextureAtlas atlas, HashSet<String> purchasedSet) {
+        List<CoverObject> result = new ArrayList<>();
+
+        JsonReader reader = new JsonReader();
+        JsonValue value = reader.parse(json);
+
+        for (JsonValue item : value) {
+            String name = item.getString("text");
+            String itemName = item.getString("item");
+            int itemIndex = item.getInt("item_index");
+
+            JsonValue costJson = item.get("cost");
+            JsonValue valueArrayJson = costJson.get("value");
+
+            int[] values = new int[valueArrayJson.size];
+            for (int i = 0; i < valueArrayJson.size; i++) {
+                values[i] = valueArrayJson.getInt(i);
+            }
+
+            JsonValue currencyArrayJson = costJson.get("currency");
+            Currency[] currencies = new Currency[currencyArrayJson.size];
+            for (int i = 0; i < currencyArrayJson.size; i++) {
+                currencies[i] = Currency.fromString(currencyArrayJson.getString(i));
+            }
+
+            Cost cost = new Cost(currencies, values);
+
+            Drawable itemDrawable = createDrawable(atlas, itemName, itemIndex);
+
+            CoverObject coverObject = new CoverObject(name, itemDrawable, cost);
+            coverObject.setPurchased(purchasedSet.contains(name));
+
+            result.add(coverObject);
+        }
+
+        return result;
+    }
+
+    public static List<CoverObject> readCoverObjectsWithoutCostFromJson(String json, TextureAtlas atlas) {
+        List<CoverObject> result = new ArrayList<>();
+
+        JsonReader reader = new JsonReader();
+        JsonValue value = reader.parse(json);
+
+        for (JsonValue item : value) {
+            String text = item.getString("text");
+            String itemName = item.getString("item");
+            int itemIndex = item.getInt("item_index");
+
+            Drawable itemDrawable = createDrawable(atlas, itemName, itemIndex);
+
+            result.add(new CoverObject(text, itemDrawable));
+        }
+
+        return result;
+    }
+
+    public static List<CoverListItem> createCoverObjects(){
+        List<CoverListItem> result = new ArrayList<>();
+
+        for (CoverObject item : objects) {
+            result.add(new CoverListItem(item));
+        }
+
+        return result;
+    }
+
+    public static List<CheckListItem> createTechnologiesListItems(){
+        List<CheckListItem> result = new ArrayList<>();
+
+        for(CheckObject item : technologies){
+            result.add(new CheckListItem(item));
+        }
+
+        return result;
+    }
+
+    public static List<CheckListItem> createMechanics(){
+        List<CheckListItem> result = new ArrayList<>();
         HashSet<String> mechanicsSet = Game.getInstance().getMechanics();
 
-        for (CheckListItem mechanic : mechanics) {
-            mechanic.setPurchased(mechanicsSet.contains(mechanic.getText()));
+        for(CheckObject item : mechanics){
+            item.setPurchased(mechanicsSet.contains(item.getName()));
+            result.add(new CheckListItem(item));
         }
 
-        return mechanics;
+        return result;
     }
 
-    public static Array<CoverListItem> createPlatform(){
-        Array<CoverListItem> platforms = initPlatforms();
-        HashSet<String> platformSet = Game.getInstance().getPlatforms();
+    public static List<CoverListItem> createPlatforms(){
+        List<CoverListItem> result = new ArrayList<>();
 
-        for (CoverListItem platform : platforms) {
-            platform.setPurchased(platformSet.contains(platform.getText()));
+        Skin skin = Assets.getInstance().getSkin();
+        Drawable background = skin.getDrawable("platform_item");
+        Drawable imageBackground = skin.getDrawable("transparent");
+
+        for (CoverObject platform : platforms) {
+            result.add(new CoverListItem(platform, background, imageBackground));
         }
 
-        return platforms;
+        return result;
+    }
+
+    public static List<CoverListItem> createColors(){
+        List<CoverListItem> result = new ArrayList<>();
+
+        Skin skin = Assets.getInstance().getSkin();
+        Drawable background = skin.getDrawable("design_item");
+        Drawable imageBackground = skin.getDrawable("item_image_bg");
+
+        for (CoverObject color : colors) {
+            result.add(new CoverListItem(color, background, imageBackground));
+        }
+
+        return result;
     }
 
     public static HashSet<String> createDataObjectsSet(){
@@ -136,134 +313,8 @@ public class DataArrayFactory {
         return new HashSet<>(Arrays.asList(platformNames).subList(0, 1));
     }
 
-    private static Array<CoverListItem> initObjects(){
-        Assets assets = Assets.getInstance();
-        TextureAtlas atlas = assets.designObjectsAtlas;
-        Array<CoverListItem> objects = new Array<>();
-
-        String[] objectRegions = {
-                "aliens", "aviation", "business", "cinema", "city", "comedy", "construction",
-                "cooking", "criminal", "cyberpunk", "dance", "detective", "fantasy", "farm",
-                "fashion", "game_development", "government", "hacker", "horror", "hospital",
-                "hunting", "life", "medieval", "music", "ninja", "pirates", "prison", "race",
-                "romantic", "rhythm", "school", "space", "sport", "superheros", "time_travel",
-                "transport", "vampires", "virtual_animal", "war", "westwood", "zombie"
-        };
-
-        for (int i = 0; i < objectNames.length; i++) {
-            TextureRegionDrawable drawable1 = createDrawable(atlas, objectRegions[i], 1);
-            TextureRegionDrawable drawable2 = createDrawable(atlas, objectRegions[i], 2);
-
-            objects.add(new CoverListItem(objectNames[i] + "_1", drawable1));
-            objects.add(new CoverListItem(objectNames[i] + "_2", drawable2));
-        }
-
-        return objects;
-    }
-
-    private static Array<CheckListItem> initTechnologies() {
-        Assets assets = Assets.getInstance();
-        TextureAtlas atlas = assets.techAtlas;
-        Skin skin = assets.getSkin();
-
-        Array<CheckListItem> objects = new Array<>();
-
-        Drawable bgUnselected = skin.getDrawable("programming_item");
-        Drawable bgSelected = skin.getDrawable("programming_item_selected");
-        Drawable imageFrameUnselected = skin.getDrawable("item_image_bg");
-        Drawable imageFrameSelected = skin.getDrawable("item_image_bg_selected");
-
-
-        for (String techName : techNames) {
-            String regionName = techName.replace("\n", "");
-
-            TextureRegionDrawable frame1Texture = createDrawable(atlas, regionName, 1);
-            TextureRegionDrawable frame2Texture = createDrawable(atlas, regionName, 2);
-
-            if(atlas.findRegion(regionName, 1) == null|| atlas.findRegion(regionName, 2) == null){
-                System.out.println(regionName);
-            }
-
-            objects.add(new CheckListItem(techName, frame1Texture, frame2Texture, bgUnselected, bgSelected,
-                    imageFrameUnselected, imageFrameSelected));
-        }
-
-        return objects;
-    }
-
     private static TextureRegionDrawable createDrawable(TextureAtlas atlas, String regionName, int index) {
         return new TextureRegionDrawable(atlas.findRegion(regionName, index));
-    }
-
-    private static Array<CheckListItem> initMechanics(){
-        Skin skin = Assets.getInstance().getSkin();
-
-        Array<CheckListItem> objects = new Array<>();
-
-        Drawable bgUnselected = skin.getDrawable("game_design_item");
-        Drawable bgSelected = skin.getDrawable("game_design_item_selected");
-        Drawable imageFrameUnselected = skin.getDrawable("item_image_bg");
-        Drawable imageFrameSelected = skin.getDrawable("item_image_bg_selected");
-
-        TextureRegionDrawable frame1Texture = new TextureRegionDrawable(new Texture(Gdx.files.internal("frame1.png")));
-        TextureRegionDrawable  frame2Texture = new TextureRegionDrawable(new Texture(Gdx.files.internal("frame2.png")));
-
-        for (String mechanicName : mechanicNames) {
-            objects.add(new CheckListItem(mechanicName, frame1Texture, frame2Texture, bgUnselected, bgSelected,
-                    imageFrameUnselected, imageFrameSelected));
-        }
-
-        return objects;
-    }
-
-    public static Array<CoverListItem> initColors() {
-        Assets assets = Assets.getInstance();
-        Skin skin = assets.getSkin();
-        Array<CoverListItem> colors = new Array<>();
-
-        String[] colorNames = {
-                "Light Blue", "Dark Blue", "Blue", "Red", "Light Red", "Dark Red", "Yellow", "Dark Yellow", "Sandy", "Orange",
-                "Light Purple", "Dark Purple", "Purple", "Light Pink", "Pink", "Light Brown", "Dark Brown", "Brown",
-                "Black", "White", "Light Grey", "Dark Grey", "Grey", "Dark Green", "Light Green", "Green"
-        };
-
-        String[] colorRegions = {
-                "light_blue", "dark_blue", "blue", "red", "light_red", "dark_red", "yellow", "dark_yellow", "sandy", "orange",
-                "light_purple", "dark_purple", "purple", "light_pink", "pink", "light_brown", "dark_brown", "brown",
-                "black", "white", "light_grey", "dark_grey", "grey", "dark_green", "light_green", "green"
-        };
-
-        Drawable background = skin.getDrawable("design_item");
-
-        Drawable imageBackground = skin.getDrawable("item_image_bg");
-
-        for (int i = 0; i < colorNames.length; i++) {
-            TextureRegionDrawable item = new TextureRegionDrawable(assets.designColorsAtlas.findRegion(colorRegions[i]));
-            colors.add(new CoverListItem(colorNames[i], item, background, imageBackground));
-        }
-
-        return colors;
-    }
-
-    private static Array<CoverListItem> initPlatforms() {
-        Assets assets = Assets.getInstance();
-        Skin skin = assets.getSkin();
-        Array<CoverListItem> platforms = new Array<>();
-
-        String[] platformRegions = {
-                "placeinplaystore", "freeweb", "expensivesite", "advertisingcampaign"
-        };
-
-        Drawable background = skin.getDrawable("platform_item");
-
-        Drawable imageBackground = skin.getDrawable("transparent");
-
-        for (int i = 0; i < platformNames.length; i++) {
-            TextureRegionDrawable item = new TextureRegionDrawable(assets.platformAtlas.findRegion(platformRegions[i]));
-            platforms.add(new CoverListItem(platformNames[i], item, background, imageBackground));
-        }
-
-        return platforms;
     }
 
     public static Drawable getObject(String name){

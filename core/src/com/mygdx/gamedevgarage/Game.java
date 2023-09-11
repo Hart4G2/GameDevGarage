@@ -3,15 +3,24 @@ package com.mygdx.gamedevgarage;
 
 import static com.mygdx.gamedevgarage.utils.Utils.convertStringToList;
 
-import com.mygdx.gamedevgarage.collection.CollectionScreen;
-import com.mygdx.gamedevgarage.mini_games.DesignScreen;
-import com.mygdx.gamedevgarage.mini_games.EndScreen;
-import com.mygdx.gamedevgarage.mini_games.GameDesignScreen;
-import com.mygdx.gamedevgarage.mini_games.PlatformScreen;
-import com.mygdx.gamedevgarage.mini_games.ProgrammingScreen;
-import com.mygdx.gamedevgarage.upgrade.UpgradeScreen;
+import com.badlogic.gdx.utils.Timer;
+import com.mygdx.gamedevgarage.screens.MainScreen;
+import com.mygdx.gamedevgarage.screens.collection.CollectionScreen;
+import com.mygdx.gamedevgarage.screens.game_event.EventPublisher;
+import com.mygdx.gamedevgarage.screens.game_event.GameEvent;
+import com.mygdx.gamedevgarage.screens.game_event.GameOverScreen;
+import com.mygdx.gamedevgarage.screens.game_event.Observer;
+import com.mygdx.gamedevgarage.screens.game_event.TaxEvent;
+import com.mygdx.gamedevgarage.screens.mini_games.DesignScreen;
+import com.mygdx.gamedevgarage.screens.mini_games.EndScreen;
+import com.mygdx.gamedevgarage.screens.mini_games.GameDesignScreen;
+import com.mygdx.gamedevgarage.screens.mini_games.PlatformScreen;
+import com.mygdx.gamedevgarage.screens.mini_games.ProgrammingScreen;
+import com.mygdx.gamedevgarage.screens.upgrade.UpgradeScreen;
+import com.mygdx.gamedevgarage.stats.Stats;
 import com.mygdx.gamedevgarage.utils.DataManager;
 import com.mygdx.gamedevgarage.utils.DialogThread;
+import com.mygdx.gamedevgarage.utils.constraints.Constants;
 import com.mygdx.gamedevgarage.utils.constraints.GameState;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
@@ -21,7 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 
-public class Game extends com.badlogic.gdx.Game {
+public class Game extends com.badlogic.gdx.Game implements Observer {
 
     private MainScreen mainScreen;
 
@@ -34,6 +43,7 @@ public class Game extends com.badlogic.gdx.Game {
     public boolean isGameStarted = false;
     public GameState gameState;
     private DataManager dataManager;
+    private EventPublisher eventPublisher;
 
     private static Game instance;
 
@@ -65,11 +75,18 @@ public class Game extends com.badlogic.gdx.Game {
             platforms = DataArrayFactory.createDataPlatformsSet();
         }
 
+        DataArrayFactory.initialise();
+
         for(GameObject gameObject : games){
             if(!gameObject.isSold()){
                 mainScreen.startSellGame(gameObject);
             }
         }
+
+        eventPublisher = new EventPublisher();
+        eventPublisher.addObserver(this);
+        GameEvent event = new TaxEvent();
+        eventPublisher.triggerEvent(event);
     }
 
     @Override
@@ -168,6 +185,10 @@ public class Game extends com.badlogic.gdx.Game {
         setScreen(mainScreen);
     }
 
+    public void setGameOverScreen() {
+        setScreen(new GameOverScreen());
+    }
+
     public void setCoverScreen() {
         setScreen(new DesignScreen());
     }
@@ -242,5 +263,30 @@ public class Game extends com.badlogic.gdx.Game {
                 game.setSold(true);
             }
         }
+    }
+
+    @Override
+    public void onEventReceived(final GameEvent event) {
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+                event.start();
+                eventPublisher.triggerEvent(event);
+            }
+        }, Constants.MONTH_TIME);
+    }
+
+    public void restart() {
+        setMainScreen();
+        coverObjects = DataArrayFactory.createDataObjectsSet();
+        technologies = DataArrayFactory.createDataTechnologiesSet();
+        mechanics = DataArrayFactory.createDataMechanicsSet();
+        platforms = DataArrayFactory.createDataPlatformsSet();
+        games.clear();
+        Stats.setInstance(new Stats(1, 0, 5, 5, 5, 10));
+        gameState = null;
+        DataManager.getInstance().setSkipTax(true);
+        mainScreen.removeSellingGames();
+        mainScreen.setGameCanceled();
     }
 }

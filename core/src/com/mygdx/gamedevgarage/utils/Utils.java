@@ -77,8 +77,8 @@ public class Utils {
         return textButton;
     }
 
-    public static TextButton createBuyButton(String text, String name){
-        TextButton button = new TextButton(text, Assets.getInstance().getSkin(), "buy_button");
+    public static Button createBuyButton(String name){
+        Button button = new Button(Assets.getInstance().getSkin(), "buy_button");
         button.setName(name);
         return button;
     }

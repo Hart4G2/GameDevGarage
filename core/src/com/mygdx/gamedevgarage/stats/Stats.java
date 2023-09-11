@@ -1,6 +1,7 @@
 package com.mygdx.gamedevgarage.stats;
 
-import com.mygdx.gamedevgarage.utils.DataManager;
+import com.mygdx.gamedevgarage.utils.Cost;
+import com.mygdx.gamedevgarage.utils.constraints.Currency;
 
 import java.util.HashMap;
 
@@ -26,10 +27,11 @@ public class Stats {
 
     public static Stats getInstance(){
         if(instance == null){
-            HashMap<String, Integer> statsMap = DataManager.getInstance().getStats();
+//            HashMap<String, Integer> statsMap = DataManager.getInstance().getStats();
+            HashMap<String, Integer> statsMap = new HashMap<>();
 
             if(statsMap.isEmpty()){
-                instance = new Stats(1, 49, 10, 10, 10, 1);
+                instance = new Stats(6, 49, 30, 30, 30, 100);
             } else {
                 instance = new Stats(statsMap.get("level"), statsMap.get("exp"),
                         statsMap.get("design"), statsMap.get("programming"),
@@ -39,51 +41,96 @@ public class Stats {
         return instance;
     }
 
-    public int getLevel() {
-        return level;
+    public static void setInstance(Stats stats){
+        instance = stats;
     }
 
     public void setLevel(int level) {
         this.level = Math.min(level, 9);
     }
 
-    public int getExperience() {
-        return experience;
-    }
-
     public void setExperience(int experience, int requiredExp) {
         this.experience = experience - requiredExp;
-    }
-
-    public int getDesign() {
-        return design;
     }
 
     public void setDesign(int design) {
         this.design = Math.min(design, 100);
     }
 
-    public int getProgramming() {
-        return programming;
-    }
-
     public void setProgramming(int programming) {
         this.programming = Math.min(programming, 100);
-    }
-
-    public int getGameDesign() {
-        return gameDesign;
     }
 
     public void setGameDesign(int gameDesign) {
         this.gameDesign = Math.min(gameDesign, 100);
     }
 
-    public int getMoney() {
-        return money;
-    }
-
     public void setMoney(int money) {
         this.money = Math.min(money, 100);
+    }
+
+    public boolean isEnough(Cost cost){
+        Currency[] costNames = cost.getCostNames();
+        int[] costs = cost.getCosts();
+
+        for(int i = 0; i < costNames.length; i++){
+            if(this.getStat(costNames[i]) < costs[i]){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public void pay(Cost cost){
+        Currency[] costNames = cost.getCostNames();
+        int[] costs = cost.getCosts();
+
+        for(int i = 0; i < costNames.length; i++){
+            int costValue = costs[i];
+            Currency currency = costNames[i];
+
+            if(currency == Currency.LEVEL || currency == Currency.EXPERIENCE){
+                continue;
+            }
+
+            setStat(currency, getStat(currency) - costValue);
+        }
+    }
+
+    public void setStat(Currency currency, int stat){
+        switch (currency){
+            case MONEY:
+                setMoney(stat);
+                break;
+            case DESIGN:
+                setDesign(stat);
+                break;
+            case PROGRAMMING:
+                setProgramming(stat);
+                break;
+            case GAME_DESIGN:
+                setGameDesign(stat);
+                break;
+        }
+    }
+
+    public int getStat(Currency currency){
+        switch (currency){
+            case MONEY:
+                return money;
+            case DESIGN:
+                return design;
+            case PROGRAMMING:
+                return programming;
+            case GAME_DESIGN:
+                return gameDesign;
+            case LEVEL:
+                return level;
+            case EXPERIENCE:
+                return experience;
+            default:
+                return 0;
+        }
     }
 }

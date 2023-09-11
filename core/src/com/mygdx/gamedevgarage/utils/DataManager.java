@@ -5,6 +5,7 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.Json;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.stats.Stats;
+import com.mygdx.gamedevgarage.utils.constraints.Currency;
 import com.mygdx.gamedevgarage.utils.constraints.GameState;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
 import com.mygdx.gamedevgarage.utils.data.GameObject;
@@ -16,6 +17,8 @@ public class DataManager {
 
     private final Game game;
     private static DataManager instance;
+
+    private static Boolean canSkipTax;
 
     public DataManager() {
         this.game = Game.getInstance();
@@ -33,6 +36,7 @@ public class DataManager {
         saveStats();
         saveGameState();
         saveGames();
+        saveCanSkipTax();
     }
 
     private void saveData() {
@@ -61,12 +65,12 @@ public class DataManager {
         Stats stats = Stats.getInstance();
 
         HashMap<String, Integer> statsMap = new HashMap<>();
-        statsMap.put("level", stats.getLevel());
-        statsMap.put("exp", stats.getExperience());
-        statsMap.put("money", stats.getMoney());
-        statsMap.put("design", stats.getDesign());
-        statsMap.put("programming", stats.getProgramming());
-        statsMap.put("gameDesign", stats.getGameDesign());
+        statsMap.put("level", stats.getStat(Currency.LEVEL));
+        statsMap.put("exp", stats.getStat(Currency.EXPERIENCE));
+        statsMap.put("money", stats.getStat(Currency.MONEY));
+        statsMap.put("design", stats.getStat(Currency.DESIGN));
+        statsMap.put("programming", stats.getStat(Currency.PROGRAMMING));
+        statsMap.put("gameDesign", stats.getStat(Currency.GAME_DESIGN));
 
         String purchasedItemsJson = new Json().toJson(statsMap);
         prefs.putString("stats", purchasedItemsJson);
@@ -91,6 +95,33 @@ public class DataManager {
         String jsonStr = new Json().toJson(game.getGames());
         prefs.putString("games", jsonStr);
         prefs.flush();
+    }
+
+    public void saveCanSkipTax() {
+        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+
+        if(canSkipTax == null)
+            canSkipTax = true;
+
+        prefs.putBoolean("canSkipTax", canSkipTax);
+        prefs.flush();
+    }
+
+    private boolean getCanSkipTax() {
+        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+
+        return prefs.getBoolean("canSkipTax", true);
+    }
+
+    public boolean getSkipTax() {
+        if(canSkipTax != null) return canSkipTax;
+
+        canSkipTax = getCanSkipTax();
+        return getCanSkipTax();
+    }
+
+    public void setSkipTax(boolean skipTax) {
+        canSkipTax = skipTax;
     }
 
     public HashSet<String> getCovers() {

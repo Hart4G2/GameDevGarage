@@ -5,7 +5,9 @@ import static com.mygdx.gamedevgarage.utils.data.GameFactory.object;
 import static com.mygdx.gamedevgarage.utils.data.GameFactory.theme;
 
 import com.mygdx.gamedevgarage.stats.Stats;
+import com.mygdx.gamedevgarage.utils.Cost;
 import com.mygdx.gamedevgarage.utils.Utils;
+import com.mygdx.gamedevgarage.utils.constraints.Currency;
 
 import java.util.Random;
 
@@ -485,7 +487,7 @@ public class Reward {
 
     private void calculateLevel() {
         requiredExp = 0;
-        int oldLvl = stats.getLevel();
+        int oldLvl = stats.getStat(Currency.LEVEL);
 
         switch (oldLvl) {
             case 1:
@@ -508,12 +510,12 @@ public class Reward {
                 break;
         }
 
-        int newExp = stats.getExperience() + exp;
+        int newExp = stats.getStat(Currency.EXPERIENCE) + exp;
 
         if (newExp >= requiredExp) {
-            lvl = stats.getLevel() + 1;
+            lvl = stats.getStat(Currency.LEVEL) + 1;
         } else {
-            lvl = stats.getLevel();
+            lvl = stats.getStat(Currency.LEVEL);
             requiredExp = 0;
         }
     }
@@ -551,10 +553,10 @@ public class Reward {
     }
 
     public void setNewValues(){
-        stats.setDesign(stats.getDesign() + design);
-        stats.setProgramming(stats.getProgramming() + programming);
-        stats.setGameDesign(stats.getGameDesign() + gameDesign);
+        stats.pay(new Cost(new Currency[]{Currency.DESIGN, Currency.PROGRAMMING, Currency.GAME_DESIGN},
+                new int[]{-design, -programming, -gameDesign}));
+
         stats.setLevel(lvl);
-        stats.setExperience(stats.getExperience() + exp, requiredExp);
+        stats.setExperience(stats.getStat(Currency.EXPERIENCE) + exp, requiredExp);
     }
 }
