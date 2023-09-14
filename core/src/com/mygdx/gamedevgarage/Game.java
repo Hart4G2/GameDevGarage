@@ -83,6 +83,8 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
             }
         }
 
+        eventTimer = new Timer();
+
         eventPublisher = new EventPublisher();
         eventPublisher.addObserver(this);
         GameEvent event = new TaxEvent();
@@ -265,9 +267,11 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
         }
     }
 
+    public Timer eventTimer;
+
     @Override
     public void onEventReceived(final GameEvent event) {
-        Timer.schedule(new Timer.Task() {
+        eventTimer.scheduleTask(new Timer.Task() {
             @Override
             public void run() {
                 event.start();

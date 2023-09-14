@@ -75,7 +75,7 @@ public class UpgradeCoverObjectsList extends Table {
 
         for (int i = 0; i < icons.size(); i++) {
             Image image = new Image(icons.get(i));
-            Label label = createLabel(costs[i] + "", "white_18");
+            Label label = createLabel(costs[i] + "", "white_18", false);
 
             button.add(label)
                     .padRight(getWidthPercent(.005f));

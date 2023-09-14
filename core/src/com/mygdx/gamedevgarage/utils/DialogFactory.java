@@ -40,11 +40,11 @@ public class DialogFactory {
         final SelectBox<String> levelSelectBox = createSelectBox("default",
                 gameLevels, Align.center, "levelSelectBox", false);
 
-        Label headerLabel = createLabel("Create Game", "black_32");
-        Label nameLabel = createLabel("Name:", "black_24");
-        Label genreLabel = createLabel("Genre:", "black_24");
-        Label platformLabel = createLabel("Theme:", "black_24");
-        Label levelLabel = createLabel("Level:", "black_24");
+        Label headerLabel = createLabel("Create Game", "black_32", false);
+        Label nameLabel = createLabel("Name:", "black_24", false);
+        Label genreLabel = createLabel("Genre:", "black_24", false);
+        Label platformLabel = createLabel("Theme:", "black_24", false);
+        Label levelLabel = createLabel("Level:", "black_24", false);
 
         float labelWidth = getWidthPercent(.2f);
         float labelHeight = getHeightPercent(.05f);

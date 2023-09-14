@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.utils.data.CheckObject;
@@ -25,21 +24,28 @@ public class CheckListItem extends Group {
     private Image backgroundImage;
     private boolean isSelected;
     private Table mainTable;
-    private final Drawable bgSelected;
-    private final Drawable bgUnselected;
-    private final Drawable imageFrameUnselected;
-    private final Drawable imageFrameSelected;
+
+    private final String bgSelected;
+    private final String bgUnselected;
+    private final String imageFrameUnselected;
+    private final String imageFrameSelected;
     private float stateTime;
     private Animation<TextureRegionDrawable> animation;
 
-    public CheckListItem(CheckObject checkObject) {
+    public CheckListItem(CheckObject checkObject, boolean isTech) {
         this.skin = Assets.getInstance().getSkin();
         this.checkObject = checkObject;
 
-        bgUnselected = skin.getDrawable("programming_item");
-        bgSelected = skin.getDrawable("programming_item_selected");
-        imageFrameUnselected = skin.getDrawable("item_image_bg");
-        imageFrameSelected = skin.getDrawable("item_image_bg_selected");
+        if(isTech){
+            bgUnselected = "programming_item";
+            bgSelected = "programming_item_selected";
+        } else {
+            bgUnselected = "game_design_item";
+            bgSelected = "game_design_item_selected";
+        }
+
+        imageFrameUnselected = "item_image_bg";
+        imageFrameSelected = "item_image_bg_selected";
 
         initAnimation();
         initUIElements();
@@ -59,28 +65,31 @@ public class CheckListItem extends Group {
     }
 
     private void initUIElements(){
-        headerLabel = createLabel(checkObject.getName(), "black_18");
-        descriptionLabel = createLabel(checkObject.getDescription(), "default");
+        headerLabel = createLabel(checkObject.getName(), "black_18", true);
+        descriptionLabel = createLabel(checkObject.getDescription(), "default", true);
 
         float imageSize = getHeightPercent(0.1f);
 
-        backgroundImage = new Image(imageFrameUnselected);
+        backgroundImage = new Image(skin.getDrawable(imageFrameUnselected));
         backgroundImage.setFillParent(true);
 
         Group imageGroup = new Group();
         imageGroup.addActor(image);
         imageGroup.addActor(backgroundImage);
 
-        Table textTable = new Table();
-        textTable.add(headerLabel)
-                .colspan(2).center().row();
-        textTable.add(descriptionLabel);
+        float labelSize = checkObject.isPurchased() ? getWidthPercent(.6f) : getWidthPercent(.4f);
 
-        mainTable = new Table();
+        Table textTable = new Table();
+        textTable.add(headerLabel).width(labelSize)
+                .colspan(2).center().row();
+        textTable.add(descriptionLabel).width(labelSize)
+                .colspan(2).left();
+
+        mainTable = new Table(skin);
         mainTable.setFillParent(true);
         mainTable.setBackground(bgUnselected);
-        mainTable.add(textTable).left().width(getWidthPercent(.32f)).height(getHeightPercent(.15f))
-                .padRight(getWidthPercent(.04f)).padLeft(getWidthPercent(.08f));
+        mainTable.add(textTable).width(labelSize).height(getHeightPercent(.15f))
+                .padRight(getWidthPercent(.02f)).left();
         mainTable.add(imageGroup).right().width(imageSize).height(imageSize);
 
         addActor(mainTable);
@@ -93,7 +102,7 @@ public class CheckListItem extends Group {
     public void setUnselected() {
         isSelected = false;
         mainTable.setBackground(bgUnselected);
-        backgroundImage.setDrawable(imageFrameUnselected);
+        backgroundImage.setDrawable(skin, imageFrameUnselected);
         headerLabel.setStyle(skin.get("black_18", Label.LabelStyle.class));
         descriptionLabel.setStyle(skin.get("default", Label.LabelStyle.class));
     }
@@ -101,7 +110,7 @@ public class CheckListItem extends Group {
     public void setSelected() {
         isSelected = true;
         mainTable.setBackground(bgSelected);
-        backgroundImage.setDrawable(imageFrameSelected);
+        backgroundImage.setDrawable(skin, imageFrameSelected);
         headerLabel.setStyle(skin.get("white_18", Label.LabelStyle.class));
         descriptionLabel.setStyle(skin.get("white_16", Label.LabelStyle.class));
     }

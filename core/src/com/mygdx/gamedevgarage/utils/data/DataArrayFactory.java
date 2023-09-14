@@ -244,7 +244,7 @@ public class DataArrayFactory {
         List<CheckListItem> result = new ArrayList<>();
 
         for(CheckObject item : technologies){
-            result.add(new CheckListItem(item));
+            result.add(new CheckListItem(item, true));
         }
 
         return result;
@@ -256,7 +256,7 @@ public class DataArrayFactory {
 
         for(CheckObject item : mechanics){
             item.setPurchased(mechanicsSet.contains(item.getName()));
-            result.add(new CheckListItem(item));
+            result.add(new CheckListItem(item, false));
         }
 
         return result;

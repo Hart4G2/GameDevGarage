@@ -63,7 +63,7 @@ public class GameDesignScreen implements Screen {
         scrollPane.setFillParent(true);
         scrollPane.setScrollbarsVisible(true);
 
-        Label headerLabel = createLabel("Choose technologies", "white_20");
+        Label headerLabel = createLabel("Choose mechanics", "white_20", false);
 
         okButton = createTextButton("OK", "white_18");
         okButton.setDisabled(true);

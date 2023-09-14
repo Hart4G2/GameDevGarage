@@ -64,7 +64,7 @@ public class ProgrammingScreen implements Screen {
         scrollPane.setFillParent(true);
         scrollPane.setScrollbarsVisible(true);
 
-        headerLabel = createLabel("Choose technologies", "white_20");
+        headerLabel = createLabel("Choose technologies", "white_20", false);
 
         okButton = createTextButton("OK", "white_18");
         okButton.setDisabled(true);

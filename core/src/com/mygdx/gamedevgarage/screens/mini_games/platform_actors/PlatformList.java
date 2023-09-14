@@ -82,7 +82,7 @@ public class PlatformList extends Table {
 
         for (int i = 0; i < icons.size(); i++) {
             Image image = new Image(icons.get(i));
-            Label label = createLabel(costs[i] + "", "white_18");
+            Label label = createLabel(costs[i] + "", "white_18", false);
 
             button.add(label);
             button.add(image).width(imageSize).height(imageSize)
@@ -148,11 +148,6 @@ public class PlatformList extends Table {
         if(selectedPlatform.equals("") || !selectedPlatform.equals(thisPlatform)){
             GameFactory.platform = thisPlatform;
             item.setBackground(selected);
-        }
-
-        if(selectedPlatform.equals(thisPlatform)){
-            GameFactory.platform = "";
-            item.setBackground(unSelected);
         }
     }
 

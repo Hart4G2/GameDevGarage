@@ -16,7 +16,7 @@ import com.mygdx.gamedevgarage.utils.data.GameFactory;
 
 public class DialogThread {
 
-    private static final Timer currentTimer = new Timer();
+    private final Timer currentTimer = new Timer();
 
     private static DialogThread instance;
 

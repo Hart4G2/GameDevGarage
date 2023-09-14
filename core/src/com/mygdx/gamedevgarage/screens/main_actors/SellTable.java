@@ -32,4 +32,16 @@ public class SellTable extends Table {
                     .row();
         }
     }
+
+    public void resume() {
+        for(SellActor sellActor : sellActors) {
+            sellActor.resumeSelling();
+        }
+    }
+
+    public void stop() {
+        for(SellActor sellActor : sellActors) {
+            sellActor.stopSelling();
+        }
+    }
 }

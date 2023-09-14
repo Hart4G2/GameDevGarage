@@ -35,8 +35,10 @@ public class Utils {
                 false, Assets.getInstance().getSkin(), "default-horizontal");
     }
 
-    public static Label createLabel(String text, String styleText){
-        return new Label(text, Assets.getInstance().getSkin(), styleText);
+    public static Label createLabel(String text, String styleText, boolean wrap){
+        Label label = new Label(text, Assets.getInstance().getSkin(), styleText);
+        label.setWrap(wrap);
+        return label;
     }
 
     public static SelectBox<String> createSelectBox(String styleName, String[] items,

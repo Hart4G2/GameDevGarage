@@ -35,7 +35,7 @@ public class CoverListItem extends Group {
     }
 
     private void initColorUIElements(Drawable imageBackground){
-        Label headerLabel = Utils.createLabel(coverObject.getName(), "black_18");
+        Label headerLabel = Utils.createLabel(coverObject.getName(), "black_18", true);
         image = new Image(coverObject.getItem());
 
         Image backgroundImage = new Image(imageBackground);

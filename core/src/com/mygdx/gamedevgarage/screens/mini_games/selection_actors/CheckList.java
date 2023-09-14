@@ -28,7 +28,7 @@ public class CheckList extends Table {
     private void addItems() {
         for (CheckListItem item : items) {
             if(item.getCheckObject().isPurchased()) {
-                add(item).width(getWidthPercent(.8f)).height(getHeightPercent(.15f)).row();
+                add(item).width(getWidthPercent(.95f)).height(getHeightPercent(.15f)).row();
                 addClickListener(item);
             }
         }

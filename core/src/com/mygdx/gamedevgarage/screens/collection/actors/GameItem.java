@@ -61,9 +61,9 @@ public class GameItem extends Table {
             labelStyle = "black_20";
         }
 
-        nameLabel = createLabel(name, headerStyle);
-        scoreLabel = createLabel(score, labelStyle);
-        priceLabel = createLabel(price, labelStyle);
+        nameLabel = createLabel(name, headerStyle, true);
+        scoreLabel = createLabel(score, labelStyle, false);
+        priceLabel = createLabel(price, labelStyle, false);
         priceImage = new Image(priceIcon);
         scoreImage = new Image(scoreIcon);
         objectImage = new Image(object);
@@ -72,7 +72,7 @@ public class GameItem extends Table {
         float iconSize = getHeightPercent(.04f);
 
         Table table = new Table();
-        table.add(nameLabel)
+        table.add(nameLabel).width(getWidthPercent(.5f))
                 .padBottom(getHeightPercent(.05f))
                 .colspan(4).left().top().row();
         table.add(priceImage).width(iconSize).height(iconSize)

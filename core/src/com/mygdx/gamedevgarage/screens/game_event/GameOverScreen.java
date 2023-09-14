@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
@@ -28,6 +29,7 @@ import java.util.List;
 
 public class GameOverScreen implements Screen {
 
+    private Game game;
     private Stage stage;
     private StatsTable statsTable;
 
@@ -38,6 +40,7 @@ public class GameOverScreen implements Screen {
 
     public GameOverScreen() {
         canSkipTax = DataManager.getInstance().getSkipTax();
+        game = Game.getInstance();
     }
 
     @Override
@@ -48,19 +51,24 @@ public class GameOverScreen implements Screen {
         createUIElements();
         setupUIListeners();
 
+        game.eventTimer.stop();
+        game.getMainScreen().stopSelling();
         DialogThread.getInstance().pause();
     }
 
     private void createUIElements(){
         statsTable = createStatsTable();
 
-        String text = "You don't have enough money to pay taxes.";
+        String text = "You don't have enough money to pay taxes. ";
 
         if(canSkipTax){
-            text += "\nBut it's the first time, so you can skip taxes!";
+            text += "But it's the first time, so you can skip taxes!";
+        } else {
+            text += "You already used skipping taxes. :(";
         }
 
-        Label header = createLabel(text, "white_18");
+        Label header = createLabel(text, "white_24", true);
+        header.setAlignment(Align.center);
 
         restartButton = createTextButton("New game", "white_18");
         skipButton = createTextButton("Skip and continue", "white_18");
@@ -68,9 +76,8 @@ public class GameOverScreen implements Screen {
 
         Table table = new Table(Assets.getInstance().getSkin());
         table.setFillParent(true);
-        table.add(header).width(getWidthPercent(.9f)).height(getHeightPercent(.4f))
-                .pad(getHeightPercent(.1f), getWidthPercent(.05f), getHeightPercent(.05f), getWidthPercent(.05f))
-                .row();
+        table.add(header).width(getWidthPercent(.8f)).height(getHeightPercent(.2f))
+                .pad(getHeightPercent(.1f), getWidthPercent(.05f), getHeightPercent(.1f), getWidthPercent(.05f)).row();
         table.add(skipButton).width(getWidthPercent(.5f)).height(getHeightPercent(.08f))
                 .padBottom(getHeightPercent(.03f))
                 .row();
@@ -89,7 +96,7 @@ public class GameOverScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if(!skipButton.isDisabled()){
-                    Game.getInstance().setMainScreen();
+                    game.setMainScreen();
                     DataManager.getInstance().setSkipTax(false);
 
                     Stats stats = Stats.getInstance();
@@ -102,6 +109,8 @@ public class GameOverScreen implements Screen {
                         table.getProperty("money").setHint("Get bonus", "green_16");
                     }
 
+                    game.eventTimer.start();
+                    game.getMainScreen().resumeSelling();
                     DialogThread.getInstance().resume();
                 }
             }
@@ -109,7 +118,8 @@ public class GameOverScreen implements Screen {
         restartButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Game.getInstance().restart();
+                game.eventTimer.start();
+                game.restart();
             }
         });
     }

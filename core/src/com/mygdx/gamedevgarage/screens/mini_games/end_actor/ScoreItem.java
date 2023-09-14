@@ -38,7 +38,7 @@ public class ScoreItem extends Table {
     private void createUIElements(){
         iconImage = new Image(icon);
         iconImage.setVisible(false);
-        scoreLabel = createLabel(String.valueOf(this.score), labelStyle);
+        scoreLabel = createLabel(String.valueOf(this.score), labelStyle, false);
 
         float imageSize = getWidthPercent(.15f);
         float pad = getWidthPercent(.05f);

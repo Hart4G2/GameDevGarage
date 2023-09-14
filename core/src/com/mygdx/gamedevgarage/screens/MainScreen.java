@@ -294,4 +294,12 @@ public class MainScreen implements Screen {
     public void removeSellingGames() {
         sellTable.clear();
     }
+
+    public void resumeSelling() {
+        sellTable.stop();
+    }
+
+    public void stopSelling() {
+        sellTable.stop();
+    }
 }

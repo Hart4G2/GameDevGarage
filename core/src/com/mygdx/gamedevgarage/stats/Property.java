@@ -37,10 +37,10 @@ public class Property extends Table {
 
     private void createUIElements(){
         image = new Image(icon);
-        valueLabel = createLabel(String.valueOf(value), "white_18");
+        valueLabel = createLabel(String.valueOf(value), "white_18", false);
         valueLabel.setSize(getWidthPercent(.016f), getHeightPercent(.01f));
 
-        hintLabel = createLabel(text, "white_16");
+        hintLabel = createLabel(text, "white_16", false);
         hintLabel.setVisible(false);
 
         add(image).width(getWidthPercent(.06f)).height(getWidthPercent(.06f))

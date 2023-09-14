@@ -41,7 +41,7 @@ public class DesignScreen implements Screen {
     private void createUIElements() {
         CoverMainActor coverListActor = new CoverMainActor(this);
 
-        Label headerLabel = Utils.createLabel("Create a game cover", "black_20");
+        Label headerLabel = Utils.createLabel("Create a game cover", "black_20", false);
 
         okButton = createTextButton("OK", "white_18");
         okButton.setDisabled(true);

@@ -26,6 +26,8 @@ public class SellActor extends Table {
     private Label priceLabel;
     private ProgressBar progressBar;
 
+    private Timer sellTimer;
+
     private final float iterationTime;
     private int i;
 
@@ -38,13 +40,14 @@ public class SellActor extends Table {
         i = (int) (gameObject.getSoldTime() / iterationTime);
 
         createUIElements();
+        sellTimer = new Timer();
     }
 
     private void createUIElements(){
         String name = validName(gameObject.getName());
 
-        Label nameLabel = createLabel(name, "white_18");
-        priceLabel = createLabel("", "white_16");
+        Label nameLabel = createLabel(name, "white_18", false);
+        priceLabel = createLabel("", "white_16", false);
         progressBar = createProgressBar(0, gameObject.getProfitMoney());
         progressBar.setValue(gameObject.getSoldMoney());
 
@@ -59,8 +62,9 @@ public class SellActor extends Table {
         setBackground("game_sell_item");
     }
 
+
     public void startSelling(){
-        new Timer().scheduleTask(sellTask, iterationTime);
+        sellTimer.scheduleTask(sellTask, iterationTime);
     }
 
     float[] coefficients = new float[]{.16f, .14f, .13f, .12f, .1f, .09f, .08f, .07f, .06f, .05f};
@@ -107,5 +111,13 @@ public class SellActor extends Table {
             name = name.substring(0, 20) + "...";
         }
         return name;
+    }
+
+    public void resumeSelling() {
+        sellTimer.start();
+    }
+
+    public void stopSelling() {
+        sellTimer.stop();
     }
 }
