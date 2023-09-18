@@ -8,9 +8,11 @@ import com.mygdx.gamedevgarage.screens.MainScreen;
 import com.mygdx.gamedevgarage.screens.collection.CollectionScreen;
 import com.mygdx.gamedevgarage.screens.game_event.EventPublisher;
 import com.mygdx.gamedevgarage.screens.game_event.GameEvent;
-import com.mygdx.gamedevgarage.screens.game_event.GameOverScreen;
 import com.mygdx.gamedevgarage.screens.game_event.Observer;
-import com.mygdx.gamedevgarage.screens.game_event.TaxEvent;
+import com.mygdx.gamedevgarage.screens.game_event.random.RandomEvent;
+import com.mygdx.gamedevgarage.screens.game_event.random.RandomEventScreen;
+import com.mygdx.gamedevgarage.screens.game_event.tax.GameOverScreen;
+import com.mygdx.gamedevgarage.screens.game_event.tax.TaxEvent;
 import com.mygdx.gamedevgarage.screens.mini_games.DesignScreen;
 import com.mygdx.gamedevgarage.screens.mini_games.EndScreen;
 import com.mygdx.gamedevgarage.screens.mini_games.GameDesignScreen;
@@ -20,7 +22,6 @@ import com.mygdx.gamedevgarage.screens.upgrade.UpgradeScreen;
 import com.mygdx.gamedevgarage.stats.Stats;
 import com.mygdx.gamedevgarage.utils.DataManager;
 import com.mygdx.gamedevgarage.utils.DialogThread;
-import com.mygdx.gamedevgarage.utils.constraints.Constants;
 import com.mygdx.gamedevgarage.utils.constraints.GameState;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
@@ -40,10 +41,11 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
     private HashSet<String> platforms;
     private HashSet<GameObject> games;
 
+    private boolean isGameOver = false;
     public boolean isGameStarted = false;
     public GameState gameState;
     private DataManager dataManager;
-    private EventPublisher eventPublisher;
+    public EventPublisher eventPublisher;
 
     private static Game instance;
 
@@ -61,6 +63,16 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
         initData();
         setMainScreen();
         getSavedGameState();
+
+        isGameOver = dataManager.getGameOver();
+        if(isGameOver){
+            new Timer().scheduleTask(new Timer.Task() {
+                @Override
+                public void run() {
+                    setScreen(new GameOverScreen());
+                }
+            }, 0);
+        }
     }
 
     private void initData(){
@@ -83,12 +95,19 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
             }
         }
 
-        eventTimer = new Timer();
-
         eventPublisher = new EventPublisher();
         eventPublisher.addObserver(this);
-        GameEvent event = new TaxEvent();
-        eventPublisher.triggerEvent(event);
+
+        TaxEvent.scheduleNextEvent(new TaxEvent());
+
+        RandomEvent randomEvent = new RandomEvent("Up is opinion message manners correct hearing husband my. " +
+                "Disposing commanded dashwoods cordially depending at at. " +
+                "Its strangers who you certainty earnestly resources suffering she. " +
+                "Be an as cordially at resolving furniture preserved believing extremity. " +
+                "Easy mr pain felt in. Too northward affection additions nay. " +
+                "He no an nature ye talent houses wisdom vanity denied." +
+                "Efergegre wefwefwef e!");
+        RandomEvent.scheduleNextEvent(randomEvent);
     }
 
     @Override
@@ -219,6 +238,10 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
         setScreen(new EndScreen());
     }
 
+    public void setRandomEventScreen(RandomEvent event) {
+        setScreen(new RandomEventScreen(event));
+    }
+
     public HashSet<String> getCoverObjects() {
         return coverObjects;
     }
@@ -267,17 +290,44 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
         }
     }
 
-    public Timer eventTimer;
-
     @Override
     public void onEventReceived(final GameEvent event) {
-        eventTimer.scheduleTask(new Timer.Task() {
-            @Override
-            public void run() {
-                event.start();
-                eventPublisher.triggerEvent(event);
-            }
-        }, Constants.MONTH_TIME);
+        event.start();
+    }
+
+    public void stopAllThreads(){
+        RandomEvent.eventTimer.stop();
+        TaxEvent.eventTimer.stop();
+        getMainScreen().stopSelling();
+        DialogThread.getInstance().pause();
+    }
+
+    public void resumeAllThreads(){
+        RandomEvent.eventTimer.start();
+        TaxEvent.eventTimer.start();
+        getMainScreen().resumeSelling();
+        DialogThread.getInstance().resume();
+    }
+
+    public void restartAllThreads(){
+        RandomEvent.eventTimer.clear();
+        RandomEvent.eventTimer.start();
+        TaxEvent.eventTimer.clear();
+        TaxEvent.eventTimer.start();
+
+        TaxEvent.scheduleNextEvent(new TaxEvent());
+
+        RandomEvent randomEvent = new RandomEvent("Up is opinion message manners correct hearing husband my. " +
+                "Disposing commanded dashwoods cordially depending at at. " +
+                "Its strangers who you certainty earnestly resources suffering she. " +
+                "Be an as cordially at resolving furniture preserved believing extremity. " +
+                "Easy mr pain felt in. Too northward affection additions nay. " +
+                "He no an nature ye talent houses wisdom vanity denied." +
+                "Efergegre wefwefwef e!");
+        RandomEvent.scheduleNextEvent(randomEvent);
+
+        getMainScreen().resumeSelling();
+        DialogThread.getInstance().restart();
     }
 
     public void restart() {
@@ -292,5 +342,14 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
         DataManager.getInstance().setSkipTax(true);
         mainScreen.removeSellingGames();
         mainScreen.setGameCanceled();
+        isGameOver = false;
+    }
+
+    public boolean isGameOver() {
+        return isGameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        isGameOver = gameOver;
     }
 }

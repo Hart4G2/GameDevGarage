@@ -37,6 +37,14 @@ public class DataManager {
         saveGameState();
         saveGames();
         saveCanSkipTax();
+        saveIsGameOver();
+    }
+
+    private void saveIsGameOver() {
+        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+
+        prefs.putBoolean("gameIsOver", game.isGameOver());
+        prefs.flush();
     }
 
     private void saveData() {
@@ -117,11 +125,18 @@ public class DataManager {
         if(canSkipTax != null) return canSkipTax;
 
         canSkipTax = getCanSkipTax();
-        return getCanSkipTax();
+        return canSkipTax;
     }
 
     public void setSkipTax(boolean skipTax) {
         canSkipTax = skipTax;
+    }
+
+    public boolean getGameOver() {
+        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+        boolean dataJson = prefs.getBoolean("gameIsOver", false);
+
+        return new Json().fromJson(Boolean.class, String.valueOf(dataJson));
     }
 
     public HashSet<String> getCovers() {

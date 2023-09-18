@@ -1,4 +1,4 @@
-package com.mygdx.gamedevgarage.screens.game_event;
+package com.mygdx.gamedevgarage.screens.game_event.tax;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
 import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
@@ -16,44 +16,42 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.stats.Stats;
 import com.mygdx.gamedevgarage.stats.StatsTable;
 import com.mygdx.gamedevgarage.utils.DataManager;
-import com.mygdx.gamedevgarage.utils.DialogThread;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
 
 import java.util.List;
 
 public class GameOverScreen implements Screen {
 
-    private Game game;
+    private final Game game;
     private Stage stage;
     private StatsTable statsTable;
 
     private TextButton restartButton;
     private TextButton skipButton;
 
-    private final boolean canSkipTax;
+    private boolean canSkipTax;
 
     public GameOverScreen() {
-        canSkipTax = DataManager.getInstance().getSkipTax();
         game = Game.getInstance();
     }
 
     @Override
     public void show() {
-        stage = new Stage(new ScreenViewport());
+        stage = new Stage();
         Gdx.input.setInputProcessor(stage);
+
+        canSkipTax = DataManager.getInstance().getSkipTax();
+
+        game.stopAllThreads();
+        game.setGameOver(true);
 
         createUIElements();
         setupUIListeners();
-
-        game.eventTimer.stop();
-        game.getMainScreen().stopSelling();
-        DialogThread.getInstance().pause();
     }
 
     private void createUIElements(){
@@ -106,20 +104,19 @@ public class GameOverScreen implements Screen {
 
                     List<StatsTable> tables = StatsTable.tables;
                     for (StatsTable table : tables) {
-                        table.getProperty("money").setHint("Get bonus", "green_16");
+                        table.getProperty("money").setHint("Get bonus", "default");
                     }
 
-                    game.eventTimer.start();
-                    game.getMainScreen().resumeSelling();
-                    DialogThread.getInstance().resume();
+                    game.resumeAllThreads();
+                    game.setGameOver(false);
                 }
             }
         });
         restartButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.eventTimer.start();
                 game.restart();
+                game.restartAllThreads();
             }
         });
     }

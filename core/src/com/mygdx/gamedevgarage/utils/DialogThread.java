@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Timer;
 import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.screens.MainScreen;
 import com.mygdx.gamedevgarage.utils.constraints.Constants;
 import com.mygdx.gamedevgarage.utils.constraints.GameState;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
@@ -31,6 +32,10 @@ public class DialogThread {
         mainThread.run();
     }
 
+    public void restart(){
+        currentTimer.clear();
+    }
+
     private final Task mainThread = new Task() {
         @Override
         public void run() {
@@ -46,8 +51,8 @@ public class DialogThread {
         @Override
         public void run() {
             Game game = Game.getInstance();
-            game.setCoverScreen();
             game.gameState = GameState.DESIGN;
+            game.setCoverScreen();
             System.out.println("designThread started");
         }
     };
@@ -56,9 +61,8 @@ public class DialogThread {
         @Override
         public void run() {
             Game game = Game.getInstance();
-
-            game.setTechScreen();
             game.gameState = GameState.PROGRAMMING;
+            game.setTechScreen();
             System.out.println("programmingThread started");
         }
     };
@@ -67,9 +71,8 @@ public class DialogThread {
         @Override
         public void run() {
             Game game = Game.getInstance();
-
-            game.setMechanicScreen();
             game.gameState = GameState.GAMEDESIGN;
+            game.setMechanicScreen();
             System.out.println("gameDesignThread started");
         }
     };
@@ -78,9 +81,8 @@ public class DialogThread {
         @Override
         public void run() {
             Game game = Game.getInstance();
-
-            game.setPlatformScreen();
             game.gameState = GameState.PLATFORM;
+            game.setPlatformScreen();
             System.out.println("platformThread started");
         }
     };
@@ -89,18 +91,18 @@ public class DialogThread {
         @Override
         public void run() {
             Game game = Game.getInstance();
-
-            game.setEndScreen();
             game.gameState = GameState.END;
+            game.setEndScreen();
             System.out.println("EndGameThread started");
         }
     };
 
     private void openGameMakeDialog() {
         final Game game = Game.getInstance();
+        final MainScreen screen = game.getMainScreen();
 
         mainThread.cancel();
-        game.getMainScreen().hide();
+        screen.hide();
 
         final Dialog dialog = DialogFactory.createMakeGameDialog();
 
@@ -115,8 +117,9 @@ public class DialogThread {
         okButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                screen.setDialogOpened(false);
                 dialog.hide();
-                DialogThread.getInstance().setDesignThread();
+                getInstance().setDesignThread();
                 GameFactory.genre = genreSelectBox.getSelected();
                 GameFactory.theme = themesSelectBox.getSelected();
                 GameFactory.name = nameTextField.getText();
@@ -127,11 +130,13 @@ public class DialogThread {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 dialog.hide();
-                game.getMainScreen().setGameCanceled();
+                screen.setDialogOpened(false);
+                screen.setGameCanceled();
             }
         });
 
-        dialog.show(game.getMainScreen().getStage());
+        screen.setDialogOpened(true);
+        dialog.show(screen.getStage());
     }
 
     public void setDesignThread() {

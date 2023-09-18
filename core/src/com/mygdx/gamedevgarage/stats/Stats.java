@@ -1,6 +1,7 @@
 package com.mygdx.gamedevgarage.stats;
 
 import com.mygdx.gamedevgarage.utils.Cost;
+import com.mygdx.gamedevgarage.utils.DataManager;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
 
 import java.util.HashMap;
@@ -27,8 +28,7 @@ public class Stats {
 
     public static Stats getInstance(){
         if(instance == null){
-//            HashMap<String, Integer> statsMap = DataManager.getInstance().getStats();
-            HashMap<String, Integer> statsMap = new HashMap<>();
+            HashMap<String, Integer> statsMap = DataManager.getInstance().getStats();
 
             if(statsMap.isEmpty()){
                 instance = new Stats(6, 49, 30, 30, 30, 10);
@@ -74,7 +74,7 @@ public class Stats {
         int[] costs = cost.getCosts();
 
         for(int i = 0; i < costNames.length; i++){
-            if(this.getStat(costNames[i]) < costs[i]){
+            if(getStat(costNames[i]) < costs[i]){
                 return false;
             }
         }

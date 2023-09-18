@@ -192,7 +192,7 @@ public class Assets {
         int r = song;
 
         while(r == song){
-            r = new Random().nextInt(8);
+            r = new Random().nextInt(8) + 1;
         }
 
         song = r;

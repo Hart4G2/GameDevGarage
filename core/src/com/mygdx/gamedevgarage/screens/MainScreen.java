@@ -72,6 +72,21 @@ public class MainScreen implements Screen {
         createScene();
     }
 
+    @Override
+    public void show() {
+        stage = new Stage();
+        Gdx.input.setInputProcessor(stage);
+
+        stage.addActor(makeGameButton);
+        stage.addActor(upgradeButton);
+        stage.addActor(collectionButton);
+        stage.addActor(gameMakingProgressBar);
+        stage.addActor(sellScrollPane);
+        stage.addActor(statsTable);
+
+        resume();
+    }
+
     private void createScene(){
         modelBatch = new ModelBatch();
         modelBatch.getRenderContext().setCullFace(GL20.GL_BACK);
@@ -112,6 +127,8 @@ public class MainScreen implements Screen {
     }
 
     private void createUIElements(){
+        statsTable = createStatsTable();
+
         makeGameButton = createTextButton("Make a game", "white_18");
         upgradeButton = createButton("store_button");
         collectionButton = createButton("collection_button");
@@ -174,23 +191,6 @@ public class MainScreen implements Screen {
                 game.setCollectionScreen();
             }
         });
-    }
-
-    @Override
-    public void show() {
-        stage = new Stage();
-        Gdx.input.setInputProcessor(stage);
-
-        statsTable = createStatsTable();
-
-        stage.addActor(makeGameButton);
-        stage.addActor(upgradeButton);
-        stage.addActor(collectionButton);
-        stage.addActor(gameMakingProgressBar);
-        stage.addActor(sellScrollPane);
-        stage.addActor(statsTable);
-
-        resume();
     }
 
     float value = 0f;
@@ -265,7 +265,6 @@ public class MainScreen implements Screen {
         game.isGameStarted = true;
         isGameInProgress = true;
         makeGameButton.setVisible(false);
-        System.out.println("Game started");
         animationController.setAnimation("coding_loop", -1);
     }
 
@@ -301,5 +300,15 @@ public class MainScreen implements Screen {
 
     public void stopSelling() {
         sellTable.stop();
+    }
+
+    boolean dialogOpened = false;
+
+    public void setDialogOpened(boolean value){
+        dialogOpened = value;
+    }
+
+    public boolean isDialogOpened(){
+        return dialogOpened;
     }
 }
