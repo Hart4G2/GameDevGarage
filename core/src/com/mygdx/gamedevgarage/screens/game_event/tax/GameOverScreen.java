@@ -1,7 +1,6 @@
 package com.mygdx.gamedevgarage.screens.game_event.tax;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
-import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -11,19 +10,20 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Scaling;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
-import com.mygdx.gamedevgarage.stats.Stats;
-import com.mygdx.gamedevgarage.stats.StatsTable;
+import com.mygdx.gamedevgarage.utils.stats.Stats;
+import com.mygdx.gamedevgarage.utils.stats.StatsTable;
 import com.mygdx.gamedevgarage.utils.DataManager;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
-
-import java.util.List;
 
 public class GameOverScreen implements Screen {
 
@@ -55,7 +55,7 @@ public class GameOverScreen implements Screen {
     }
 
     private void createUIElements(){
-        statsTable = createStatsTable();
+        statsTable = StatsTable.getInstance();
 
         String text = "You don't have enough money to pay taxes. ";
 
@@ -83,10 +83,13 @@ public class GameOverScreen implements Screen {
                 .padBottom(getHeightPercent(.03f))
                 .row();
 
-        stage.addActor(table);
-        stage.addActor(statsTable);
+        Image bg = new Image(Assets.getInstance().getSkin().getDrawable("window_red"));
+        bg.setScaling(Scaling.fill);
+        Stack stack = new Stack(bg, table);
+        stack.setFillParent(true);
 
-        table.setBackground("window_red");
+        stage.addActor(stack);
+        stage.addActor(statsTable);
     }
 
     private void setupUIListeners(){
@@ -102,10 +105,7 @@ public class GameOverScreen implements Screen {
                     int money = Stats.getInstance().getStat(Currency.MONEY);
                     stats.setMoney(money + 10);
 
-                    List<StatsTable> tables = StatsTable.tables;
-                    for (StatsTable table : tables) {
-                        table.getProperty("money").setHint("Get bonus", "default");
-                    }
+                    StatsTable.setHint(Currency.MONEY, "Get bonus", "default");
 
                     game.resumeAllThreads();
                     game.setGameOver(false);

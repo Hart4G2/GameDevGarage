@@ -1,6 +1,5 @@
 package com.mygdx.gamedevgarage.screens.mini_games;
 
-import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -11,16 +10,19 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Scaling;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.mini_games.cover_actors.CoverMainActor;
-import com.mygdx.gamedevgarage.stats.StatsTable;
 import com.mygdx.gamedevgarage.utils.DialogThread;
 import com.mygdx.gamedevgarage.utils.Utils;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
+import com.mygdx.gamedevgarage.utils.stats.StatsTable;
 
 public class DesignScreen implements Screen {
 
@@ -34,21 +36,23 @@ public class DesignScreen implements Screen {
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
 
+        Game.getInstance().isScreenShowed = true;
+
         createUIElements();
         setupUIListeners();
     }
 
     private void createUIElements() {
+        statsTable = StatsTable.getInstance();
+        statsTable.setValueLabelsStyle("black_18");
+        statsTable.setHintLabelsStyle("default");
+
         CoverMainActor coverListActor = new CoverMainActor(this);
 
         Label headerLabel = Utils.createLabel("Create a game cover", "black_20", false);
 
         okButton = createTextButton("OK", "white_18");
         okButton.setDisabled(true);
-
-        statsTable = createStatsTable();
-        statsTable.setValueLabelsStyle("black_18");
-        statsTable.setHintLabelsStyle("default");
 
         Table table = new Table(Assets.getInstance().getSkin());
         table.setFillParent(true);
@@ -62,10 +66,13 @@ public class DesignScreen implements Screen {
                 .padBottom(getHeightPercent(.05f))
                 .center().row();
 
-        stage.addActor(table);
-        stage.addActor(statsTable);
+        Image bg = new Image(Assets.getInstance().getSkin().getDrawable("window_yellow"));
+        bg.setScaling(Scaling.fill);
+        Stack stack = new Stack(bg, table);
+        stack.setFillParent(true);
 
-        table.setBackground("window_yellow");
+        stage.addActor(stack);
+        stage.addActor(statsTable);
     }
 
     private void setupUIListeners() {
@@ -74,7 +81,7 @@ public class DesignScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 if(!okButton.isDisabled()){
                     Game.getInstance().setMainScreen();
-                    DialogThread.getInstance().setProgrammingThread();
+                    DialogThread.getInstance().setProgrammingThread(true);
                 }
             }
         });
@@ -98,17 +105,18 @@ public class DesignScreen implements Screen {
 
     @Override
     public void pause() {
-        // Действия при приостановке экрана (например, когда игра переходит в фоновый режим)
     }
 
     @Override
     public void resume() {
-        // Действия при возобновлении экрана (например, когда игра возвращается из фонового режима)
     }
 
     @Override
     public void hide() {
+        statsTable.setValueLabelsStyle("white_18");
+        statsTable.setHintLabelsStyle("white_16");
         Gdx.input.setInputProcessor(null);
+        Game.getInstance().isScreenShowed = false;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.mygdx.gamedevgarage.screens.mini_games;
 
-import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -11,20 +10,23 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.mini_games.end_actor.NumberActor;
-import com.mygdx.gamedevgarage.stats.Stats;
-import com.mygdx.gamedevgarage.stats.StatsTable;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
 import com.mygdx.gamedevgarage.utils.data.GameObject;
 import com.mygdx.gamedevgarage.utils.reward.Reward;
+import com.mygdx.gamedevgarage.utils.stats.Stats;
+import com.mygdx.gamedevgarage.utils.stats.StatsTable;
 
 public class EndScreen implements Screen {
 
@@ -47,7 +49,11 @@ public class EndScreen implements Screen {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
-        reward.calculateScores();
+        game.isScreenShowed = true;
+
+        if(!game.isEndScreenCalculated) {
+            reward.calculateScores();
+        }
 
         createUIElements();
         setupUIListeners();
@@ -56,29 +62,27 @@ public class EndScreen implements Screen {
     }
 
     private void createUIElements(){
-        statsTable = createStatsTable();
+        statsTable = StatsTable.getInstance();
 
         okButton = createTextButton("OK", "white_18");
         okButton.setDisabled(true);
 
-        final boolean isSoundNeeded = Stats.getInstance().getStat(Currency.EXPERIENCE) < reward.getLvl();
+        final boolean isSoundNeeded = Stats.getInstance().getStat(Currency.LEVEL) < reward.getLvl();
 
-            okButton.addAction(
-                Actions.sequence(
-                        Actions.delay(2.5f),
-                        Actions.run(
-                                new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        okButton.setDisabled(false);
+        okButton.addAction(
+            Actions.sequence(
+                Actions.delay(2.7f),
+                Actions.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        okButton.setDisabled(false);
 
-                                        if(isSoundNeeded) {
-                                            playSound("lvl_up");
-                                        }
-                                    }
-                                }
-                        )
-                ));
+                        if(isSoundNeeded) {
+                            playSound("lvl_up");
+                        }
+                    }
+                })
+        ));
 
         NumberActor numberActor = new NumberActor();
 
@@ -91,10 +95,13 @@ public class EndScreen implements Screen {
                 .padBottom(getHeightPercent(.03f))
                 .center().row();
 
-        stage.addActor(table);
-        stage.addActor(statsTable);
+        Image bg = new Image(Assets.getInstance().getSkin().getDrawable("window_lightblue"));
+        bg.setScaling(Scaling.fill);
+        Stack stack = new Stack(bg, table);
+        stack.setFillParent(true);
 
-        table.setBackground("window_lightblue");
+        stage.addActor(stack);
+        stage.addActor(statsTable);
     }
 
     private void setupUIListeners(){
@@ -145,6 +152,8 @@ public class EndScreen implements Screen {
     @Override
     public void hide() {
         Gdx.input.setInputProcessor(null);
+        Game.getInstance().isScreenShowed = false;
+        game.isEndScreenCalculated = false;
     }
 
     @Override

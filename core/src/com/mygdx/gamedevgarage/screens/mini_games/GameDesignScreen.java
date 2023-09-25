@@ -1,7 +1,6 @@
 package com.mygdx.gamedevgarage.screens.mini_games;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
-import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -13,20 +12,24 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.mini_games.selection_actors.CheckList;
 import com.mygdx.gamedevgarage.screens.mini_games.selection_actors.CheckListItem;
-import com.mygdx.gamedevgarage.stats.StatsTable;
 import com.mygdx.gamedevgarage.utils.DialogThread;
+import com.mygdx.gamedevgarage.utils.data.CheckObject;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
+import com.mygdx.gamedevgarage.utils.stats.StatsTable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +42,7 @@ public class GameDesignScreen implements Screen {
     private Button okButton;
     private CheckList mechanicList;
     private StatsTable statsTable;
+    private Label headerLabel;
 
     public GameDesignScreen() {
         this.skin = Assets.getInstance().getSkin();
@@ -49,11 +53,17 @@ public class GameDesignScreen implements Screen {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
+        Game.getInstance().isScreenShowed = true;
+
         createUIElements();
         setupUIListeners();
     }
 
     private void createUIElements(){
+        statsTable = StatsTable.getInstance();
+        statsTable.setValueLabelsStyle("black_18");
+        statsTable.setHintLabelsStyle("default");
+
         GameFactory.mechanics = new ArrayList<>();
         List<CheckListItem> mechanics = DataArrayFactory.createMechanics();
 
@@ -63,7 +73,7 @@ public class GameDesignScreen implements Screen {
         scrollPane.setFillParent(true);
         scrollPane.setScrollbarsVisible(true);
 
-        Label headerLabel = createLabel("Choose mechanics", "white_20", false);
+        headerLabel = createLabel("Choose mechanics (0 / 3)", "white_20", false);
 
         okButton = createTextButton("OK", "white_18");
         okButton.setDisabled(true);
@@ -71,10 +81,6 @@ public class GameDesignScreen implements Screen {
         Group group = new Group();
         group.addActor(scrollPane);
         group.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 1.15f);
-
-        statsTable = createStatsTable();
-        statsTable.setValueLabelsStyle("black_18");
-        statsTable.setHintLabelsStyle("default");
 
         Table table = new Table(skin);
         table.setFillParent(true);
@@ -89,10 +95,13 @@ public class GameDesignScreen implements Screen {
                 .colspan(2).center()
                 .row();
 
-        stage.addActor(table);
-        stage.addActor(statsTable);
+        Image bg = new Image(Assets.getInstance().getSkin().getDrawable("window_green"));
+        bg.setScaling(Scaling.fill);
+        Stack stack = new Stack(bg, table);
+        stack.setFillParent(true);
 
-        table.setBackground("window_green");
+        stage.addActor(stack);
+        stage.addActor(statsTable);
     }
 
     private void setupUIListeners(){
@@ -101,7 +110,10 @@ public class GameDesignScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 if(!okButton.isDisabled()){
                     Game.getInstance().setMainScreen();
-                    DialogThread.getInstance().setPlatformThread();
+                    DialogThread.getInstance().setPlatformThread(true);
+                    for(CheckObject object : mechanicList.getSelectedItems()){
+                        GameFactory.mechanics.add(object.getName());
+                    }
                 }
             }
         });
@@ -110,8 +122,13 @@ public class GameDesignScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 okButton.setDisabled(mechanicList.getSelectedItems().size() == 0);
+                setSelectedCount();
             }
         });
+    }
+
+    private void setSelectedCount(){
+        headerLabel.setText("Choose mechanics (" + mechanicList.getSelectedItems().size() + " / 3)");
     }
 
     @Override
@@ -144,7 +161,10 @@ public class GameDesignScreen implements Screen {
 
     @Override
     public void hide() {
+        statsTable.setValueLabelsStyle("white_18");
+        statsTable.setHintLabelsStyle("white_16");
         Gdx.input.setInputProcessor(null);
+        Game.getInstance().isScreenShowed = false;
     }
 
     @Override

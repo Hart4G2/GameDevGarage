@@ -1,10 +1,10 @@
 package com.mygdx.gamedevgarage;
 
 import android.os.Bundle;
-import android.view.WindowManager;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.badlogic.gdx.backends.android.surfaceview.RatioResolutionStrategy;
 
 public class AndroidLauncher extends AndroidApplication {
 	@Override

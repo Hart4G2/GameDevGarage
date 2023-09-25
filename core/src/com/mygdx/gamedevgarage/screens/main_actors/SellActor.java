@@ -2,6 +2,7 @@ package com.mygdx.gamedevgarage.screens.main_actors;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
 import static com.mygdx.gamedevgarage.utils.Utils.createProgressBar;
+import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -10,10 +11,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Timer;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
-import com.mygdx.gamedevgarage.stats.Stats;
+import com.mygdx.gamedevgarage.utils.stats.Stats;
 import com.mygdx.gamedevgarage.utils.Cost;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
 import com.mygdx.gamedevgarage.utils.data.GameObject;
+import com.mygdx.gamedevgarage.utils.stats.StatsTable;
 
 
 public class SellActor extends Table {
@@ -44,11 +46,11 @@ public class SellActor extends Table {
     }
 
     private void createUIElements(){
-        String name = validName(gameObject.getName());
+        String name = validName(gameObject.getName(), 20);
 
         Label nameLabel = createLabel(name, "white_18", false);
         priceLabel = createLabel("", "white_16", false);
-        progressBar = createProgressBar(0, gameObject.getProfitMoney());
+        progressBar = createProgressBar(0, gameObject.getProfitMoney(), getHeightPercent(0.012f));
         progressBar.setValue(gameObject.getSoldMoney());
 
         add(nameLabel)
@@ -100,15 +102,17 @@ public class SellActor extends Table {
         gameObject.setSoldMoney(soldMoney + value);
 
         stats.pay(new Cost(new Currency[]{Currency.MONEY}, new int[]{-value}));
+
+        StatsTable.setHint(Currency.MONEY, validName(gameObject.getName(), 7), "white_16");
     }
 
-    private String validName(String name){
+    private String validName(String name, int chars){
         if(name.isEmpty()){
             name = "game" + gameObject.getId();
         }
 
-        if(name.length() > 20){
-            name = name.substring(0, 20) + "...";
+        if(name.length() > chars){
+            name = name.substring(0, chars) + "...";
         }
         return name;
     }

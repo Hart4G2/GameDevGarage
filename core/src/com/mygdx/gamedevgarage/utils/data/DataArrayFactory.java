@@ -1,7 +1,6 @@
 package com.mygdx.gamedevgarage.utils.data;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -14,9 +13,11 @@ import com.mygdx.gamedevgarage.screens.mini_games.cover_actors.CoverListItem;
 import com.mygdx.gamedevgarage.screens.mini_games.selection_actors.CheckListItem;
 import com.mygdx.gamedevgarage.utils.Cost;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
+import com.mygdx.gamedevgarage.utils.data.events.Event;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -37,10 +38,6 @@ public class DataArrayFactory {
             "Survival", "Action", "Quest"
     };
 
-    public static final String[] gameLevels = {
-            "Flash game", "AA game", "AAA game"
-    };
-
     public static final String[] objectNames = {
             "Aliens", "Aviation", "Business", "Cinema", "City", "Comedy", "Construction",
             "Cooking", "Criminal", "Cyberpunk", "Dance", "Detective", "Fantasy", "Farm",
@@ -51,7 +48,7 @@ public class DataArrayFactory {
     };
 
     public static final String[] techNames = {
-            "Physics of motion", "Procedural level \ngeneration", "Artificial intelligence", "Surround sound",
+            "Physics of motion", "Procedural level generation", "Artificial intelligence", "Surround sound",
             "Photorealism", "Virtual reality", "Multiplayer", "Photomode", "Animated videos",
             "Realistic illumination", "Realistic destruction physics", "Volumetric Effects",
             "Interactive sound", "Add gamepad vibration", "Procedural animation",
@@ -63,14 +60,41 @@ public class DataArrayFactory {
             "Free movement on the map", "Time slows down", "First person camera control",
             "Nonlinear plot", "Dodging and blocking", "Multiplayer on one screen",
             "Dialogue selection system", "Stealth/Invisibility", "Lots of playable characters",
-            "Environmental influence", "Squad formation", "Change of perspective", "Base leveling",
-            "Split-dresser mode", "Identity substitution", "Time attack", "Character evolution",
-            "Online multiplayer", "Creation of unique game elements by the player", "Hospital",
-            "Complete destruction of the environment"
+            "Environmental influence", "Squad formation", "Change of perspective",
+            "Base leveling", "Split-dresser mode", "Identity substitution",
+            "Time attack", "Character evolution", "Online multiplayer",
+            "Creation of unique game elements by the player", "Complete destruction of the environment"
     };
 
     public static final String[] platformNames = {
             "Push to free web", "Buy a place in play store", "Order an expensive site", "Order an advertising campaign"
+    };
+
+    public static final HashMap<String, String> gameHints = new HashMap<String, String>() {{
+        put("low_energy", "Low energy reduces the score");
+        put("same_game", "Players don't want to play the same games");
+        put("low_design_score", "Objects should be chosen based on theme");
+        put("low_tech_score", "Technologies should be chosen based on genre");
+        put("low_mech_score", "Mechanics should be chosen based on genre");
+        put("platform_increase_money", "The platform increases game sales");
+        put("tech_bonus", "Some technologies and mechanics in combination provide an additional bonus");
+        put("genre_theme_compatibility", "Some themes and genres aren't compatible");
+    }};
+
+    public static final String[] talkHints = new String[] {
+            "I need to go out for a walk...",
+            "All this commentators... They just don't know what they're talking about...",
+            "Last line and i'll go to bed...",
+            "z z z z z z",
+            "\"muttering\"",
+            "and... if it'll... so...",
+            "that value needed to increase",
+            "think it's too hard to play...",
+            "can't understand my yesterday code...",
+            "looks like a drawing...",
+            "i can't think...",
+            "did i just delete it... aghh...",
+            "need something to eat..."
     };
 
     public static List<CoverObject> objects;
@@ -78,6 +102,8 @@ public class DataArrayFactory {
     public static List<CheckObject> mechanics;
     public static List<CoverObject> platforms;
     public static List<CoverObject> colors;
+    public static List<Event> randomEvents;
+    public static List<Event> shownRandomEvents;
 
     public static void initialise(){
         Assets assets = Assets.getInstance();
@@ -87,12 +113,38 @@ public class DataArrayFactory {
         String mechanicsJson = Gdx.files.internal("mechanics.json").readString();
         String platformsJson = Gdx.files.internal("platforms.json").readString();
         String colorsJson = Gdx.files.internal("colors.json").readString();
+        String randomEventsJson = Gdx.files.internal("random_events.json").readString();
 
         objects = readCoverObjectsFromJson(objectsJson, assets.designObjectsAtlas, Game.getInstance().getCoverObjects());
         technologies = readCheckObjectsFromJson(technologiesJson, assets.techAtlas, Game.getInstance().getTechnologies());
-        mechanics = readMechanicsFromJson(mechanicsJson);
+        mechanics = readCheckObjectsFromJson(mechanicsJson, assets.mechAtlas, Game.getInstance().getMechanics());
         platforms = readCoverObjectsFromJson(platformsJson, assets.platformAtlas, Game.getInstance().getPlatforms());
         colors = readCoverObjectsWithoutCostFromJson(colorsJson, assets.designColorsAtlas);
+        randomEvents = readEventsFromJson(randomEventsJson, assets.randomEventsAtlas);
+        shownRandomEvents = new ArrayList<>();
+    }
+
+    public static List<Event> readEventsFromJson(String json, TextureAtlas atlas) {
+        List<Event> result = new ArrayList<>();
+
+        JsonReader reader = new JsonReader();
+        JsonValue value = reader.parse(json);
+
+        for (JsonValue item : value) {
+            String text = item.getString("text");
+            String drawableName = item.getString("drawable");
+
+            Drawable drawable = createDrawable(atlas, drawableName, -1);
+
+            JsonValue confirmCostJson = item.get("confirmCost");
+            JsonValue rejectCostJson = item.get("rejectCost");
+            Cost confirmCost = readCostFromJson(confirmCostJson);
+            Cost rejectCost = readCostFromJson(rejectCostJson);
+
+            result.add(new Event(text, drawable, confirmCost, rejectCost));
+        }
+
+        return result;
     }
 
     public static List<CheckObject> readCheckObjectsFromJson(String json, TextureAtlas atlas, HashSet<String> purchasedSet) {
@@ -104,65 +156,16 @@ public class DataArrayFactory {
         for (JsonValue item : value) {
             String name = item.getString("name");
             String description = item.getString("description");
+            String regionName = item.getString("drawable");
 
-            String regionName = name.replace("\n", "");
             TextureRegionDrawable frame1 = createDrawable(atlas, regionName, 1);
             TextureRegionDrawable frame2 = createDrawable(atlas, regionName, 2);
 
-            JsonValue costJson = item.get("cost");
-            JsonValue valueArrayJson = costJson.get("value");
-
-            int[] values = new int[valueArrayJson.size];
-            for (int i = 0; i < valueArrayJson.size; i++) {
-                values[i] = valueArrayJson.getInt(i);
+            if(atlas.findRegion(regionName, 1) == null || atlas.findRegion(regionName, 2) == null){
+                System.out.println("checkObject: " + regionName);
             }
 
-            JsonValue currencyArrayJson = costJson.get("currency");
-            Currency[] currencies = new Currency[currencyArrayJson.size];
-            for (int i = 0; i < currencyArrayJson.size; i++) {
-                currencies[i] = Currency.fromString(currencyArrayJson.getString(i));
-            }
-
-            Cost cost = new Cost(currencies, values);
-
-            CheckObject checkObject = new CheckObject(name, description, frame1, frame2, cost);
-            checkObject.setPurchased(purchasedSet.contains(name));
-
-            result.add(checkObject);
-        }
-
-        return result;
-    }
-
-    public static List<CheckObject> readMechanicsFromJson(String json) {
-        List<CheckObject> result = new ArrayList<>();
-        HashSet<String> purchasedSet = Game.getInstance().getMechanics();
-
-        JsonReader reader = new JsonReader();
-        JsonValue value = reader.parse(json);
-
-        for (JsonValue item : value) {
-            String name = item.getString("name");
-            String description = item.getString("description");
-
-            TextureRegionDrawable frame1 = new TextureRegionDrawable(new Texture(Gdx.files.internal("frame1.png")));
-            TextureRegionDrawable  frame2 = new TextureRegionDrawable(new Texture(Gdx.files.internal("frame2.png")));
-
-            JsonValue costJson = item.get("cost");
-            JsonValue valueArrayJson = costJson.get("value");
-
-            int[] values = new int[valueArrayJson.size];
-            for (int i = 0; i < valueArrayJson.size; i++) {
-                values[i] = valueArrayJson.getInt(i);
-            }
-
-            JsonValue currencyArrayJson = costJson.get("currency");
-            Currency[] currencies = new Currency[currencyArrayJson.size];
-            for (int i = 0; i < currencyArrayJson.size; i++) {
-                currencies[i] = Currency.fromString(currencyArrayJson.getString(i));
-            }
-
-            Cost cost = new Cost(currencies, values);
+            Cost cost = readCostFromJson(item.get("cost"));
 
             CheckObject checkObject = new CheckObject(name, description, frame1, frame2, cost);
             checkObject.setPurchased(purchasedSet.contains(name));
@@ -184,23 +187,12 @@ public class DataArrayFactory {
             String itemName = item.getString("item");
             int itemIndex = item.getInt("item_index");
 
-            JsonValue costJson = item.get("cost");
-            JsonValue valueArrayJson = costJson.get("value");
-
-            int[] values = new int[valueArrayJson.size];
-            for (int i = 0; i < valueArrayJson.size; i++) {
-                values[i] = valueArrayJson.getInt(i);
-            }
-
-            JsonValue currencyArrayJson = costJson.get("currency");
-            Currency[] currencies = new Currency[currencyArrayJson.size];
-            for (int i = 0; i < currencyArrayJson.size; i++) {
-                currencies[i] = Currency.fromString(currencyArrayJson.getString(i));
-            }
-
-            Cost cost = new Cost(currencies, values);
+            Cost cost = readCostFromJson(item.get("cost"));
 
             Drawable itemDrawable = createDrawable(atlas, itemName, itemIndex);
+            if(atlas.findRegion(itemName, itemIndex) == null){
+                System.out.println(name + " " + itemIndex);
+            }
 
             CoverObject coverObject = new CoverObject(name, itemDrawable, cost);
             coverObject.setPurchased(purchasedSet.contains(name));
@@ -228,6 +220,23 @@ public class DataArrayFactory {
         }
 
         return result;
+    }
+
+    private static Cost readCostFromJson(JsonValue costJson){
+        JsonValue valueArrayJson = costJson.get("value");
+
+        int[] values = new int[valueArrayJson.size];
+        for (int i = 0; i < valueArrayJson.size; i++) {
+            values[i] = valueArrayJson.getInt(i);
+        }
+
+        JsonValue currencyArrayJson = costJson.get("currency");
+        Currency[] currencies = new Currency[currencyArrayJson.size];
+        for (int i = 0; i < currencyArrayJson.size; i++) {
+            currencies[i] = Currency.fromString(currencyArrayJson.getString(i));
+        }
+
+        return new Cost(currencies, values);
     }
 
     public static List<CoverListItem> createCoverObjects(){

@@ -1,7 +1,6 @@
 package com.mygdx.gamedevgarage.screens.game_event.random;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
-import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -9,18 +8,21 @@ import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Scaling;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
-import com.mygdx.gamedevgarage.stats.StatsTable;
+import com.mygdx.gamedevgarage.utils.stats.Stats;
+import com.mygdx.gamedevgarage.utils.stats.StatsTable;
+import com.mygdx.gamedevgarage.utils.data.events.Event;
 
 public class RandomEventScreen implements Screen {
 
@@ -28,17 +30,14 @@ public class RandomEventScreen implements Screen {
     private final Skin skin;
     private Stage stage;
     private StatsTable statsTable;
-    private final RandomEvent event;
+    private RandomEvent randomEvent;
 
-    private Image image;
-    private Label label;
     private TextButton confirmButton;
     private TextButton rejectButton;
 
-    public RandomEventScreen(RandomEvent event) {
+    public RandomEventScreen() {
         game = Game.getInstance();
         skin = Assets.getInstance().getSkin();
-        this.event = event;
     }
 
     @Override
@@ -48,28 +47,30 @@ public class RandomEventScreen implements Screen {
 
         game.stopAllThreads();
 
+        game.isRandomEventShown = true;
+
         createUIElements();
         setupUIListeners();
     }
 
     private void createUIElements(){
-        statsTable = createStatsTable();
+        statsTable = StatsTable.getInstance();
 
-        String text = event.getText();
+        Event event = randomEvent.getEvent();
 
-        image = new Image(new Texture(Gdx.files.internal("event_debug.png")));
+        Image image = new Image(event.getDrawable());
 
-        label = createLabel(text, "white_24", true);
+        Label label = createLabel(event.getText(), "white_24", true);
 
         confirmButton = createTextButton("Confirm", "white_18");
         rejectButton = createTextButton("Reject", "white_18");
 
         Table table = new Table(skin);
         table.setFillParent(true);
-        table.add(image).width(getWidthPercent(.9f)).height(getHeightPercent(.3f))
-                .pad(getHeightPercent(.1f), getWidthPercent(.05f), getHeightPercent(.03f), getWidthPercent(.05f))
+        table.add(image).width(getHeightPercent(.4f)).height(getHeightPercent(.4f))
+                .padTop(getHeightPercent(.1f)).padBottom(getHeightPercent(.01f))
                 .colspan(2).center().row();
-        table.add(label).width(getWidthPercent(.85f)).height(getHeightPercent(.4f))
+        table.add(label).width(getWidthPercent(.85f)).height(getHeightPercent(.3f))
                 .padBottom(getHeightPercent(.03f))
                 .colspan(2).center().row();
         table.add(confirmButton).width(getWidthPercent(.4f)).height(getHeightPercent(.08f))
@@ -77,10 +78,16 @@ public class RandomEventScreen implements Screen {
         table.add(rejectButton).width(getWidthPercent(.4f)).height(getHeightPercent(.08f))
                 .padBottom(getHeightPercent(.03f));
 
-        stage.addActor(table);
-        stage.addActor(statsTable);
+        boolean canConfirm = Stats.getInstance().isEnough(event.getConfirmCost());
+        confirmButton.setDisabled(!canConfirm);
 
-        table.setBackground("window_purple");
+        Image bg = new Image(Assets.getInstance().getSkin().getDrawable("window_darkblue"));
+        bg.setScaling(Scaling.fill);
+        Stack stack = new Stack(bg, table);
+        stack.setFillParent(true);
+
+        stage.addActor(stack);
+        stage.addActor(statsTable);
     }
 
     private void setupUIListeners(){
@@ -88,7 +95,7 @@ public class RandomEventScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.setMainScreen();
-                RandomEventScreen.this.event.confirm();
+                RandomEventScreen.this.randomEvent.confirm();
                 game.resumeAllThreads();
             }
         });
@@ -96,7 +103,7 @@ public class RandomEventScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.setMainScreen();
-                RandomEventScreen.this.event.reject();
+                RandomEventScreen.this.randomEvent.reject();
                 game.resumeAllThreads();
             }
         });
@@ -131,10 +138,15 @@ public class RandomEventScreen implements Screen {
     @Override
     public void hide() {
         Gdx.input.setInputProcessor(null);
+        game.isRandomEventShown = false;
     }
 
     @Override
     public void dispose() {
         stage.dispose();
+    }
+
+    public void setRandomEvent(RandomEvent randomEvent) {
+        this.randomEvent = randomEvent;
     }
 }

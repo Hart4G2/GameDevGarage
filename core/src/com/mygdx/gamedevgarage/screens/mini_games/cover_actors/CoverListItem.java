@@ -1,5 +1,6 @@
 package com.mygdx.gamedevgarage.screens.mini_games.cover_actors;
 
+import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
@@ -10,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.mygdx.gamedevgarage.Assets;
-import com.mygdx.gamedevgarage.utils.Utils;
 import com.mygdx.gamedevgarage.utils.data.CoverObject;
 
 public class CoverListItem extends Group {
@@ -35,7 +35,7 @@ public class CoverListItem extends Group {
     }
 
     private void initColorUIElements(Drawable imageBackground){
-        Label headerLabel = Utils.createLabel(coverObject.getName(), "black_18", true);
+        Label headerLabel = createLabel(coverObject.getName(), "black_18", true);
         image = new Image(coverObject.getItem());
 
         Image backgroundImage = new Image(imageBackground);
@@ -55,7 +55,7 @@ public class CoverListItem extends Group {
         table = new Table();
         table.setFillParent(true);
         table.setBackground(background);
-        table.add(headerLabel).left().width(getWidthPercent(.4f)).height(getHeightPercent(.15f));
+        table.add(headerLabel).left().width(getWidthPercent(.5f)).height(getHeightPercent(.15f));
         table.add(imageGroup).right().width(frameSize).height(frameSize);
 
         addActor(table);

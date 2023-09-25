@@ -28,7 +28,7 @@ public class CheckList extends Table {
     private void addItems() {
         for (CheckListItem item : items) {
             if(item.getCheckObject().isPurchased()) {
-                add(item).width(getWidthPercent(.95f)).height(getHeightPercent(.15f)).row();
+                add(item).width(getWidthPercent(.95f)).height(getHeightPercent(.2f)).row();
                 addClickListener(item);
             }
         }
@@ -48,8 +48,10 @@ public class CheckList extends Table {
             item.setUnselected();
             removeItem(item.getCheckObject());
         } else {
-            item.setSelected();
-            addItem(item.getCheckObject());
+            if(selectedItems.size() < 3) {
+                item.setSelected();
+                addItem(item.getCheckObject());
+            }
         }
     }
 

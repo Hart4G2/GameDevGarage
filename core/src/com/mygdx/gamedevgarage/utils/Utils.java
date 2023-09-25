@@ -8,12 +8,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
-import com.mygdx.gamedevgarage.stats.StatsTable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,9 +30,26 @@ public class Utils {
         return dialog;
     }
 
-    public static ProgressBar createProgressBar(int min, int max){
-        return new ProgressBar(min, max, 1,
+    public static ProgressBar createProgressBar(int min, int max, float height){
+        ProgressBar progressBar = new ProgressBar(min, max, 1,
                 false, Assets.getInstance().getSkin(), "default-horizontal");
+
+        progressBar.getStyle().background.setMinHeight(height);
+        progressBar.getStyle().knobAfter.setMinHeight(height);
+        progressBar.getStyle().knobBefore.setMinHeight(height);
+
+        return progressBar;
+    }
+
+    public static Slider createSlider(float min, float max, float step, float height){
+        Slider slider = new Slider(min, max, step, false, Assets.getInstance().getSkin());
+
+        slider.getStyle().knob.setMinHeight(height * 1.01f);
+        slider.getStyle().background.setMinHeight(height);
+        slider.getStyle().knobAfter.setMinHeight(height);
+        slider.getStyle().knobBefore.setMinHeight(height);
+
+        return slider;
     }
 
     public static Label createLabel(String text, String styleText, boolean wrap){
@@ -112,10 +129,6 @@ public class Utils {
             }
         }
         return false;
-    }
-
-    public static StatsTable createStatsTable(){
-        return new StatsTable();
     }
 
     public static float getWidthPercent(float percent) {

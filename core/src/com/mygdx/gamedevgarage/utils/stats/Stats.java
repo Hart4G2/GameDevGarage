@@ -1,4 +1,4 @@
-package com.mygdx.gamedevgarage.stats;
+package com.mygdx.gamedevgarage.utils.stats;
 
 import com.mygdx.gamedevgarage.utils.Cost;
 import com.mygdx.gamedevgarage.utils.DataManager;
@@ -14,16 +14,18 @@ public class Stats {
     private int programming = 1011;
     private int gameDesign = 1011;
     private int money = 1000;
+    private int energy = 10;
 
     private static Stats instance;
 
-    public Stats(int level, int experience, int design, int programming, int gameDesign, int money) {
+    public Stats(int level, int experience, int design, int programming, int gameDesign, int money, int energy) {
         this.level = level;
         this.experience = experience;
         this.design = design;
         this.programming = programming;
         this.gameDesign = gameDesign;
         this.money = money;
+        this.energy = energy;
     }
 
     public static Stats getInstance(){
@@ -31,11 +33,11 @@ public class Stats {
             HashMap<String, Integer> statsMap = DataManager.getInstance().getStats();
 
             if(statsMap.isEmpty()){
-                instance = new Stats(6, 49, 30, 30, 30, 10);
+                instance = new Stats(6, 49, 30, 30, 30, 10, 10);
             } else {
                 instance = new Stats(statsMap.get("level"), statsMap.get("exp"),
                         statsMap.get("design"), statsMap.get("programming"),
-                        statsMap.get("gameDesign"), statsMap.get("money"));
+                        statsMap.get("gameDesign"), statsMap.get("money"), statsMap.get("energy"));
             }
         }
         return instance;
@@ -46,27 +48,31 @@ public class Stats {
     }
 
     public void setLevel(int level) {
-        this.level = Math.min(level, 9);
+        this.level = Math.max(1, Math.min(level, 9));
     }
 
     public void setExperience(int experience, int requiredExp) {
-        this.experience = experience - requiredExp;
+        this.experience = Math.max(0, experience - requiredExp);
     }
 
     public void setDesign(int design) {
-        this.design = Math.min(design, 100);
+        this.design = Math.max(0, Math.min(design, 100));
     }
 
     public void setProgramming(int programming) {
-        this.programming = Math.min(programming, 100);
+        this.programming = Math.max(0, Math.min(programming, 100));
     }
 
     public void setGameDesign(int gameDesign) {
-        this.gameDesign = Math.min(gameDesign, 100);
+        this.gameDesign = Math.max(0, Math.min(gameDesign, 100));
     }
 
     public void setMoney(int money) {
         this.money = Math.min(money, 100);
+    }
+
+    public void setEnergy(int energy) {
+        this.energy = Math.max(0, Math.min(energy, 10));
     }
 
     public boolean isEnough(Cost cost){
@@ -112,6 +118,9 @@ public class Stats {
             case GAME_DESIGN:
                 setGameDesign(stat);
                 break;
+            case ENERGY:
+                setEnergy(stat);
+                break;
         }
     }
 
@@ -129,6 +138,8 @@ public class Stats {
                 return level;
             case EXPERIENCE:
                 return experience;
+            case ENERGY:
+                return energy;
             default:
                 return 0;
         }

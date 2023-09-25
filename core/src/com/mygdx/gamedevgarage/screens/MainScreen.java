@@ -1,8 +1,7 @@
 package com.mygdx.gamedevgarage.screens;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createButton;
-import static com.mygdx.gamedevgarage.utils.Utils.createProgressBar;
-import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
+import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -22,19 +21,26 @@ import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.main_actors.SellActor;
 import com.mygdx.gamedevgarage.screens.main_actors.SellTable;
-import com.mygdx.gamedevgarage.stats.StatsTable;
 import com.mygdx.gamedevgarage.utils.DialogThread;
+import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 import com.mygdx.gamedevgarage.utils.data.GameObject;
+import com.mygdx.gamedevgarage.utils.stats.StatsTable;
+
+import java.util.Random;
 
 public class MainScreen implements Screen {
 
@@ -50,18 +56,15 @@ public class MainScreen implements Screen {
     private TextButton makeGameButton;
     private Button upgradeButton;
     private Button collectionButton;
-    private ProgressBar gameMakingProgressBar;
+    private Label talkLabel;
     private StatsTable statsTable;
     private SellTable sellTable;
     private ScrollPane sellScrollPane;
 
     private AnimationController animationController;
 
-    private boolean isGameInProgress = false;
-
     private DirectionalShadowLight shadowLight;
     private ModelBatch shadowBatch;
-
 
     public MainScreen() {
         this.game = Game.getInstance();
@@ -70,17 +73,19 @@ public class MainScreen implements Screen {
         createUIElements();
         setupUIListeners();
         createScene();
+
+        talkTimer.scheduleTask(talkTask, 10, 10, -1);
     }
 
     @Override
     public void show() {
-        stage = new Stage();
+        stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
         stage.addActor(makeGameButton);
         stage.addActor(upgradeButton);
         stage.addActor(collectionButton);
-        stage.addActor(gameMakingProgressBar);
+        stage.addActor(talkLabel);
         stage.addActor(sellScrollPane);
         stage.addActor(statsTable);
 
@@ -127,31 +132,33 @@ public class MainScreen implements Screen {
     }
 
     private void createUIElements(){
-        statsTable = createStatsTable();
+        statsTable = StatsTable.getInstance();
 
         makeGameButton = createTextButton("Make a game", "white_18");
         upgradeButton = createButton("store_button");
         collectionButton = createButton("collection_button");
-        gameMakingProgressBar = createProgressBar(0, 100);
+        talkLabel = createLabel("", "white_18", true);
+        talkLabel.setAlignment(Align.center);
+        talkLabel.setVisible(false);
 
-        upgradeButton.setPosition(getWidthPercent(0.05f), getHeightPercent(0.78f));
-        upgradeButton.setSize(getWidthPercent(0.18f), getWidthPercent(0.18f));
+        upgradeButton.setPosition(getWidthPercent(.05f), getHeightPercent(.78f));
+        upgradeButton.setSize(getWidthPercent(.18f), getWidthPercent(.18f));
 
-        collectionButton.setPosition(getWidthPercent(0.05f), getHeightPercent(0.75f) - getWidthPercent(0.18f));
-        collectionButton.setSize(getWidthPercent(0.18f), getWidthPercent(0.18f));
+        collectionButton.setPosition(getWidthPercent(.05f), getHeightPercent(.75f) - getWidthPercent(.18f));
+        collectionButton.setSize(getWidthPercent(.18f), getWidthPercent(.18f));
 
-        makeGameButton.setPosition(getWidthPercent(0.1f), getHeightPercent(0.02f));
-        makeGameButton.setSize(getWidthPercent(0.84f), getHeightPercent(0.15f));
+        makeGameButton.setPosition(getWidthPercent(.1f), getHeightPercent(.02f));
+        makeGameButton.setSize(getWidthPercent(.84f), getHeightPercent(.15f));
 
-        gameMakingProgressBar.setPosition(getWidthPercent(0.38f), getHeightPercent(0.58f));
-        gameMakingProgressBar.setSize(getWidthPercent(0.3f), getHeightPercent(0.1f));
+        talkLabel.setPosition(getWidthPercent(.3f), getHeightPercent(.55f));
+        talkLabel.setSize(getWidthPercent(.5f), getHeightPercent(.15f));
 
         sellTable = new SellTable();
         sellScrollPane = new ScrollPane(sellTable, assets.getSkin());
         sellScrollPane.setFadeScrollBars(false);
 
-        sellScrollPane.setPosition(getWidthPercent(.45f), getHeightPercent(0.6f));
-        sellScrollPane.setSize(getWidthPercent(0.5f), getHeightPercent(0.3f));
+        sellScrollPane.setPosition(getWidthPercent(.45f), getHeightPercent(.6f));
+        sellScrollPane.setSize(getWidthPercent(.5f), getHeightPercent(.3f));
     }
 
     public void startSellGame(GameObject gameObject){
@@ -193,8 +200,6 @@ public class MainScreen implements Screen {
         });
     }
 
-    float value = 0f;
-
     @Override
     public void render(float delta) {
         shadowLight.begin(Vector3.Zero, cam.direction);
@@ -209,18 +214,6 @@ public class MainScreen implements Screen {
         float deltaTime = Gdx.graphics.getDeltaTime();
 
         animationController.update(deltaTime);
-
-        if(isGameInProgress) {
-            if (Math.round(deltaTime) % 2 == 0) {
-                value += 0.1;
-            }
-
-            gameMakingProgressBar.setValue(value);
-
-            if (value >= 100) {
-                value = 0;
-            }
-        }
 
         modelBatch.begin(cam);
         modelBatch.render(instances, environment);
@@ -239,19 +232,17 @@ public class MainScreen implements Screen {
 
     @Override
     public void pause() {
-        isGameInProgress = false;
+        talkTimer.stop();
     }
 
     @Override
     public void resume() {
-        if(game.isGameStarted){
-            isGameInProgress = true;
-        }
+        talkTimer.start();
     }
 
     @Override
     public void hide() {
-        isGameInProgress = false;
+        talkTimer.stop();
     }
 
     @Override
@@ -263,7 +254,6 @@ public class MainScreen implements Screen {
 
     public void setGameStarted(){
         game.isGameStarted = true;
-        isGameInProgress = true;
         makeGameButton.setVisible(false);
         animationController.setAnimation("coding_loop", -1);
     }
@@ -271,18 +261,14 @@ public class MainScreen implements Screen {
     public void setGameEnded(){
         makeGameButton.setVisible(true);
         game.isGameStarted = false;
-        isGameInProgress = false;
         System.out.println("Game ended");
-        gameMakingProgressBar.setValue(0);
         animationController.current = null;
     }
 
     public void setGameCanceled(){
         makeGameButton.setVisible(true);
         game.isGameStarted = false;
-        isGameInProgress = false;
         System.out.println("Game canceled");
-        gameMakingProgressBar.setValue(0);
         animationController.current = null;
     }
 
@@ -308,7 +294,52 @@ public class MainScreen implements Screen {
         dialogOpened = value;
     }
 
-    public boolean isDialogOpened(){
-        return dialogOpened;
+    public boolean isDialogClosed(){
+        return !dialogOpened;
+    }
+
+
+    private final Timer talkTimer = new Timer();
+    private String previousPhrase;
+
+    Timer.Task talkTask = new Timer.Task() {
+        @Override
+        public void run() {
+            String[] hints = DataArrayFactory.talkHints;
+            int r = new Random().nextInt(hints.length);
+            String hint = hints[r];
+
+            while(hint.equals(previousPhrase)){
+                r = new Random().nextInt(hints.length);
+                hint = hints[r];
+            }
+
+            previousPhrase = hint;
+            setHintTalk(hint);
+        }
+    };
+
+    private void setHintTalk(final String hint){
+        talkLabel.addAction(Actions.sequence(
+                Actions.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        talkLabel.setText(hint);
+                        talkLabel.addAction(Actions.alpha(0f, .001f));
+                        talkLabel.setVisible(true);
+                    }
+                }),
+                Actions.delay(.01f),
+                Actions.fadeIn(.2f),
+                Actions.delay(3f),
+                Actions.fadeOut(.3f),
+                Actions.delay(.1f),
+                Actions.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        talkLabel.setVisible(false);
+                    }
+                })
+        ));
     }
 }

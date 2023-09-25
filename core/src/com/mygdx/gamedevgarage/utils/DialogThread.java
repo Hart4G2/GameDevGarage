@@ -14,6 +14,7 @@ import com.mygdx.gamedevgarage.screens.MainScreen;
 import com.mygdx.gamedevgarage.utils.constraints.Constants;
 import com.mygdx.gamedevgarage.utils.constraints.GameState;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
+import com.mygdx.gamedevgarage.utils.stats.StatsTable;
 
 public class DialogThread {
 
@@ -112,14 +113,15 @@ public class DialogThread {
         final TextField nameTextField = dialog.getContentTable().findActor("nameTextField");
         final SelectBox<String> genreSelectBox = dialog.getContentTable().findActor("genreSelectBox");
         final SelectBox<String> themesSelectBox = dialog.getContentTable().findActor("themesSelectBox");
-        final SelectBox<String> levelSelectBox = dialog.getContentTable().findActor("levelSelectBox");
 
         okButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 screen.setDialogOpened(false);
                 dialog.hide();
-                getInstance().setDesignThread();
+                getInstance().setDesignThread(true);
+                GameFactory.previousGenre = GameFactory.genre;
+                GameFactory.previousTheme = GameFactory.theme;
                 GameFactory.genre = genreSelectBox.getSelected();
                 GameFactory.theme = themesSelectBox.getSelected();
                 GameFactory.name = nameTextField.getText();
@@ -139,24 +141,24 @@ public class DialogThread {
         dialog.show(screen.getStage());
     }
 
-    public void setDesignThread() {
-        currentTimer.scheduleTask(designThread, Constants.MAIN_TIME);
+    public void setDesignThread(boolean isDelayNeeded) {
+        currentTimer.scheduleTask(designThread, isDelayNeeded ? Constants.MAIN_TIME : 0);
     }
 
-    public void setProgrammingThread() {
-        currentTimer.scheduleTask(programmingThread, Constants.DESIGN_TIME);
+    public void setProgrammingThread(boolean isDelayNeeded) {
+        currentTimer.scheduleTask(programmingThread, isDelayNeeded ? Constants.DESIGN_TIME : 0);
     }
 
-    public void setGameDesignThread() {
-        currentTimer.scheduleTask(gameDesignThread, Constants.PROGRAMING_TIME);
+    public void setGameDesignThread(boolean isDelayNeeded) {
+        currentTimer.scheduleTask(gameDesignThread, isDelayNeeded ? Constants.PROGRAMING_TIME : 0);
     }
 
-    public void setEndGameThread() {
-        currentTimer.scheduleTask(endGameThread, Constants.MAIN_TIME);
+    public void setEndGameThread(boolean isDelayNeeded) {
+        currentTimer.scheduleTask(endGameThread, isDelayNeeded ? Constants.MAIN_TIME : 0);
     }
 
-    public void setPlatformThread() {
-        currentTimer.scheduleTask(platformThread, Constants.GAME_DESIGN_TIME);
+    public void setPlatformThread(boolean isDelayNeeded) {
+        currentTimer.scheduleTask(platformThread, isDelayNeeded ? Constants.GAME_DESIGN_TIME : 0);
     }
 
     public void pause() {

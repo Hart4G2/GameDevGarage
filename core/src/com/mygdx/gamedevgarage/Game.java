@@ -1,9 +1,6 @@
 package com.mygdx.gamedevgarage;
 
 
-import static com.mygdx.gamedevgarage.utils.Utils.convertStringToList;
-
-import com.badlogic.gdx.utils.Timer;
 import com.mygdx.gamedevgarage.screens.MainScreen;
 import com.mygdx.gamedevgarage.screens.collection.CollectionScreen;
 import com.mygdx.gamedevgarage.screens.game_event.EventPublisher;
@@ -13,37 +10,52 @@ import com.mygdx.gamedevgarage.screens.game_event.random.RandomEvent;
 import com.mygdx.gamedevgarage.screens.game_event.random.RandomEventScreen;
 import com.mygdx.gamedevgarage.screens.game_event.tax.GameOverScreen;
 import com.mygdx.gamedevgarage.screens.game_event.tax.TaxEvent;
+import com.mygdx.gamedevgarage.screens.menu.MenuScreen;
 import com.mygdx.gamedevgarage.screens.mini_games.DesignScreen;
 import com.mygdx.gamedevgarage.screens.mini_games.EndScreen;
 import com.mygdx.gamedevgarage.screens.mini_games.GameDesignScreen;
 import com.mygdx.gamedevgarage.screens.mini_games.PlatformScreen;
 import com.mygdx.gamedevgarage.screens.mini_games.ProgrammingScreen;
 import com.mygdx.gamedevgarage.screens.upgrade.UpgradeScreen;
-import com.mygdx.gamedevgarage.stats.Stats;
 import com.mygdx.gamedevgarage.utils.DataManager;
 import com.mygdx.gamedevgarage.utils.DialogThread;
 import com.mygdx.gamedevgarage.utils.constraints.GameState;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
-import com.mygdx.gamedevgarage.utils.data.GameFactory;
 import com.mygdx.gamedevgarage.utils.data.GameObject;
+import com.mygdx.gamedevgarage.utils.stats.Stats;
+import com.mygdx.gamedevgarage.utils.stats.StatsTable;
 
-import java.util.HashMap;
 import java.util.HashSet;
 
 
 public class Game extends com.badlogic.gdx.Game implements Observer {
 
+    private MenuScreen menuScreen;
     private MainScreen mainScreen;
+    private CollectionScreen collectionScreen;
+    private UpgradeScreen upgradeScreen;
+    private DesignScreen designScreen;
+    private ProgrammingScreen programmingScreen;
+    private GameDesignScreen gameDesignScreen;
+    private PlatformScreen platformScreen;
+    private EndScreen endScreen;
+    private RandomEventScreen randomEventScreen;
+    private GameOverScreen gameOverScreen;
 
-    private HashSet<String> coverObjects;
-    private HashSet<String> technologies;
-    private HashSet<String> mechanics;
-    private HashSet<String> platforms;
-    private HashSet<GameObject> games;
+    public HashSet<String> coverObjects;
+    public HashSet<String> technologies;
+    public HashSet<String> mechanics;
+    public HashSet<String> platforms;
+    public HashSet<GameObject> games;
 
-    private boolean isGameOver = false;
+
+    public boolean isRandomEventShown = false;
+    public boolean isRandomEventShownFromLastOpen = false;
+    public boolean isGameOver = false;
     public boolean isGameStarted = false;
     public GameState gameState;
+    public boolean isScreenShowed;
+    public boolean isEndScreenCalculated;
     private DataManager dataManager;
     public EventPublisher eventPublisher;
 
@@ -59,55 +71,11 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
     @Override
     public void create() {
         dataManager = DataManager.getInstance();
+        Assets.getInstance().loadMusic();
 
-        initData();
-        setMainScreen();
-        getSavedGameState();
+        menuScreen = new MenuScreen();
 
-        isGameOver = dataManager.getGameOver();
-        if(isGameOver){
-            new Timer().scheduleTask(new Timer.Task() {
-                @Override
-                public void run() {
-                    setScreen(new GameOverScreen());
-                }
-            }, 0);
-        }
-    }
-
-    private void initData(){
-        games = dataManager.getGames();
-
-        mainScreen = new MainScreen();
-
-        if(!getSavedData()) {
-            coverObjects = DataArrayFactory.createDataObjectsSet();
-            technologies = DataArrayFactory.createDataTechnologiesSet();
-            mechanics = DataArrayFactory.createDataMechanicsSet();
-            platforms = DataArrayFactory.createDataPlatformsSet();
-        }
-
-        DataArrayFactory.initialise();
-
-        for(GameObject gameObject : games){
-            if(!gameObject.isSold()){
-                mainScreen.startSellGame(gameObject);
-            }
-        }
-
-        eventPublisher = new EventPublisher();
-        eventPublisher.addObserver(this);
-
-        TaxEvent.scheduleNextEvent(new TaxEvent());
-
-        RandomEvent randomEvent = new RandomEvent("Up is opinion message manners correct hearing husband my. " +
-                "Disposing commanded dashwoods cordially depending at at. " +
-                "Its strangers who you certainty earnestly resources suffering she. " +
-                "Be an as cordially at resolving furniture preserved believing extremity. " +
-                "Easy mr pain felt in. Too northward affection additions nay. " +
-                "He no an nature ye talent houses wisdom vanity denied." +
-                "Efergegre wefwefwef e!");
-        RandomEvent.scheduleNextEvent(randomEvent);
+        setMenuScreen();
     }
 
     @Override
@@ -130,72 +98,25 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
     public void dispose() {
         dataManager.save();
         Assets.getInstance().dispose();
-    }
+        menuScreen.dispose();
+        try {
+            mainScreen.dispose();
+            collectionScreen.dispose();
+            upgradeScreen.dispose();
+            designScreen.dispose();
+            programmingScreen.dispose();
+            gameDesignScreen.dispose();
+            platformScreen.dispose();
+            endScreen.dispose();
+            randomEventScreen.dispose();
+            gameOverScreen.dispose();
+        } catch (NullPointerException ignored){
 
-    private boolean getSavedData(){
-        coverObjects = dataManager.getCovers();
-        if(coverObjects.isEmpty()) return false;
-
-        technologies = dataManager.getTechnologies();
-        mechanics = dataManager.getMechanics();
-        platforms = dataManager.getPlatforms();
-
-        return true;
-    }
-
-    private void getSavedGameState(){
-        isGameStarted = dataManager.isGameStarted();
-        if(isGameStarted){
-            gameState = dataManager.getGameState();
-            setGameState();
-            mainScreen.setGameStarted();
         }
     }
 
-    private void setSavedGameData() {
-        HashMap<String, String> gameData = dataManager.getGameData();
-
-        GameFactory.name = gameData.get("name");
-        GameFactory.genre = gameData.get("genre");
-        GameFactory.theme = gameData.get("theme");
-        GameFactory.color = gameData.get("color");
-        GameFactory.object = gameData.get("object");
-        GameFactory.technologies = convertStringToList(gameData.get("technologies"));
-        GameFactory.mechanics = convertStringToList(gameData.get("mechanics"));
-        GameFactory.platform = gameData.get("platform");
-    }
-
-    private void setGameState(){
-        setSavedGameData();
-
-        DialogThread dialogThread = DialogThread.getInstance();
-
-        switch (gameState){
-            case MAIN: {
-                dialogThread.start();
-                break;
-            }
-            case DESIGN: {
-                dialogThread.setDesignThread();
-                break;
-            }
-            case PROGRAMMING: {
-                dialogThread.setProgrammingThread();
-                break;
-            }
-            case GAMEDESIGN: {
-                dialogThread.setGameDesignThread();
-                break;
-            }
-            case PLATFORM: {
-                dialogThread.setPlatformThread();
-                break;
-            }
-            case END: {
-                dialogThread.setEndGameThread();
-                break;
-            }
-        }
+    public void setMenuScreen() {
+        setScreen(menuScreen);
     }
 
     public MainScreen getMainScreen() {
@@ -203,43 +124,64 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
     }
 
     public void setMainScreen() {
+        if(mainScreen == null) mainScreen = new MainScreen();
+
         setScreen(mainScreen);
     }
 
     public void setGameOverScreen() {
-        setScreen(new GameOverScreen());
+        if(gameOverScreen == null) gameOverScreen = new GameOverScreen();
+
+        setScreen(gameOverScreen);
     }
 
     public void setCoverScreen() {
-        setScreen(new DesignScreen());
+        if(designScreen == null) designScreen = new DesignScreen();
+
+        setScreen(designScreen);
     }
 
     public void setTechScreen() {
-        setScreen(new ProgrammingScreen());
+        if(programmingScreen == null) programmingScreen = new ProgrammingScreen();
+
+        setScreen(programmingScreen);
     }
 
     public void setMechanicScreen() {
-        setScreen(new GameDesignScreen());
+        if(gameDesignScreen == null) gameDesignScreen = new GameDesignScreen();
+
+        setScreen(gameDesignScreen);
     }
 
     public void setPlatformScreen() {
-        setScreen(new PlatformScreen());
+        if(platformScreen == null) platformScreen = new PlatformScreen();
+
+        setScreen(platformScreen);
     }
 
     public void setUpgradeScreen() {
-        setScreen(new UpgradeScreen());
+        if(upgradeScreen == null) upgradeScreen = new UpgradeScreen();
+
+        setScreen(upgradeScreen);
     }
 
     public void setCollectionScreen() {
-        setScreen(new CollectionScreen());
+        if(collectionScreen == null) collectionScreen = new CollectionScreen();
+
+        setScreen(collectionScreen);
     }
 
     public void setEndScreen() {
-        setScreen(new EndScreen());
+        if(endScreen == null) endScreen = new EndScreen();
+
+        setScreen(endScreen);
     }
 
     public void setRandomEventScreen(RandomEvent event) {
-        setScreen(new RandomEventScreen(event));
+        if(randomEventScreen == null) randomEventScreen = new RandomEventScreen();
+
+        randomEventScreen.setRandomEvent(event);
+        setScreen(randomEventScreen);
     }
 
     public HashSet<String> getCoverObjects() {
@@ -315,15 +257,9 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
         TaxEvent.eventTimer.clear();
         TaxEvent.eventTimer.start();
 
-        TaxEvent.scheduleNextEvent(new TaxEvent());
+        TaxEvent.scheduleEvent(new TaxEvent());
 
-        RandomEvent randomEvent = new RandomEvent("Up is opinion message manners correct hearing husband my. " +
-                "Disposing commanded dashwoods cordially depending at at. " +
-                "Its strangers who you certainty earnestly resources suffering she. " +
-                "Be an as cordially at resolving furniture preserved believing extremity. " +
-                "Easy mr pain felt in. Too northward affection additions nay. " +
-                "He no an nature ye talent houses wisdom vanity denied." +
-                "Efergegre wefwefwef e!");
+        RandomEvent randomEvent = new RandomEvent();
         RandomEvent.scheduleNextEvent(randomEvent);
 
         getMainScreen().resumeSelling();
@@ -336,8 +272,10 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
         technologies = DataArrayFactory.createDataTechnologiesSet();
         mechanics = DataArrayFactory.createDataMechanicsSet();
         platforms = DataArrayFactory.createDataPlatformsSet();
+        DataArrayFactory.shownRandomEvents.clear();
         games.clear();
-        Stats.setInstance(new Stats(1, 0, 5, 5, 5, 10));
+        Stats.setInstance(new Stats(1, 0, 5, 5, 5, 20, 8));
+        StatsTable.getInstance().update();
         gameState = null;
         DataManager.getInstance().setSkipTax(true);
         mainScreen.removeSellingGames();

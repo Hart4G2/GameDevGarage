@@ -3,12 +3,13 @@ package com.mygdx.gamedevgarage.utils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.utils.Json;
+import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
-import com.mygdx.gamedevgarage.stats.Stats;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
 import com.mygdx.gamedevgarage.utils.constraints.GameState;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
 import com.mygdx.gamedevgarage.utils.data.GameObject;
+import com.mygdx.gamedevgarage.utils.stats.Stats;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,12 +39,28 @@ public class DataManager {
         saveGames();
         saveCanSkipTax();
         saveIsGameOver();
+        saveRandomEvent();
+        saveVolume();
+    }
+
+    private void saveVolume() {
+        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+
+        prefs.putFloat("volume", Assets.getInstance().getVolume());
+        prefs.flush();
     }
 
     private void saveIsGameOver() {
         Preferences prefs = Gdx.app.getPreferences("my-game-data");
 
         prefs.putBoolean("gameIsOver", game.isGameOver());
+        prefs.flush();
+    }
+
+    private void saveRandomEvent() {
+        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+
+        prefs.putBoolean("isRandomEventShown", game.isRandomEventShown);
         prefs.flush();
     }
 
@@ -79,6 +96,7 @@ public class DataManager {
         statsMap.put("design", stats.getStat(Currency.DESIGN));
         statsMap.put("programming", stats.getStat(Currency.PROGRAMMING));
         statsMap.put("gameDesign", stats.getStat(Currency.GAME_DESIGN));
+        statsMap.put("energy", stats.getStat(Currency.ENERGY));
 
         String purchasedItemsJson = new Json().toJson(statsMap);
         prefs.putString("stats", purchasedItemsJson);
@@ -90,10 +108,11 @@ public class DataManager {
 
         String json = new Json().toJson(game.gameState);
         prefs.putString("gameState", json);
-        json = new Json().toJson(game.isGameStarted);
-        prefs.putString("isGameStarted", json);
         json = new Json().toJson(GameFactory.getProcessData());
         prefs.putString("gameData", json);
+
+        prefs.putBoolean("isGameStarted", game.isGameStarted);
+        prefs.putBoolean("screenShowed", game.isScreenShowed);
         prefs.flush();
     }
 
@@ -116,9 +135,7 @@ public class DataManager {
     }
 
     private boolean getCanSkipTax() {
-        Preferences prefs = Gdx.app.getPreferences("my-game-data");
-
-        return prefs.getBoolean("canSkipTax", true);
+        return getBooleanData("canSkipTax", true);
     }
 
     public boolean getSkipTax() {
@@ -132,11 +149,12 @@ public class DataManager {
         canSkipTax = skipTax;
     }
 
-    public boolean getGameOver() {
-        Preferences prefs = Gdx.app.getPreferences("my-game-data");
-        boolean dataJson = prefs.getBoolean("gameIsOver", false);
+    public float getVolume() {
+        return getFloatData("volume", .5f);
+    }
 
-        return new Json().fromJson(Boolean.class, String.valueOf(dataJson));
+    public boolean getGameOver() {
+        return getBooleanData("gameIsOver", false);
     }
 
     public HashSet<String> getCovers() {
@@ -160,11 +178,19 @@ public class DataManager {
     }
 
     public boolean isGameStarted() {
-        return getData(Boolean.class, "isGameStarted", false);
+        return getBooleanData("isGameStarted", false);
     }
 
     public GameState getGameState() {
         return getData(GameState.class, "gameState", null);
+    }
+
+    public boolean isScreenShowed() {
+        return getBooleanData("screenShowed", false);
+    }
+
+    public boolean isRandomEventStarted() {
+        return getBooleanData("isRandomEventShown", false);
     }
 
     public HashMap<String, String> getGameData() {
@@ -179,10 +205,24 @@ public class DataManager {
         Preferences prefs = Gdx.app.getPreferences("my-game-data");
         String dataJson = prefs.getString(prefKey, null);
 
-        if (dataJson == null) {
+        if (dataJson == null || dataJson.isEmpty() || dataJson.equals("null")) {
             return defaultValue;
         }
 
         return new Json().fromJson(type, dataJson);
+    }
+
+    private boolean getBooleanData(String prefKey, boolean defaultValue) {
+        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+        boolean dataJson = prefs.getBoolean(prefKey, defaultValue);
+
+        return new Json().fromJson(Boolean.class, String.valueOf(dataJson));
+    }
+
+    private float getFloatData(String prefKey, float defaultValue) {
+        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+        float dataJson = prefs.getFloat(prefKey, defaultValue);
+
+        return new Json().fromJson(Float.class, String.valueOf(dataJson));
     }
 }

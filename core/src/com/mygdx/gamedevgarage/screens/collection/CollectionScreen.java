@@ -1,7 +1,6 @@
 package com.mygdx.gamedevgarage.screens.collection;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createButton;
-import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
@@ -12,15 +11,18 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.collection.actors.GameList;
-import com.mygdx.gamedevgarage.stats.StatsTable;
+import com.mygdx.gamedevgarage.utils.stats.StatsTable;
 
 public class CollectionScreen implements Screen {
 
@@ -44,7 +46,7 @@ public class CollectionScreen implements Screen {
     }
 
     private void createUIElements(){
-        statsTable = createStatsTable();
+        statsTable = StatsTable.getInstance();
 
         GameList gameList = new GameList();
         ScrollPane gamesScrollPane = new ScrollPane(gameList, skin);
@@ -53,7 +55,7 @@ public class CollectionScreen implements Screen {
 
         Group scrollPaneContainer = new Group();
         scrollPaneContainer.addActor(gamesScrollPane);
-        scrollPaneContainer.setSize(getWidthPercent(.99f), getHeightPercent(0.7f));
+        scrollPaneContainer.setSize(getWidthPercent(.99f), getHeightPercent(0.75f));
 
         backButton = createButton("back_button");
 
@@ -64,10 +66,13 @@ public class CollectionScreen implements Screen {
         table.add(scrollPaneContainer)
                 .center();
 
-        stage.addActor(table);
-        stage.addActor(statsTable);
+        Image bg = new Image(skin.getDrawable("window_purple"));
+        bg.setScaling(Scaling.fill);
+        Stack stack = new Stack(bg, table);
+        stack.setFillParent(true);
 
-        table.setBackground(skin.getDrawable("window_purple"));
+        stage.addActor(stack);
+        stage.addActor(statsTable);
     }
 
     private void setupUIListeners(){

@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
+import com.mygdx.gamedevgarage.utils.DataManager;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -26,17 +27,21 @@ public class Assets {
     private final AssetManager assetManager;
     private Skin skin;
 
+    private final String characters = "0123456789!@#$%^&*()_+-=?/.><,`~'\";:|\\abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+
     public TextureAtlas designColorsAtlas;
     public TextureAtlas designObjectsAtlas;
     public TextureAtlas techAtlas;
+    public TextureAtlas mechAtlas;
     public TextureAtlas platformAtlas;
+    public TextureAtlas randomEventsAtlas;
     public TextureRegionDrawable transparent;
     public TextureRegionDrawable frame;
     public Model model;
 
     private static Assets instance;
 
-    public Assets() {
+    private Assets() {
         assetManager = new AssetManager();
         loadAllAssets();
     }
@@ -47,7 +52,6 @@ public class Assets {
         }
         return instance;
     }
-    //		characters: "0123456789!@#$%^&*()_+-=?/.><,`~'\";:|\\abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ"
 
     private void loadAllAssets() {
         AssetManager assetManager = new AssetManager();
@@ -57,6 +61,8 @@ public class Assets {
         assetManager.load("design_items/platforms/platform-atlas.atlas", TextureAtlas.class);
         assetManager.load("design_items/techs/tech-atlas.atlas", TextureAtlas.class);
         assetManager.load("models/mobile_game_background.g3db", Model.class);
+        assetManager.load("design_items/random_events/random-events-atlas.atlas", TextureAtlas.class);
+        assetManager.load("design_items/mechs/mech-atlas.atlas", TextureAtlas.class);
 
 
         while (!assetManager.update()) {
@@ -68,6 +74,8 @@ public class Assets {
         designObjectsAtlas = assetManager.get("design_items/objects/object-atlas.atlas", TextureAtlas.class);
         platformAtlas = assetManager.get("design_items/platforms/platform-atlas.atlas", TextureAtlas.class);
         techAtlas = assetManager.get("design_items/techs/tech-atlas.atlas", TextureAtlas.class);
+        mechAtlas = assetManager.get("design_items/mechs/mech-atlas.atlas", TextureAtlas.class);
+        randomEventsAtlas = assetManager.get("design_items/random_events/random-events-atlas.atlas", TextureAtlas.class);
         model = assetManager.get("models/mobile_game_background.g3db", Model.class);
 
         skin = new Skin(Gdx.files.internal("skin/skin.json")) {
@@ -97,6 +105,7 @@ public class Assets {
 
                         FreeTypeFontParameter parameter = json.readValue(FreeTypeFontParameter.class, jsonData);
                         parameter.size = Gdx.graphics.getHeight() / (900 / parameter.size);
+                        parameter.characters = characters;
                         parameter.hinting = hinting;
                         parameter.minFilter = minFilter;
                         parameter.magFilter = magFilter;
@@ -118,77 +127,96 @@ public class Assets {
 
         transparent = (TextureRegionDrawable) skin.getDrawable("transparent");
         frame = (TextureRegionDrawable) skin.getDrawable("frame");
-
-        setMusic();
-        setSound();
     }
 
+    /*
     // 0123456789!@#$%^&*()_+-=?/.><,`~'\";:|\\abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ
 
 //    public static void main(String[] args) {
 //        TexturePacker.Settings settings = new TexturePacker.Settings();
 //        settings.maxWidth = 4096;
 //        settings.maxHeight = 4096;
-//        settings.filterMin = Texture.TextureFilter.Linear;
-//        settings.filterMag = Texture.TextureFilter.Linear;
+//        settings.filterMin = TextureFilter.Linear;
+//        settings.filterMag = TextureFilter.Linear;
 //
 //        TexturePacker packer = new TexturePacker(settings);
 //        try {
 //
 ////            String[] fileNames = new String[]{
-////                    "freeweb", "placeinplaystore", "expensivesite", "advertisingcampaign"
+////                    "group_marathon"
 ////            };
-//            for (String fileName : DataArrayFactory.techNames) {
-//                String regionName = fileName.toLowerCase().replace(" ", "_").replace("\n", "");
+//            for (String fileName : DataArrayFactory.mechanicNames) {
+//                String regionName = fileName.toLowerCase().replace(" ", "_").replace("/", "_");
+//                String filePath1 = "C:\\Users\\Артём\\Downloads\\assets\\items\\mech_items\\" + regionName + "_1.png";
+//                String filePath2 = "C:\\Users\\Артём\\Downloads\\assets\\items\\mech_items\\" + regionName + "_2.png";
 //
-//                String filePath = "C:\\Users\\Артём\\Downloads\\assets\\tech_items\\" + regionName + "_1.png";
-//
-//                File file = new File(filePath);
+//                File file = new File(filePath1);
 //                if (!file.exists()) {
 //                    System.out.println(fileName);
 //                    break;
 //                }
 //                BufferedImage img = ImageIO.read(file);
 //
-//                packer.addImage(img, fileName);
+//                packer.addImage(img, fileName + "_1");
 //
-//                filePath = "C:\\Users\\Артём\\Downloads\\assets\\tech_items\\" + regionName + "_2.png";
-//
-//                file = new File(filePath);
+//                file = new File(filePath2);
 //                if (!file.exists()) {
 //                    System.out.println(fileName);
 //                    break;
 //                }
 //                img = ImageIO.read(file);
 //
-//                packer.addImage(img, fileName);
+//                packer.addImage(img, fileName + "_2");
 //            }
 //
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
-//        File outputdir = new File("C:\\ProjectsJava\\GameDevGarage\\assets\\design_items\\techs\\");
+//        File outputdir = new File("C:\\ProjectsJava\\GameDevGarage\\assets\\design_items\\mechs\\");
 //
-//        packer.pack(outputdir, "tech-atlas.atlas");
+//        packer.pack(outputdir, "mech-atlas.atlas");
 //    }
 
-    int song = new Random().nextInt(8) + 1;
+     */
+
+    public void loadMusic(){
+        loadVolume();
+        setMusic();
+        setSound();
+    }
+
+    private float volume = 1;
+
+    private void loadVolume() {
+        volume = DataManager.getInstance().getVolume();
+    }
+
+    public void setVolume(float volume) {
+        this.volume = volume;
+        music.setVolume(volume);
+    }
+
+    public float getVolume() {
+        return volume;
+    }
+
+    private int song = new Random().nextInt(8) + 1;
+    private Music music;
 
     private void setMusic(){
-        Music music = Gdx.audio.newMusic(Gdx.files.internal("music/" + song + ".mp3"));
-        music.setVolume(0.1f);
+        music = Gdx.audio.newMusic(Gdx.files.internal("music/" + song + ".mp3"));
+        music.setVolume(volume);
         music.play();
 
         music.setOnCompletionListener(new Music.OnCompletionListener() {
             @Override
             public void onCompletion(Music music) {
-                onMusicCompletion(music);
+                onMusicCompletion();
             }
         });
     }
 
-    private void onMusicCompletion(Music music){
-        music.dispose();
+    private void onMusicCompletion(){
         int r = song;
 
         while(r == song){
@@ -218,11 +246,12 @@ public class Assets {
 
     public void setSound(String name){
         Sound sound = sounds.get(name);
-        sound.play(.5f);
+        sound.play(volume);
     }
 
     public void dispose() {
         skin.dispose();
+        music.dispose();
         assetManager.dispose();
     }
 

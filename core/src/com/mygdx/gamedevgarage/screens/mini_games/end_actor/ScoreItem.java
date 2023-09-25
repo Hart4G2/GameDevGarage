@@ -104,13 +104,13 @@ public class ScoreItem extends Table {
                                         new Runnable() {
                                             @Override
                                             public void run() {
-                                                if(value[0] == 0){
+                                                if (value[0] == 0) {
                                                     value[0]++;
                                                 } else if (value[0] == 10) {
                                                     value[0]--;
                                                 } else {
                                                     int r = new Random().nextInt(10);
-                                                    if(r > 5){
+                                                    if (r > 5) {
                                                         value[0]++;
                                                     } else {
                                                         value[0]--;

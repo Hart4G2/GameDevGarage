@@ -1,6 +1,7 @@
 package com.mygdx.gamedevgarage.utils.data;
 
 import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.utils.constraints.GameState;
 import com.mygdx.gamedevgarage.utils.reward.Reward;
 
 import java.util.HashMap;
@@ -12,6 +13,8 @@ public class GameFactory {
     public static String name;
     public static String theme;
     public static String genre;
+    public static String previousTheme;
+    public static String previousGenre;
     public static String color;
     public static String object;
     public static List<String> technologies;
@@ -45,16 +48,28 @@ public class GameFactory {
         data.put("name", name);
         data.put("theme", theme);
         data.put("genre", genre);
+        data.put("previousTheme", previousTheme);
+        data.put("previousGenre", previousGenre);
         data.put("color", color);
         data.put("object", object);
         data.put("technologies", String.valueOf(technologies));
         data.put("mechanics", String.valueOf(mechanics));
         data.put("platform", platform);
 
-        return data;
-    }
+        if(Game.getInstance().gameState == GameState.END  && Game.getInstance().isScreenShowed){
+            Reward reward = Reward.getInstance();
 
-    public static String getString() {
-        return getProcessData().toString();
+            data.put("rewardScore", String.valueOf(reward.getScore()));
+            data.put("rewardDesign", String.valueOf(reward.getDesign()));
+            data.put("rewardProgramming", String.valueOf(reward.getProgramming()));
+            data.put("rewardGameDesign", String.valueOf(reward.getGameDesign()));
+            data.put("rewardEnergy", String.valueOf(reward.getEnergy()));
+            data.put("rewardExp", String.valueOf(reward.getExp()));
+            data.put("rewardLvl", String.valueOf(reward.getLvl()));
+            data.put("rewardSellTime", String.valueOf(reward.getSellTime()));
+            data.put("rewardProfitMoney", String.valueOf(reward.getProfitMoney()));
+        }
+
+        return data;
     }
 }

@@ -7,7 +7,8 @@ public enum Currency {
     GAME_DESIGN("game_design"),
     MONEY("money"),
     LEVEL("lvl"),
-    EXPERIENCE("exp");
+    EXPERIENCE("exp"),
+    ENERGY("energy");
 
     private final String drawableName;
 
@@ -27,6 +28,7 @@ public enum Currency {
             case "MONEY": return MONEY;
             case "LEVEL": return LEVEL;
             case "EXPERIENCE": return EXPERIENCE;
+            case "ENERGY": return ENERGY;
             default: return null;
         }
     }

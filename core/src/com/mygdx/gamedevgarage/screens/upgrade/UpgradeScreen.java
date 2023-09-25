@@ -1,7 +1,6 @@
 package com.mygdx.gamedevgarage.screens.upgrade;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createButton;
-import static com.mygdx.gamedevgarage.utils.Utils.createStatsTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -13,17 +12,20 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
-import com.mygdx.gamedevgarage.stats.StatsTable;
 import com.mygdx.gamedevgarage.screens.upgrade.ui.UpgradeCheckItemsList;
 import com.mygdx.gamedevgarage.screens.upgrade.ui.UpgradeCoverObjectsList;
+import com.mygdx.gamedevgarage.utils.stats.StatsTable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +66,7 @@ public class UpgradeScreen implements Screen {
     }
 
     private void createUIElements(){
-        statsTable = createStatsTable();
+        statsTable = StatsTable.getInstance();
 
         coverList = new UpgradeCoverObjectsList();
         coverObjectsScrollPane = new ScrollPane(coverList, skin);
@@ -121,10 +123,13 @@ public class UpgradeScreen implements Screen {
                 .pad(0, buttonPad, getHeightPercent(0.01f), buttonPad)
                 .row();
 
-        stage.addActor(table);
-        stage.addActor(statsTable);
+        Image bg = new Image(skin.getDrawable("window_darkred"));
+        bg.setScaling(Scaling.fill);
+        Stack stack = new Stack(bg, table);
+        stack.setFillParent(true);
 
-        table.setBackground("window_red");
+        stage.addActor(stack);
+        stage.addActor(statsTable);
     }
 
     private void setupUIListeners(){

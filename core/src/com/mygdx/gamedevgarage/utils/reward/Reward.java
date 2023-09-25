@@ -1,24 +1,31 @@
 package com.mygdx.gamedevgarage.utils.reward;
 
+import static com.mygdx.gamedevgarage.utils.data.DataArrayFactory.platformNames;
 import static com.mygdx.gamedevgarage.utils.data.GameFactory.genre;
+import static com.mygdx.gamedevgarage.utils.data.GameFactory.mechanics;
 import static com.mygdx.gamedevgarage.utils.data.GameFactory.object;
+import static com.mygdx.gamedevgarage.utils.data.GameFactory.previousGenre;
+import static com.mygdx.gamedevgarage.utils.data.GameFactory.previousTheme;
+import static com.mygdx.gamedevgarage.utils.data.GameFactory.technologies;
 import static com.mygdx.gamedevgarage.utils.data.GameFactory.theme;
 
-import com.mygdx.gamedevgarage.stats.Stats;
 import com.mygdx.gamedevgarage.utils.Cost;
 import com.mygdx.gamedevgarage.utils.Utils;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
+import com.mygdx.gamedevgarage.utils.data.GameFactory;
+import com.mygdx.gamedevgarage.utils.stats.Stats;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 public class Reward {
 
-
-
     private final Stats stats;
     private static Reward instance;
 
-    public Reward() {
+    private Reward() {
         stats = Stats.getInstance();
     }
 
@@ -36,38 +43,341 @@ public class Reward {
     private int exp;
     private int requiredExp;
     private int lvl;
+    private int energy;
     private int profitMoney;
     private int sellTime;
+    private List<String> possibleHints;
 
     public void calculateScores(){
+        possibleHints = new ArrayList<>();
+
         design = calculateDesignScore();
         programming = calculateTechScore();
         gameDesign = calculateMechanicScore();
         score = calculateScore();
         exp = calculateExperienceScore();
         calculateLevel();
+        energy = calculateEnergy();
         calculateSellParams();
     }
 
     private void calculateSellParams() {
-        profitMoney = (score + new Random().nextInt(2)) * 15;
+        Random r = new Random();
+
+        int randomBonus = r.nextInt(3);
+        int platformBonus = 0;
+
+        for(int i = 0; i < platformNames.length; i++){
+            if(platformNames[i].equals(GameFactory.platform)){
+                platformBonus = i;
+            }
+        }
+
+        if(platformBonus == 0) {
+            possibleHints.add("platform_increase_money");
+        }
+
+        profitMoney = (score + randomBonus) * (5 + platformBonus);
         sellTime = score * 5;
     }
 
     private int calculateTechScore() {
-        // TODO
+        int result = 0;
+        for(String tech : technologies){
+            result += calculateTechnologyScore(tech);
+        }
 
-        return 3;
+        result = result / technologies.size();
+
+        int diff = 3 - technologies.size();
+        result = Math.max(0, result - diff);
+
+        if(result == 0)
+            possibleHints.add("low_tech_score");
+
+        return result;
     }
 
-    private int calculateMechanicScore() {
-        // TODO
+    private int calculateTechnologyScore(String technology) {
+        String[] primaryTechnologies;
+        String[] secondaryTechnologies;
 
-        return 3;
+        switch (genre) {
+            case "Shooter":{
+                primaryTechnologies = new String[]{
+                        "Physics of motion", "Surround sound", "Interactive sound", "Multiplayer",
+                        "Procedural level generation", "Realistic destruction physics",
+                };
+                secondaryTechnologies = new String[]{
+                        "Virtual reality", "Volumetric Effects"
+                };
+                break;
+            }
+            case "Arcade":{
+                primaryTechnologies = new String[]{
+                        "Virtual reality", "Gesture control system", "Reactive environment", "Loading screens",
+                        "Procedural level generation",
+                };
+                secondaryTechnologies = new String[]{
+                        "Multiplayer", "Realistic destruction physics", "Interactive sound"
+                };
+                break;
+            }
+            case "Strategy":{
+                primaryTechnologies = new String[]{
+                        "Reactive environment", "Artificial intelligence", "Realistic illumination",
+                        "Procedural level generation", "Photorealism", "Loading screens"
+                };
+                secondaryTechnologies = new String[]{
+                        "Multiplayer", "Volumetric Effects", "Surround sound", "Procedural animation"
+                };
+                break;
+            }
+            case "RPG":{
+                primaryTechnologies = new String[]{
+                        "Physics of motion", "Procedural level generation",
+                        "Volumetric Effects", "Integration with cloud services",
+                        "Reactive environment", "Dynamic change of time of day", "Multiplayer"
+                };
+                secondaryTechnologies = new String[]{
+                        "Volumetric Effects", "Interactive sound", "Loading screens", "Surround sound"
+                };
+                break;
+            }
+            case "Platform":{
+                primaryTechnologies = new String[]{
+                        "Procedural level generation", "Realistic destruction physics", "Interactive sound",
+                        "Gesture control system", "Reactive environment", "Dynamic change of time of day"
+                };
+                secondaryTechnologies = new String[]{
+                        "Physics of motion", "Volumetric Effects", "Loading screens"
+                };
+                break;
+            }
+            case "Stealth":{
+                primaryTechnologies = new String[]{
+                        "Physics of motion", "Artificial intelligence", "Surround sound",
+                        "Photorealism", "Virtual reality", "Animated videos",
+                        "Interactive sound", "Procedural animation",
+                        "Reactive environment"
+                };
+                secondaryTechnologies = new String[]{
+                        "Multiplayer", "Physics of motion", "Volumetric Effects", "Add gamepad vibration"
+                };
+                break;
+            }
+            case "Survival":{
+                primaryTechnologies = new String[]{
+                        "Physics of motion", "Photorealism", "Procedural level generation",
+                        "Realistic illumination", "Volumetric Effects", "Interactive sound",
+                        "Reactive environment", "Dynamic change of time of day", "Photomode"
+                };
+                secondaryTechnologies = new String[]{
+                        "Multiplayer", "Physics of motion", "Procedural animation",
+                        "Add gamepad vibration", "Virtual reality", "Surround sound"
+                };
+                break;
+            }
+            case "Action":{
+                primaryTechnologies = new String[]{
+                        "Physics of motion", "Surround sound", "Photorealism",
+                        "Virtual reality", "Multiplayer", "Interactive sound",
+                        "Procedural animation"
+                };
+                secondaryTechnologies = new String[]{
+                        "Multiplayer", "Procedural level generation", "Artificial intelligence",
+                        "Photomode", "Add gamepad vibration"
+                };
+                break;
+            }
+            default:{   // case "Quest":
+                primaryTechnologies = new String[]{
+                        "Procedural level generation", "Gesture control system",
+                        "Reactive environment", "Physics of motion"
+                };
+                secondaryTechnologies = new String[]{
+                        "Virtual reality", "Multiplayer", "Artificial intelligence",
+                        "Surround sound"
+                };
+                break;
+            }
+        }
+
+        int r = new Random().nextInt(11) > 6 ? 1 : 0;
+
+        if(Utils.isInArray(primaryTechnologies, technology)) {
+            return 2 + r;
+        } else if(Utils.isInArray(secondaryTechnologies, technology)) {
+            return 1 + r;
+        } else {
+            return r;
+        }
+    }
+
+    HashMap<String, String> exceptions = new HashMap<String, String>() {{
+        put("Online multiplayer", "Multiplayer");
+        put("Complete destruction of the environment", "Realistic destruction physics");
+        put("Environmental influence", "Reactive environment");
+    }};
+
+    private int calculateMechanicScore() {
+        int result = 0;
+
+        boolean containsException = false;
+        for(String mech : mechanics){
+            result += calculateMechanicScore(mech);
+
+            if(exceptions.containsKey(mech) &&
+                    technologies.contains(exceptions.get(mech))) {
+                result++;
+                containsException = true;
+            }
+        }
+
+        if(!containsException) {
+            possibleHints.add("tech_bonus");
+        }
+
+        result = result / mechanics.size();
+
+        int diff = 3 - mechanics.size();
+        result = Math.max(0, result - diff);
+
+        if(result == 0)
+            possibleHints.add("low_mech_score");
+
+        return result;
+    }
+
+    private int calculateMechanicScore(String mechanic) {
+        String[] primaryMechanics;
+        String[] secondaryMechanics;
+
+        switch (genre) {
+            case "Shooter":{
+                primaryMechanics = new String[]{
+                        "Free movement on the map", "First person camera control", "Dodging and blocking",
+                        "Squad formation", "Change of perspective", "Character evolution", "Complete destruction of the environment"
+                };
+                secondaryMechanics = new String[]{
+                        "Time slows down", "Nonlinear plot", "Stealth/Invisibility", "Online multiplayer",
+                        "Lots of playable characters", "Base leveling", "Identity substitution", "Time attack"
+                };
+                break;
+            }
+            case "Arcade":{
+                primaryMechanics = new String[]{
+                        "Time slows down", "Multiplayer on one screen", "Split-dresser mode", "Time attack",
+                        "Online multiplayer"
+                };
+                secondaryMechanics = new String[]{
+                        "First person camera control", "Dodging and blocking", "Stealth/Invisibility",
+                        "Lots of playable characters", "Environmental influence", "Change of perspective",
+                        "Creation of unique game elements by the player"
+                };
+                break;
+            }
+            case "Strategy":{
+                primaryMechanics = new String[]{
+                        "Free movement on the map", "Lots of playable characters",
+                        "Squad formation", "Change of perspective", "Base leveling",
+                        "Character evolution", "Online multiplayer"
+                };
+                secondaryMechanics = new String[]{
+                        "Time slows down", "Environmental influence", "Split-dresser mode",
+                        "Multiplayer on one screen", "Complete destruction of the environment"
+                };
+                break;
+            }
+            case "RPG":{
+                primaryMechanics = new String[]{
+                        "Free movement on the map", "First person camera control", "Nonlinear plot",
+                        "Dodging and blocking", "Dialogue selection system", "Stealth/Invisibility",
+                        "Lots of playable characters", "Squad formation", "Character evolution",
+                        "Online multiplayer"
+                };
+                secondaryMechanics = new String[]{
+                        "Time slows down", "Environmental influence", "Squad formation",
+                        "Creation of unique game elements by the player"
+                };
+                break;
+            }
+            case "Platform":{
+                primaryMechanics = new String[]{
+                        "Time slows down", "Dodging and blocking", "Multiplayer on one screen",
+                        "Lots of playable characters", "Split-dresser mode"
+                };
+                secondaryMechanics = new String[]{
+                        "Free movement on the map", "Environmental influence", "Change of perspective",
+                        "Character evolution", "Online multiplayer",
+                };
+                break;
+            }
+            case "Stealth":{
+                primaryMechanics = new String[]{
+                        "Free movement on the map", "Time slows down", "First person camera control",
+                        "Nonlinear plot", "Dodging and blocking", "Dialogue selection system",
+                        "Stealth/Invisibility", "Identity substitution", "Time attack"
+                };
+                secondaryMechanics = new String[]{
+                        "Lots of playable characters", "Environmental influence", "Change of perspective",
+                        "Character evolution", "Online multiplayer", "Complete destruction of the environment"
+                };
+                break;
+            }
+            case "Survival":{
+                primaryMechanics = new String[]{
+                        "Free movement on the map", "First person camera control", "Lots of playable characters",
+                        "Environmental influence", "Base leveling", "Character evolution",
+                        "Creation of unique game elements by the player", "Complete destruction of the environment"
+                };
+                secondaryMechanics = new String[]{
+                        "Dodging and blocking", "Multiplayer on one screen", "Squad formation",
+                        "Change of perspective", "Online multiplayer"
+                };
+                break;
+            }
+            case "Action":{
+                primaryMechanics = new String[]{
+                        "Free movement on the map", "First person camera control",
+                        "Dodging and blocking", "Lots of playable characters",
+                        "Change of perspective",
+                };
+                secondaryMechanics = new String[]{
+                        "Time slows down", "Dialogue selection system", "Nonlinear plot",
+                        "Stealth/Invisibility", "Squad formation", "Identity substitution",
+                        "Time attack", "Character evolution", "Online multiplayer"
+                };
+                break;
+            }
+            default:{   // case "Quest":
+                primaryMechanics = new String[]{
+                        "Free movement on the map", "Time slows down", "First person camera control",
+                        "Nonlinear plot", "Dialogue selection system", "Environmental influence",
+                        "Change of perspective", "Time attack", "Creation of unique game elements by the player",
+                        "Complete destruction of the environment"
+                };
+                secondaryMechanics = new String[]{
+                        "Dodging and blocking", "Multiplayer on one screen", "Stealth/Invisibility",
+                        "Lots of playable characters", "Identity substitution", "Online multiplayer",
+                };
+                break;
+            }
+        }
+
+        int r = new Random().nextInt(11) > 6 ? 1 : 0;
+
+        if(Utils.isInArray(primaryMechanics, mechanic)) {
+            return 2 + r;
+        } else if(Utils.isInArray(secondaryMechanics, mechanic)) {
+            return 1 + r;
+        } else {
+            return r;
+        }
     }
 
     private int calculateDesignScore() {
-        int random = new Random().nextInt(10);
+        int random = new Random().nextInt(11);
 
         if(isFirstDesign()){
             return random > 6 ? 3 : 2;
@@ -75,6 +385,7 @@ public class Reward {
         if (isSecondaryDesign()){
             return random > 6 ? 2 : 1;
         }
+        possibleHints.add("low_design_score");
         return 0;
     }
 
@@ -390,7 +701,50 @@ public class Reward {
     }
 
     private int calculateScore() {
-        return getGenreThemeCompatibility() + design + programming + gameDesign;
+        int energy = stats.getStat(Currency.ENERGY);
+
+        int score = getGenreThemeCompatibility() + design + programming + gameDesign;
+
+        if(energy <= 5)
+            possibleHints.add("low_energy");
+
+        if(energy > 9) {
+            score = Math.min(10, score + 1);
+        } else if(energy > 7){
+            score = Math.max(1, score - 1);
+        } else if(energy > 5){
+            score = Math.max(1, score - 2);
+        } else if(energy > 3){
+            score = Math.max(1, score - 3);
+        } else if(energy > 1){
+            score = Math.max(1, score - 4);
+        } else {
+            score = Math.max(1, score - 5);
+        }
+
+        if(previousGenre != null && previousTheme != null) {
+            if (previousGenre.equals(genre) && previousTheme.equals(theme)) {
+                int r = new Random().nextInt(2) + 1;
+                score = Math.max(1, score - r);
+                possibleHints.add("same_game");
+            }
+        }
+
+        return score;
+    }
+
+    private int calculateEnergy() {
+        int r = new Random().nextInt(2);
+
+        if(score > 9){
+            return r + 2;
+        } else if(score > 7){
+            return r + 1;
+        } else if(score > 3) {
+            return r;
+        } else {
+            return 0;
+        }
     }
 
     private int getGenreThemeCompatibility(){
@@ -476,7 +830,12 @@ public class Reward {
             }
         }
 
-        return Utils.isInArray(themes, theme) ? 1 : 0;
+        if(!Utils.isInArray(themes, theme)){
+            possibleHints.add("genre_theme_compatibility");
+            return 0;
+        } else {
+            return 1;
+        }
     }
 
     private int calculateExperienceScore() {
@@ -513,9 +872,9 @@ public class Reward {
         int newExp = stats.getStat(Currency.EXPERIENCE) + exp;
 
         if (newExp >= requiredExp) {
-            lvl = stats.getStat(Currency.LEVEL) + 1;
+            lvl = oldLvl + 1;
         } else {
-            lvl = stats.getStat(Currency.LEVEL);
+            lvl = oldLvl;
             requiredExp = 0;
         }
     }
@@ -536,6 +895,10 @@ public class Reward {
         return score;
     }
 
+    public int getEnergy() {
+        return energy;
+    }
+
     public int getExp() {
         return exp;
     }
@@ -552,9 +915,49 @@ public class Reward {
         return sellTime;
     }
 
+    public void setDesign(int design) {
+        this.design = design;
+    }
+
+    public void setProgramming(int programming) {
+        this.programming = programming;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public void setExp(int exp) {
+        this.exp = exp;
+    }
+
+    public void setLvl(int lvl) {
+        this.lvl = lvl;
+    }
+
+    public void setEnergy(int energy) {
+        this.energy = energy;
+    }
+
+    public void setGameDesign(int gameDesign) {
+        this.gameDesign = gameDesign;
+    }
+
+    public void setProfitMoney(int profitMoney) {
+        this.profitMoney = profitMoney;
+    }
+
+    public void setSellTime(int sellTime) {
+        this.sellTime = sellTime;
+    }
+
+    public List<String> getHints(){
+        return possibleHints;
+    }
+
     public void setNewValues(){
-        stats.pay(new Cost(new Currency[]{Currency.DESIGN, Currency.PROGRAMMING, Currency.GAME_DESIGN},
-                new int[]{-design, -programming, -gameDesign}));
+        stats.pay(new Cost(new Currency[]{Currency.DESIGN, Currency.PROGRAMMING, Currency.GAME_DESIGN, Currency.ENERGY},
+                new int[]{-design, -programming, -gameDesign, -energy}));
 
         stats.setLevel(lvl);
         stats.setExperience(stats.getStat(Currency.EXPERIENCE) + exp, requiredExp);

@@ -1,4 +1,4 @@
-package com.mygdx.gamedevgarage.stats;
+package com.mygdx.gamedevgarage.utils.stats;
 
 import static com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
@@ -37,18 +37,20 @@ public class Property extends Table {
 
     private void createUIElements(){
         image = new Image(icon);
-        valueLabel = createLabel(String.valueOf(value), "white_18", false);
-        valueLabel.setSize(getWidthPercent(.016f), getHeightPercent(.01f));
+        valueLabel = createLabel(String.valueOf(value), "white_16", false);
 
-        hintLabel = createLabel(text, "white_16", false);
+        hintLabel = createLabel(text, "white_14", true);
         hintLabel.setVisible(false);
 
-        add(image).width(getWidthPercent(.06f)).height(getWidthPercent(.06f))
+        Table hintContainer = new Table();
+        hintContainer.add(hintLabel).width(getWidthPercent(.138f));
+
+        add(image).width(getWidthPercent(.05f)).height(getWidthPercent(.05f))
                 .pad(getHeightPercent(.025f), 0, getHeightPercent(.01f), getWidthPercent(.01f));
-        add(valueLabel).width(getWidthPercent(.078f))
+        add(valueLabel).width(getWidthPercent(.078f)).height(getHeightPercent(.01f))
                 .pad(getHeightPercent(.025f), 0, getHeightPercent(.01f), 0)
                 .row();
-        add(hintLabel)
+        add(hintContainer).width(getWidthPercent(.138f)).height(getHeightPercent(.05f))
                 .colspan(2).center().row();
     }
 

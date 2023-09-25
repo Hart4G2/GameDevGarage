@@ -56,8 +56,8 @@ public class CheckListItem extends Group {
 
         stateTime = 0f;
 
-        float imagePosition = getHeightPercent(.003f);
-        float imageSize = getHeightPercent(0.1f) - (imagePosition * 2);
+        float imagePosition = getHeightPercent(.006f);
+        float imageSize = getHeightPercent(0.14f) - (imagePosition * 2);
 
         image = new Image(animation.getKeyFrame(stateTime));
         image.setPosition(imagePosition, imagePosition);
@@ -68,7 +68,7 @@ public class CheckListItem extends Group {
         headerLabel = createLabel(checkObject.getName(), "black_18", true);
         descriptionLabel = createLabel(checkObject.getDescription(), "default", true);
 
-        float imageSize = getHeightPercent(0.1f);
+        float imageSize = getHeightPercent(0.14f);
 
         backgroundImage = new Image(skin.getDrawable(imageFrameUnselected));
         backgroundImage.setFillParent(true);

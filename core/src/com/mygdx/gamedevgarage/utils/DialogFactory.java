@@ -28,7 +28,6 @@ public class DialogFactory {
         // content table
         String[] genres = DataArrayFactory.genres;
         String[] themes = DataArrayFactory.themes;
-        String[] gameLevels = DataArrayFactory.gameLevels;
 
         final TextField nameTextField = createTextField(null, "default",
                 Align.center, "nameTextField");
@@ -37,14 +36,11 @@ public class DialogFactory {
                 genres, Align.center, "genreSelectBox", true);
         final SelectBox<String> themesSelectBox = createSelectBox("default",
                 themes, Align.center, "themesSelectBox", true);
-        final SelectBox<String> levelSelectBox = createSelectBox("default",
-                gameLevels, Align.center, "levelSelectBox", false);
 
         Label headerLabel = createLabel("Create Game", "black_32", false);
         Label nameLabel = createLabel("Name:", "black_24", false);
         Label genreLabel = createLabel("Genre:", "black_24", false);
         Label platformLabel = createLabel("Theme:", "black_24", false);
-        Label levelLabel = createLabel("Level:", "black_24", false);
 
         float labelWidth = getWidthPercent(.2f);
         float labelHeight = getHeightPercent(.05f);
@@ -56,7 +52,6 @@ public class DialogFactory {
 
         genreSelectBox.setSize(contentWidth, contentHeight);
         themesSelectBox.setSize(contentWidth, contentHeight);
-        levelSelectBox.setSize(contentWidth, contentHeight);
 
         Table table = new Table(skin);
         table.add(nameLabel).width(labelWidth).height(labelHeight)
@@ -70,10 +65,6 @@ public class DialogFactory {
         table.add(platformLabel).width(labelWidth).height(labelHeight)
                 .pad(labelPad).padLeft(getWidthPercent(.1f));
         table.add(themesSelectBox).width(contentWidth).height(contentHeight)
-                .pad(contentPad).padRight(getWidthPercent(.1f)).row();
-        table.add(levelLabel).width(labelWidth).height(labelHeight)
-                .pad(labelPad).padLeft(getWidthPercent(.1f));
-        table.add(levelSelectBox).width(contentWidth).height(contentHeight)
                 .pad(contentPad).padRight(getWidthPercent(.1f)).row();
 
         Table contentTable = new Table(skin);

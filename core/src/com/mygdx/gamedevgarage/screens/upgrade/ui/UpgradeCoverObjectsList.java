@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.mini_games.cover_actors.CoverListItem;
-import com.mygdx.gamedevgarage.stats.Stats;
+import com.mygdx.gamedevgarage.utils.stats.Stats;
 import com.mygdx.gamedevgarage.utils.Cost;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
 import com.mygdx.gamedevgarage.utils.data.CoverObject;
