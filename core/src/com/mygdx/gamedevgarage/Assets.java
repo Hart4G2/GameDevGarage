@@ -14,20 +14,21 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.Hinting;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.gamedevgarage.utils.DataManager;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Random;
 
 
 public class Assets {
 
     private final AssetManager assetManager;
+    private final String characters = "0123456789!@#$%^&*()_+-=?/.><,`~'\";:|\\abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
     private Skin skin;
-
-    private final String characters = "0123456789!@#$%^&*()_+-=?/.><,`~'\";:|\\abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZабвгдеёжзийклмнопрстуфхцчшщъыьэюя";
 
     public TextureAtlas designColorsAtlas;
     public TextureAtlas designObjectsAtlas;
@@ -38,6 +39,8 @@ public class Assets {
     public TextureRegionDrawable transparent;
     public TextureRegionDrawable frame;
     public Model model;
+    public I18NBundle myBundle;
+    private String language;
 
     private static Assets instance;
 
@@ -127,6 +130,28 @@ public class Assets {
 
         transparent = (TextureRegionDrawable) skin.getDrawable("transparent");
         frame = (TextureRegionDrawable) skin.getDrawable("frame");
+
+        language = DataManager.getInstance().getLanguage();
+        setBundle();
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+        setBundle();
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    private void setBundle(){
+        Locale locale = Locale.ENGLISH;
+
+        if(language.equals("Русский")){
+            locale = new Locale("ru");
+        }
+
+        myBundle = I18NBundle.createBundle(Gdx.files.internal("localization/indie"), locale);
     }
 
     /*

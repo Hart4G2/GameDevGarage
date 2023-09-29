@@ -2,7 +2,7 @@ package com.mygdx.gamedevgarage.utils.data;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.mygdx.gamedevgarage.utils.Cost;
+import com.mygdx.gamedevgarage.utils.stats.Cost;
 
 import java.util.Arrays;
 
@@ -13,8 +13,8 @@ public class CheckObject extends Object {
     private final TextureRegionDrawable frame2;
     private Animation<TextureRegionDrawable> animation;
 
-    public CheckObject(String name, String description, TextureRegionDrawable frame1, TextureRegionDrawable frame2, Cost cost) {
-        super(name, cost);
+    public CheckObject(String name, String bundleKey, String description, TextureRegionDrawable frame1, TextureRegionDrawable frame2, Cost cost) {
+        super(name, bundleKey, cost);
 
         this.description = description;
         this.frame1 = frame1;

@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.Timer;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.utils.stats.Stats;
-import com.mygdx.gamedevgarage.utils.Cost;
+import com.mygdx.gamedevgarage.utils.stats.Cost;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
 import com.mygdx.gamedevgarage.utils.data.GameObject;
 import com.mygdx.gamedevgarage.utils.stats.StatsTable;

@@ -5,38 +5,65 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.mini_games.cover_actors.CoverListItem;
 import com.mygdx.gamedevgarage.screens.mini_games.selection_actors.CheckListItem;
-import com.mygdx.gamedevgarage.utils.Cost;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
 import com.mygdx.gamedevgarage.utils.data.events.Event;
+import com.mygdx.gamedevgarage.utils.stats.Cost;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.MissingResourceException;
 
 public class DataArrayFactory {
 
-    public static final String[] themes = {
-            "Aliens", "Aviation", "Business", "Cinema", "City", "Comedy", "Construction",
-            "Cooking", "Criminal", "Cyberpunk", "Dance", "Detective", "Fantasy", "Farm",
-            "Fashion", "Game development", "Government", "Hacker", "Horror", "Hospital",
-            "Hunting", "Life", "Medieval", "Music", "Ninja", "Pirates", "Prison", "Race",
-            "Romantic", "Rhythm", "School", "Space", "Sport", "Superheros", "Time traveling",
-            "Transport", "Vampires", "Virtual animals", "War", "Wild west", "Zombie"
-    };
+    public static TranslatableObject[] themes;
 
-    public static final String[] genres = {
-            "Shooter", "Arcade", "Strategy", "RPG", "Platform", "Stealth",
-            "Survival", "Action", "Quest"
-    };
+    public static TranslatableObject[] genres;
+
+    public static String[] getGenresAsStringArray() {
+        String[] strings = new String[genres.length];
+
+        for(int i = 0; i < strings.length; i++) {
+            strings[i] = genres[i].getText();
+        }
+
+        return strings;
+    }
+
+    public static String[] getThemesAsStringArray() {
+        String[] strings = new String[themes.length];
+
+        for(int i = 0; i < strings.length; i++) {
+            strings[i] = themes[i].getText();
+        }
+
+        return strings;
+    }
+
+    public static TranslatableObject getGenre(String text){
+        for (TranslatableObject genre : genres) {
+            if(genre.getText().equals(text))
+                return genre;
+        }
+        return null;
+    }
+
+    public static TranslatableObject getTheme(String text){
+        for (TranslatableObject theme : themes) {
+            if(theme.getText().equals(text))
+                return theme;
+        }
+        return null;
+    }
 
     public static final String[] objectNames = {
             "Aliens", "Aviation", "Business", "Cinema", "City", "Comedy", "Construction",
@@ -48,55 +75,29 @@ public class DataArrayFactory {
     };
 
     public static final String[] techNames = {
-            "Physics of motion", "Procedural level generation", "Artificial intelligence", "Surround sound",
-            "Photorealism", "Virtual reality", "Multiplayer", "Photomode", "Animated videos",
-            "Realistic illumination", "Realistic destruction physics", "Volumetric Effects",
-            "Interactive sound", "Add gamepad vibration", "Procedural animation",
-            "Gesture control system", "Integration with cloud services", "Reactive environment",
-            "Dynamic change of time of day", "Loading screens"
+            "Physics_of_motion", "Procedural_level_generation", "Artificial_intelligence", "Surround_sound",
+            "Photorealism", "Virtual_reality", "Multiplayer", "Photomode", "Animated_videos",
+            "Realistic_illumination", "Realistic_destruction_physics", "Volumetric_Effects",
+            "Interactive_sound", "Add_gamepad_vibration", "Procedural_animation",
+            "Gesture_control_system", "Integration_with_cloud_services", "Reactive_environment",
+            "Dynamic_change_of_time_of_day", "Loading_screens"
     };
 
     public static final String[] mechanicNames = {
-            "Free movement on the map", "Time slows down", "First person camera control",
-            "Nonlinear plot", "Dodging and blocking", "Multiplayer on one screen",
-            "Dialogue selection system", "Stealth/Invisibility", "Lots of playable characters",
-            "Environmental influence", "Squad formation", "Change of perspective",
-            "Base leveling", "Split-dresser mode", "Identity substitution",
-            "Time attack", "Character evolution", "Online multiplayer",
-            "Creation of unique game elements by the player", "Complete destruction of the environment"
+            "Free_movement_on_the_map", "Time_slows_down", "First_person_camera_control",
+            "Nonlinear_plot", "Dodging_and_blocking", "Multiplayer_on_one_screen",
+            "Dialogue_selection_system", "Stealth/Invisibility", "Lots_of_playable_characters",
+            "Environmental_influence", "Squad_formation", "Change_of_perspective",
+            "Base_leveling", "Split-dresser_mode", "Identity_substitution",
+            "Time_attack", "Character_evolution", "Online_multiplayer",
+            "Creation_of_unique_game_elements_by_the_player", "Complete_destruction_of_the_environment"
     };
 
     public static final String[] platformNames = {
-            "Push to free web", "Buy a place in play store", "Order an expensive site", "Order an advertising campaign"
+            "Push_to_free_web", "Buy_a_place_in_play_store", "Order_an_expensive_site", "Order_an_advertising_campaign"
     };
 
-    public static final HashMap<String, String> gameHints = new HashMap<String, String>() {{
-        put("low_energy", "Low energy reduces the score");
-        put("same_game", "Players don't want to play the same games");
-        put("low_design_score", "Objects should be chosen based on theme");
-        put("low_tech_score", "Technologies should be chosen based on genre");
-        put("low_mech_score", "Mechanics should be chosen based on genre");
-        put("platform_increase_money", "The platform increases game sales");
-        put("tech_bonus", "Some technologies and mechanics in combination provide an additional bonus");
-        put("genre_theme_compatibility", "Some themes and genres aren't compatible");
-    }};
-
-    public static final String[] talkHints = new String[] {
-            "I need to go out for a walk...",
-            "All this commentators... They just don't know what they're talking about...",
-            "Last line and i'll go to bed...",
-            "z z z z z z",
-            "\"muttering\"",
-            "and... if it'll... so...",
-            "that value needed to increase",
-            "think it's too hard to play...",
-            "can't understand my yesterday code...",
-            "looks like a drawing...",
-            "i can't think...",
-            "did i just delete it... aghh...",
-            "need something to eat..."
-    };
-
+    public static String[] talkHints;
     public static List<CoverObject> objects;
     public static List<CheckObject> technologies;
     public static List<CheckObject> mechanics;
@@ -108,6 +109,9 @@ public class DataArrayFactory {
     public static void initialise(){
         Assets assets = Assets.getInstance();
 
+        String themesJson = Gdx.files.internal("themes.json").readString();
+        String genresJson = Gdx.files.internal("genres.json").readString();
+        String talksJson = Gdx.files.internal("talks.json").readString();
         String objectsJson = Gdx.files.internal("objects.json").readString();
         String technologiesJson = Gdx.files.internal("technologies.json").readString();
         String mechanicsJson = Gdx.files.internal("mechanics.json").readString();
@@ -115,6 +119,9 @@ public class DataArrayFactory {
         String colorsJson = Gdx.files.internal("colors.json").readString();
         String randomEventsJson = Gdx.files.internal("random_events.json").readString();
 
+        themes = readTranslatableObjectsFromJson(themesJson);
+        genres = readTranslatableObjectsFromJson(genresJson);
+        talkHints = readStringArrayFromJson(talksJson);
         objects = readCoverObjectsFromJson(objectsJson, assets.designObjectsAtlas, Game.getInstance().getCoverObjects());
         technologies = readCheckObjectsFromJson(technologiesJson, assets.techAtlas, Game.getInstance().getTechnologies());
         mechanics = readCheckObjectsFromJson(mechanicsJson, assets.mechAtlas, Game.getInstance().getMechanics());
@@ -124,15 +131,51 @@ public class DataArrayFactory {
         shownRandomEvents = new ArrayList<>();
     }
 
+    public static String[] readStringArrayFromJson(String json) {
+        I18NBundle bundle = Assets.getInstance().myBundle;
+        List<String> result = new ArrayList<>();
+
+        JsonReader reader = new JsonReader();
+        JsonValue value = reader.parse(json);
+
+        for (JsonValue item : value) {
+            String bundleKey = item.getString("text");
+
+            String text = bundle.get(bundleKey);
+
+            result.add(text);
+        }
+
+        return result.toArray(new String[0]);
+    }
+
+    public static TranslatableObject[] readTranslatableObjectsFromJson(String json) {
+        List<TranslatableObject> result = new ArrayList<>();
+
+        JsonReader reader = new JsonReader();
+        JsonValue value = reader.parse(json);
+
+        for (JsonValue item : value) {
+            String bundleKey = item.getString("text");
+
+            result.add(new TranslatableObject(bundleKey));
+        }
+
+        return result.toArray(new TranslatableObject[0]);
+    }
+
     public static List<Event> readEventsFromJson(String json, TextureAtlas atlas) {
+        I18NBundle bundle = Assets.getInstance().myBundle;
         List<Event> result = new ArrayList<>();
 
         JsonReader reader = new JsonReader();
         JsonValue value = reader.parse(json);
 
         for (JsonValue item : value) {
-            String text = item.getString("text");
+            String bundleKey = item.getString("text");
             String drawableName = item.getString("drawable");
+
+            String text = bundle.get(bundleKey);
 
             Drawable drawable = createDrawable(atlas, drawableName, -1);
 
@@ -148,27 +191,26 @@ public class DataArrayFactory {
     }
 
     public static List<CheckObject> readCheckObjectsFromJson(String json, TextureAtlas atlas, HashSet<String> purchasedSet) {
+        I18NBundle bundle = Assets.getInstance().myBundle;
         List<CheckObject> result = new ArrayList<>();
 
         JsonReader reader = new JsonReader();
         JsonValue value = reader.parse(json);
 
         for (JsonValue item : value) {
-            String name = item.getString("name");
-            String description = item.getString("description");
+            String bundleKey = item.getString("name");
             String regionName = item.getString("drawable");
+
+            String name = bundle.get(bundleKey);
+            String description = bundle.get(bundleKey + "_description");
 
             TextureRegionDrawable frame1 = createDrawable(atlas, regionName, 1);
             TextureRegionDrawable frame2 = createDrawable(atlas, regionName, 2);
 
-            if(atlas.findRegion(regionName, 1) == null || atlas.findRegion(regionName, 2) == null){
-                System.out.println("checkObject: " + regionName);
-            }
-
             Cost cost = readCostFromJson(item.get("cost"));
 
-            CheckObject checkObject = new CheckObject(name, description, frame1, frame2, cost);
-            checkObject.setPurchased(purchasedSet.contains(name));
+            CheckObject checkObject = new CheckObject(name, bundleKey, description, frame1, frame2, cost);
+            checkObject.setPurchased(purchasedSet.contains(bundleKey));
 
             result.add(checkObject);
         }
@@ -177,25 +219,30 @@ public class DataArrayFactory {
     }
 
     public static List<CoverObject> readCoverObjectsFromJson(String json, TextureAtlas atlas, HashSet<String> purchasedSet) {
+        I18NBundle bundle = Assets.getInstance().myBundle;
         List<CoverObject> result = new ArrayList<>();
 
         JsonReader reader = new JsonReader();
         JsonValue value = reader.parse(json);
 
         for (JsonValue item : value) {
-            String name = item.getString("text");
+            String bundleKey = item.getString("text");
             String itemName = item.getString("item");
             int itemIndex = item.getInt("item_index");
+
+            String name = bundleKey;
+            try{
+                name = bundle.get(bundleKey);
+            } catch (MissingResourceException ignore) {
+
+            }
 
             Cost cost = readCostFromJson(item.get("cost"));
 
             Drawable itemDrawable = createDrawable(atlas, itemName, itemIndex);
-            if(atlas.findRegion(itemName, itemIndex) == null){
-                System.out.println(name + " " + itemIndex);
-            }
 
-            CoverObject coverObject = new CoverObject(name, itemDrawable, cost);
-            coverObject.setPurchased(purchasedSet.contains(name));
+            CoverObject coverObject = new CoverObject(name, bundleKey, itemDrawable, cost);
+            coverObject.setPurchased(purchasedSet.contains(bundleKey));
 
             result.add(coverObject);
         }
@@ -210,13 +257,13 @@ public class DataArrayFactory {
         JsonValue value = reader.parse(json);
 
         for (JsonValue item : value) {
-            String text = item.getString("text");
+            String bundleKey = item.getString("text");
             String itemName = item.getString("item");
             int itemIndex = item.getInt("item_index");
 
             Drawable itemDrawable = createDrawable(atlas, itemName, itemIndex);
 
-            result.add(new CoverObject(text, itemDrawable));
+            result.add(new CoverObject(bundleKey, itemDrawable));
         }
 
         return result;
@@ -239,6 +286,8 @@ public class DataArrayFactory {
         return new Cost(currencies, values);
     }
 
+
+
     public static List<CoverListItem> createCoverObjects(){
         List<CoverListItem> result = new ArrayList<>();
 
@@ -249,7 +298,7 @@ public class DataArrayFactory {
         return result;
     }
 
-    public static List<CheckListItem> createTechnologiesListItems(){
+    public static List<CheckListItem> createTechnologies(){
         List<CheckListItem> result = new ArrayList<>();
 
         for(CheckObject item : technologies){
@@ -261,10 +310,8 @@ public class DataArrayFactory {
 
     public static List<CheckListItem> createMechanics(){
         List<CheckListItem> result = new ArrayList<>();
-        HashSet<String> mechanicsSet = Game.getInstance().getMechanics();
 
         for(CheckObject item : mechanics){
-            item.setPurchased(mechanicsSet.contains(item.getName()));
             result.add(new CheckListItem(item, false));
         }
 

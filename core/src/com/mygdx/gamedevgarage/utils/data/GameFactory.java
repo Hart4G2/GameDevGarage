@@ -11,8 +11,8 @@ import java.util.List;
 public class GameFactory {
 
     public static String name;
-    public static String theme;
-    public static String genre;
+    public static TranslatableObject theme;
+    public static TranslatableObject genre;
     public static String previousTheme;
     public static String previousGenre;
     public static String color;
@@ -45,9 +45,12 @@ public class GameFactory {
 
     public static HashMap<String, String> getProcessData() {
         HashMap<String, String> data = new HashMap<>();
+
         data.put("name", name);
-        data.put("theme", theme);
-        data.put("genre", genre);
+        if(theme != null && genre != null) {
+            data.put("theme", theme.getBundleKey());
+            data.put("genre", genre.getBundleKey());
+        }
         data.put("previousTheme", previousTheme);
         data.put("previousGenre", previousGenre);
         data.put("color", color);

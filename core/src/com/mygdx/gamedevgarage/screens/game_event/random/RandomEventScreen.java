@@ -1,5 +1,6 @@
 package com.mygdx.gamedevgarage.screens.game_event.random;
 
+import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
@@ -17,17 +18,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.utils.data.events.Event;
 import com.mygdx.gamedevgarage.utils.stats.Stats;
 import com.mygdx.gamedevgarage.utils.stats.StatsTable;
-import com.mygdx.gamedevgarage.utils.data.events.Event;
 
 public class RandomEventScreen implements Screen {
 
     private final Game game;
     private final Skin skin;
+    private final I18NBundle bundle;
     private Stage stage;
     private StatsTable statsTable;
     private RandomEvent randomEvent;
@@ -38,6 +40,7 @@ public class RandomEventScreen implements Screen {
     public RandomEventScreen() {
         game = Game.getInstance();
         skin = Assets.getInstance().getSkin();
+        bundle = Assets.getInstance().myBundle;
     }
 
     @Override
@@ -62,8 +65,8 @@ public class RandomEventScreen implements Screen {
 
         Label label = createLabel(event.getText(), "white_24", true);
 
-        confirmButton = createTextButton("Confirm", "white_18");
-        rejectButton = createTextButton("Reject", "white_18");
+        confirmButton = createTextButton(bundle.get("Confirm"), "white_18");
+        rejectButton = createTextButton(bundle.get("Reject"), "white_18");
 
         Table table = new Table(skin);
         table.setFillParent(true);
@@ -81,10 +84,7 @@ public class RandomEventScreen implements Screen {
         boolean canConfirm = Stats.getInstance().isEnough(event.getConfirmCost());
         confirmButton.setDisabled(!canConfirm);
 
-        Image bg = new Image(Assets.getInstance().getSkin().getDrawable("window_darkblue"));
-        bg.setScaling(Scaling.fill);
-        Stack stack = new Stack(bg, table);
-        stack.setFillParent(true);
+        Stack stack = createBgStack("window_darkblue", table);
 
         stage.addActor(stack);
         stage.addActor(statsTable);

@@ -54,11 +54,11 @@ public class GameItem extends Table {
         Drawable scoreIcon = skin.getDrawable("score");
 
         String headerStyle = "white_24";
-        String labelStyle = "white_20";
+        String labelStyle = "white_16";
 
         if(!Utils.isColorDark(colorName)){
             headerStyle = "black_24";
-            labelStyle = "black_20";
+            labelStyle = "default";
         }
 
         nameLabel = createLabel(name, headerStyle, true);
@@ -69,21 +69,28 @@ public class GameItem extends Table {
         objectImage = new Image(object);
 
         float objectSize = getHeightPercent(.15f);
-        float iconSize = getHeightPercent(.04f);
+        float textTableSize = getWidthPercent(.8f) - objectSize;
+        float iconSize = textTableSize / 8;
+        float labelSize = (textTableSize - (iconSize * 2)) / 4;
 
         Table table = new Table();
-        table.add(nameLabel).width(getWidthPercent(.5f))
+        table.add(nameLabel).width(textTableSize)
                 .padBottom(getHeightPercent(.05f))
                 .colspan(4).left().top().row();
         table.add(priceImage).width(iconSize).height(iconSize)
-                .padRight(getWidthPercent(.02f));
-        table.add(priceLabel).width(getWidthPercent(.1f))
-                .padRight(getWidthPercent(.05f));
+                .padRight(getWidthPercent(.0001f))
+                .left().colspan(1);
+        table.add(priceLabel).width(labelSize)
+                .padRight(getWidthPercent(.01f))
+                .left().colspan(1);
         table.add(scoreImage).width(iconSize).height(iconSize)
-                .padRight(getWidthPercent(.02f));
-        table.add(scoreLabel);
+                .padRight(getWidthPercent(.0001f))
+                .left().colspan(1);
+        table.add(scoreLabel).width(labelSize)
+                .left().colspan(1);
 
-        add(table).padRight(getWidthPercent(.1f));
+        add(table).width(textTableSize).height(textTableSize)
+                .padRight(getWidthPercent(.01f));
         add(objectImage).width(objectSize).height(objectSize);
 
         setBackground(createBackground());
@@ -100,7 +107,7 @@ public class GameItem extends Table {
                                 Actions.run(new Runnable() {
                                     @Override
                                     public void run() {
-                                        priceLabel.setText("selling");
+                                        priceLabel.setText(Assets.getInstance().myBundle.get("selling"));
                                         if(gameObject.isSold()){
                                             priceLabel.setText(gameObject.getProfitMoney());
                                             priceLabel.clearActions();

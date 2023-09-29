@@ -1,6 +1,7 @@
 package com.mygdx.gamedevgarage;
 
 
+import com.mygdx.gamedevgarage.ads.AdHandler;
 import com.mygdx.gamedevgarage.screens.MainScreen;
 import com.mygdx.gamedevgarage.screens.collection.CollectionScreen;
 import com.mygdx.gamedevgarage.screens.game_event.EventPublisher;
@@ -30,6 +31,8 @@ import java.util.HashSet;
 
 public class Game extends com.badlogic.gdx.Game implements Observer {
 
+    private AdHandler adHandler;
+
     private MenuScreen menuScreen;
     private MainScreen mainScreen;
     private CollectionScreen collectionScreen;
@@ -48,7 +51,7 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
     public HashSet<String> platforms;
     public HashSet<GameObject> games;
 
-
+    public boolean needToSave = false;
     public boolean isRandomEventShown = false;
     public boolean isRandomEventShownFromLastOpen = false;
     public boolean isGameOver = false;
@@ -80,7 +83,9 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
 
     @Override
     public void pause() {
-        dataManager.save();
+        if(needToSave)
+            dataManager.save();
+        dataManager.saveSettings();
         super.pause();
     }
 
@@ -96,7 +101,9 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
 
     @Override
     public void dispose() {
-        dataManager.save();
+        if(needToSave)
+            dataManager.save();
+        dataManager.saveSettings();
         Assets.getInstance().dispose();
         menuScreen.dispose();
         try {
@@ -112,6 +119,16 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
             gameOverScreen.dispose();
         } catch (NullPointerException ignored){
 
+        }
+    }
+
+    public void setAdFinished(String fromWhere, boolean isCompleted) {
+        if(fromWhere.equals("upgrade")) {
+            upgradeScreen.setAdShowed(isCompleted);
+        }
+
+        if(fromWhere.equals("gameOver")) {
+            gameOverScreen.setCanSkipTax(isCompleted);
         }
     }
 
@@ -289,5 +306,13 @@ public class Game extends com.badlogic.gdx.Game implements Observer {
 
     public void setGameOver(boolean gameOver) {
         isGameOver = gameOver;
+    }
+
+    public void setAdHandler(AdHandler adHandler) {
+        this.adHandler = adHandler;
+    }
+
+    public AdHandler getAdHandler() {
+        return adHandler;
     }
 }

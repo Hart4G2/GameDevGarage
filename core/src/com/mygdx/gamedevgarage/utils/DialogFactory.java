@@ -16,31 +16,31 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 
 public class DialogFactory {
 
     public static Dialog createMakeGameDialog() {
+        I18NBundle bundle = Assets.getInstance().myBundle;
         Skin skin = Assets.getInstance().getSkin();
         final Dialog dialog = createDialog();
 
         // content table
-        String[] genres = DataArrayFactory.genres;
-        String[] themes = DataArrayFactory.themes;
+        String[] genres = DataArrayFactory.getGenresAsStringArray();
+        String[] themes = DataArrayFactory.getThemesAsStringArray();
 
         final TextField nameTextField = createTextField(null, "default",
                 Align.center, "nameTextField");
 
-        final SelectBox<String> genreSelectBox = createSelectBox("default",
-                genres, Align.center, "genreSelectBox", true);
-        final SelectBox<String> themesSelectBox = createSelectBox("default",
-                themes, Align.center, "themesSelectBox", true);
+        final SelectBox<String> genreSelectBox = createSelectBox("default", genres, Align.center, "genreSelectBox", true);
+        final SelectBox<String> themesSelectBox = createSelectBox("default", themes, Align.center, "themesSelectBox", true);
 
-        Label headerLabel = createLabel("Create Game", "black_32", false);
-        Label nameLabel = createLabel("Name:", "black_24", false);
-        Label genreLabel = createLabel("Genre:", "black_24", false);
-        Label platformLabel = createLabel("Theme:", "black_24", false);
+        Label headerLabel = createLabel(bundle.get("Create_game"), "black_32", false);
+        Label nameLabel = createLabel(bundle.get("Name"), "black_24", false);
+        Label genreLabel = createLabel(bundle.get("Genre"), "black_24", false);
+        Label platformLabel = createLabel(bundle.get("Theme"), "black_24", false);
 
         float labelWidth = getWidthPercent(.2f);
         float labelHeight = getHeightPercent(.05f);
@@ -80,8 +80,8 @@ public class DialogFactory {
         float buttonHeight = getHeightPercent(.08f);
         float buttonPad = getWidthPercent(.03f);
 
-        TextButton okButton = createTextButton("OK", "white_18", "okButton");
-        TextButton cancelButton = createTextButton("Cancel", "white_18", "cancelButton");
+        TextButton okButton = createTextButton(bundle.get("ok"), "white_18", "okButton");
+        TextButton cancelButton = createTextButton(bundle.get("Cancel"), "white_18", "cancelButton");
 
         Table buttonTable = dialog.getButtonTable();
 

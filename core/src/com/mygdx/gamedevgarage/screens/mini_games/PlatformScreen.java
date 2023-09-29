@@ -1,5 +1,7 @@
 package com.mygdx.gamedevgarage.screens.mini_games;
 
+import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
+import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -10,11 +12,11 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.mini_games.cover_actors.CoverListItem;
@@ -28,11 +30,16 @@ import java.util.List;
 
 public class PlatformScreen implements Screen {
 
+    private final I18NBundle bundle;
     private Stage stage;
 
     private Button okButton;
     private PlatformList platformsList;
     private StatsTable statsTable;
+
+    public PlatformScreen() {
+        bundle = Assets.getInstance().myBundle;
+    }
 
     @Override
     public void show() {
@@ -54,20 +61,23 @@ public class PlatformScreen implements Screen {
 
         platformsList = new PlatformList(platforms);
 
-        okButton = createTextButton("OK", "white_18");
+        okButton = createTextButton(bundle.get("ok"), "white_18");
         okButton.setDisabled(true);
+
+        Label headerLabel = createLabel(bundle.get("Choose_platform"), "white_20", false);
 
         Table table = new Table(Assets.getInstance().getSkin());
         table.setFillParent(true);
+        table.add(headerLabel)
+                .pad(getHeightPercent(.07f), 0, getHeightPercent(.003f), 0)
+                .row();
         table.add(platformsList).width(getWidthPercent(1f)).height(getHeightPercent(.8f))
+                .pad(getHeightPercent(.001f), 0, getHeightPercent(.001f), 0)
                 .row();
         table.add(okButton).width(getWidthPercent(.5f)).height(getHeightPercent(.08f))
                 .center().row();
 
-        Image bg = new Image(Assets.getInstance().getSkin().getDrawable("window_purple"));
-        bg.setScaling(Scaling.fill);
-        Stack stack = new Stack(bg, table);
-        stack.setFillParent(true);
+        Stack stack = createBgStack("window_purple", table);
 
         stage.addActor(stack);
         stage.addActor(statsTable);

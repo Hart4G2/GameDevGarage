@@ -1,15 +1,17 @@
 package com.mygdx.gamedevgarage.screens.game_event.tax;
 
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.Timer;
+import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.MainScreen;
 import com.mygdx.gamedevgarage.screens.collection.CollectionScreen;
 import com.mygdx.gamedevgarage.screens.game_event.GameEvent;
 import com.mygdx.gamedevgarage.screens.upgrade.UpgradeScreen;
+import com.mygdx.gamedevgarage.utils.constraints.Currency;
+import com.mygdx.gamedevgarage.utils.stats.Cost;
 import com.mygdx.gamedevgarage.utils.stats.Stats;
 import com.mygdx.gamedevgarage.utils.stats.StatsTable;
-import com.mygdx.gamedevgarage.utils.Cost;
-import com.mygdx.gamedevgarage.utils.constraints.Currency;
 
 public class TaxEvent implements GameEvent {
 
@@ -27,6 +29,7 @@ public class TaxEvent implements GameEvent {
 
     @Override
     public void start() {
+        I18NBundle bundle = Assets.getInstance().myBundle;
         Stats stats = Stats.getInstance();
         Cost cost = new Cost(new Currency[]{Currency.MONEY} , new int[]{10});
 
@@ -36,7 +39,7 @@ public class TaxEvent implements GameEvent {
             setGameOverScreen();
         }
 
-        StatsTable.setHint(Currency.MONEY, "Pay taxes", "red_16");
+        StatsTable.setHint(Currency.MONEY, bundle.get("Pay_taxes"), "red_16");
     }
 
     private float gameOverDelay = 0;

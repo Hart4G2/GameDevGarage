@@ -4,6 +4,7 @@ import static com.mygdx.gamedevgarage.utils.data.DataArrayFactory.randomEvents;
 import static com.mygdx.gamedevgarage.utils.data.DataArrayFactory.shownRandomEvents;
 
 import com.badlogic.gdx.utils.Timer;
+import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.MainScreen;
 import com.mygdx.gamedevgarage.screens.collection.CollectionScreen;
@@ -87,13 +88,19 @@ public class RandomEvent implements GameEvent  {
 
     public void confirm(){
         Stats.getInstance().pay(event.getConfirmCost());
-        StatsTable.setHint(Currency.MONEY, "Confirmed", "default");
-        StatsTable.setHint(Currency.ENERGY, "Confirmed", "default");
+
+        String hint = Assets.getInstance().myBundle.get("Confirmed");
+
+        StatsTable.setHint(Currency.MONEY, hint, "default");
+        StatsTable.setHint(Currency.ENERGY, hint, "default");
     }
 
     public void reject(){
         Stats.getInstance().pay(event.getRejectCost());
-        StatsTable.setHint(Currency.ENERGY, "Rejected", "red_16");
+
+        String hint = Assets.getInstance().myBundle.get("Rejected");
+
+        StatsTable.setHint(Currency.ENERGY, hint, "red_16");
     }
 
     public Event getEvent() {

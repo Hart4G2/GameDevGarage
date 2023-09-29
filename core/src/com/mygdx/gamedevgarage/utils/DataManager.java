@@ -19,6 +19,8 @@ public class DataManager {
     private final Game game;
     private static DataManager instance;
 
+    private final String prefName = "indie-coder-data";
+
     private static Boolean canSkipTax;
 
     public DataManager() {
@@ -40,25 +42,43 @@ public class DataManager {
         saveCanSkipTax();
         saveIsGameOver();
         saveRandomEvent();
+    }
+
+    public void saveSettings() {
         saveVolume();
+        saveLanguage();
+    }
+
+    private void saveLanguage() {
+        Preferences prefs = Gdx.app.getPreferences(prefName);
+
+        prefs.putString("language", Assets.getInstance().getLanguage());
+        prefs.flush();
+    }
+
+    public String getLanguage() {
+        Preferences prefs = Gdx.app.getPreferences(prefName);
+        String dataJson = prefs.getString("language", "en");
+
+        return new Json().fromJson(String.class, String.valueOf(dataJson));
     }
 
     private void saveVolume() {
-        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+        Preferences prefs = Gdx.app.getPreferences(prefName);
 
         prefs.putFloat("volume", Assets.getInstance().getVolume());
         prefs.flush();
     }
 
     private void saveIsGameOver() {
-        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+        Preferences prefs = Gdx.app.getPreferences(prefName);
 
         prefs.putBoolean("gameIsOver", game.isGameOver());
         prefs.flush();
     }
 
     private void saveRandomEvent() {
-        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+        Preferences prefs = Gdx.app.getPreferences(prefName);
 
         prefs.putBoolean("isRandomEventShown", game.isRandomEventShown);
         prefs.flush();
@@ -77,7 +97,7 @@ public class DataManager {
     }
 
     private void saveData(HashSet<String> purchasedItems, String prefKey) {
-        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+        Preferences prefs = Gdx.app.getPreferences(prefName);
 
         String purchasedItemsJson = new Json().toJson(purchasedItems);
         prefs.putString(prefKey, purchasedItemsJson);
@@ -85,7 +105,7 @@ public class DataManager {
     }
 
     private void saveStats() {
-        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+        Preferences prefs = Gdx.app.getPreferences(prefName);
 
         Stats stats = Stats.getInstance();
 
@@ -104,7 +124,7 @@ public class DataManager {
     }
 
     public void saveGameState() {
-        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+        Preferences prefs = Gdx.app.getPreferences(prefName);
 
         String json = new Json().toJson(game.gameState);
         prefs.putString("gameState", json);
@@ -117,7 +137,7 @@ public class DataManager {
     }
 
     public void saveGames() {
-        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+        Preferences prefs = Gdx.app.getPreferences(prefName);
 
         String jsonStr = new Json().toJson(game.getGames());
         prefs.putString("games", jsonStr);
@@ -125,7 +145,7 @@ public class DataManager {
     }
 
     public void saveCanSkipTax() {
-        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+        Preferences prefs = Gdx.app.getPreferences(prefName);
 
         if(canSkipTax == null)
             canSkipTax = true;
@@ -202,7 +222,7 @@ public class DataManager {
     }
 
     private <T> T getData(Class<T> type, String prefKey, T defaultValue) {
-        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+        Preferences prefs = Gdx.app.getPreferences(prefName);
         String dataJson = prefs.getString(prefKey, null);
 
         if (dataJson == null || dataJson.isEmpty() || dataJson.equals("null")) {
@@ -213,14 +233,14 @@ public class DataManager {
     }
 
     private boolean getBooleanData(String prefKey, boolean defaultValue) {
-        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+        Preferences prefs = Gdx.app.getPreferences(prefName);
         boolean dataJson = prefs.getBoolean(prefKey, defaultValue);
 
         return new Json().fromJson(Boolean.class, String.valueOf(dataJson));
     }
 
     private float getFloatData(String prefKey, float defaultValue) {
-        Preferences prefs = Gdx.app.getPreferences("my-game-data");
+        Preferences prefs = Gdx.app.getPreferences(prefName);
         float dataJson = prefs.getFloat(prefKey, defaultValue);
 
         return new Json().fromJson(Float.class, String.valueOf(dataJson));

@@ -4,8 +4,6 @@ import static com.mygdx.gamedevgarage.utils.Utils.createBuyButton;
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
-import static com.mygdx.gamedevgarage.utils.data.DataArrayFactory.createMechanics;
-import static com.mygdx.gamedevgarage.utils.data.DataArrayFactory.createTechnologiesListItems;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -17,12 +15,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.mini_games.selection_actors.CheckListItem;
+import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 import com.mygdx.gamedevgarage.utils.stats.Stats;
-import com.mygdx.gamedevgarage.utils.Cost;
+import com.mygdx.gamedevgarage.utils.stats.Cost;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
 import com.mygdx.gamedevgarage.utils.data.CheckObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class UpgradeCheckItemsList extends Table {
@@ -40,7 +40,8 @@ public class UpgradeCheckItemsList extends Table {
         this.game = Game.getInstance();
         this.stats = Stats.getInstance();
         this.isTechnology = isTechnology;
-        this.items = isTechnology ? createTechnologiesListItems() : createMechanics();
+        this.items = isTechnology ? DataArrayFactory.createTechnologies() : DataArrayFactory.createMechanics();
+        Collections.shuffle(items);
         buttons = new ArrayList<>();
 
         addItems();
@@ -54,9 +55,9 @@ public class UpgradeCheckItemsList extends Table {
                 buttons.add(button);
                 addClickListener(button);
 
-                add(item).width(getWidthPercent(.7f)).height(getHeightPercent(.15f))
+                add(item).width(getWidthPercent(.79f)).height(getHeightPercent(.2f))
                         .padRight(getWidthPercent(.001f));
-                add(button).width(getWidthPercent(.21f)).height(getWidthPercent(.2f))
+                add(button).width(getWidthPercent(.17f)).height(getWidthPercent(.17f))
                         .row();
             }
         }
@@ -73,13 +74,13 @@ public class UpgradeCheckItemsList extends Table {
             icons.add(getSkin().getDrawable(currency.getDrawableName()));
         }
 
-        Button button = createBuyButton(checkObject.getName());
+        Button button = createBuyButton(checkObject.getBundleKey());
 
         float imageSize = getWidthPercent(.04f);
 
         for (int i = 0; i < icons.size(); i++) {
             Image image = new Image(icons.get(i));
-            Label label = createLabel(costs[i] + "", "white_18", false);
+            Label label = createLabel(costs[i] + "", "white_14", false);
 
             button.add(label)
                     .padRight(getWidthPercent(.005f));
@@ -103,9 +104,9 @@ public class UpgradeCheckItemsList extends Table {
                     stats.pay(cost);
 
                     if(isTechnology){
-                        game.setTechnologyPurchased(item.getCheckObject().getName());
+                        game.setTechnologyPurchased(item.getCheckObject().getBundleKey());
                     } else {
-                        game.setMechanicPurchased(item.getCheckObject().getName());
+                        game.setMechanicPurchased(item.getCheckObject().getBundleKey());
                     }
 
                     item.getCheckObject().setPurchased(true);
@@ -118,7 +119,7 @@ public class UpgradeCheckItemsList extends Table {
 
     private CheckListItem findItem(String name){
         for(CheckListItem item : items){
-            if(item.getCheckObject().getName().equals(name)){
+            if(item.getCheckObject().getBundleKey().equals(name)){
                 return item;
             }
         }

@@ -1,6 +1,5 @@
 package com.mygdx.gamedevgarage.utils.stats;
 
-import com.mygdx.gamedevgarage.utils.Cost;
 import com.mygdx.gamedevgarage.utils.DataManager;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
 
@@ -56,19 +55,19 @@ public class Stats {
     }
 
     public void setDesign(int design) {
-        this.design = Math.max(0, Math.min(design, 100));
+        this.design = Math.max(0, Math.min(design, 999));
     }
 
     public void setProgramming(int programming) {
-        this.programming = Math.max(0, Math.min(programming, 100));
+        this.programming = Math.max(0, Math.min(programming, 999));
     }
 
     public void setGameDesign(int gameDesign) {
-        this.gameDesign = Math.max(0, Math.min(gameDesign, 100));
+        this.gameDesign = Math.max(0, Math.min(gameDesign, 999));
     }
 
     public void setMoney(int money) {
-        this.money = Math.min(money, 100);
+        this.money = Math.min(money, 999);
     }
 
     public void setEnergy(int energy) {

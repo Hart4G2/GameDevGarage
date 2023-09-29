@@ -1,5 +1,6 @@
 package com.mygdx.gamedevgarage.screens.mini_games;
 
+import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
@@ -12,14 +13,13 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
@@ -37,6 +37,7 @@ import java.util.List;
 public class ProgrammingScreen implements Screen {
 
     private final Skin skin;
+    private final I18NBundle bundle;
     private Stage stage;
 
     private Label headerLabel;
@@ -44,8 +45,11 @@ public class ProgrammingScreen implements Screen {
     private CheckList techList;
     private StatsTable statsTable;
 
+    private String genre;
+
     public ProgrammingScreen() {
-        this.skin = Assets.getInstance().getSkin();
+        skin = Assets.getInstance().getSkin();
+        bundle = Assets.getInstance().myBundle;
     }
 
     @Override
@@ -55,6 +59,8 @@ public class ProgrammingScreen implements Screen {
 
         Game.getInstance().isScreenShowed = true;
 
+        genre = GameFactory.genre.getText();
+
         createUIElements();
         setupUIListeners();
     }
@@ -63,7 +69,7 @@ public class ProgrammingScreen implements Screen {
         statsTable = StatsTable.getInstance();
 
         GameFactory.technologies = new ArrayList<>();
-        List<CheckListItem> technologies = DataArrayFactory.createTechnologiesListItems();
+        List<CheckListItem> technologies = DataArrayFactory.createTechnologies();
 
         techList = new CheckList(technologies);
 
@@ -71,7 +77,7 @@ public class ProgrammingScreen implements Screen {
         scrollPane.setFillParent(true);
         scrollPane.setScrollbarsVisible(true);
 
-        headerLabel = createLabel("Choose technologies (0 / 3)", "white_20", false);
+        headerLabel = createLabel(bundle.get("Choose_technologies_for") + genre + " (0 / 3)", "white_20", false);
 
         okButton = createTextButton("OK", "white_18");
         okButton.setDisabled(true);
@@ -93,10 +99,7 @@ public class ProgrammingScreen implements Screen {
                 .colspan(2).center()
                 .row();
 
-        Image bg = new Image(Assets.getInstance().getSkin().getDrawable("window_blue"));
-        bg.setScaling(Scaling.fill);
-        Stack stack = new Stack(bg, table);
-        stack.setFillParent(true);
+        Stack stack = createBgStack("window_blue", table);
 
         stage.addActor(stack);
         stage.addActor(statsTable);
@@ -110,7 +113,7 @@ public class ProgrammingScreen implements Screen {
                     Game.getInstance().setMainScreen();
                     DialogThread.getInstance().setGameDesignThread(true);
                     for(CheckObject object : techList.getSelectedItems()){
-                        GameFactory.technologies.add(object.getName());
+                        GameFactory.technologies.add(object.getBundleKey());
                     }
                 }
             }
@@ -126,7 +129,7 @@ public class ProgrammingScreen implements Screen {
     }
 
     private void setSelectedCount(){
-        headerLabel.setText("Choose technologies (" + techList.getSelectedItems().size() + " / 3)");
+        headerLabel.setText(bundle.get("Choose_technologies_for") + genre + " (" + techList.getSelectedItems().size() + " / 3)");
     }
 
     @Override
@@ -149,12 +152,10 @@ public class ProgrammingScreen implements Screen {
 
     @Override
     public void pause() {
-        // Действия при приостановке экрана (например, когда игра переходит в фоновый режим)
     }
 
     @Override
     public void resume() {
-        // Действия при возобновлении экрана (например, когда игра возвращается из фонового режима)
     }
 
     @Override

@@ -65,10 +65,10 @@ public class CheckListItem extends Group {
     }
 
     private void initUIElements(){
-        headerLabel = createLabel(checkObject.getName(), "black_18", true);
-        descriptionLabel = createLabel(checkObject.getDescription(), "default", true);
+        headerLabel = createLabel(checkObject.getName(), "default", true);
+        descriptionLabel = createLabel(checkObject.getDescription(), "black_italic_14", true);
 
-        float imageSize = getHeightPercent(0.14f);
+        float imageSize = getHeightPercent(.14f);
 
         backgroundImage = new Image(skin.getDrawable(imageFrameUnselected));
         backgroundImage.setFillParent(true);
@@ -88,9 +88,11 @@ public class CheckListItem extends Group {
         mainTable = new Table(skin);
         mainTable.setFillParent(true);
         mainTable.setBackground(bgUnselected);
-        mainTable.add(textTable).width(labelSize).height(getHeightPercent(.15f))
-                .padRight(getWidthPercent(.02f)).left();
-        mainTable.add(imageGroup).right().width(imageSize).height(imageSize);
+        mainTable.add(textTable).width(labelSize).height(getHeightPercent(.2f))
+                .pad(getHeightPercent(.001f), getWidthPercent(.03f), 0, getWidthPercent(.01f))
+                .left();
+        mainTable.add(imageGroup).width(imageSize).height(imageSize)
+                .right();
 
         addActor(mainTable);
     }
@@ -103,16 +105,16 @@ public class CheckListItem extends Group {
         isSelected = false;
         mainTable.setBackground(bgUnselected);
         backgroundImage.setDrawable(skin, imageFrameUnselected);
-        headerLabel.setStyle(skin.get("black_18", Label.LabelStyle.class));
-        descriptionLabel.setStyle(skin.get("default", Label.LabelStyle.class));
+        headerLabel.setStyle(skin.get("default", Label.LabelStyle.class));
+        descriptionLabel.setStyle(skin.get("black_italic_14", Label.LabelStyle.class));
     }
 
     public void setSelected() {
         isSelected = true;
         mainTable.setBackground(bgSelected);
         backgroundImage.setDrawable(skin, imageFrameSelected);
-        headerLabel.setStyle(skin.get("white_18", Label.LabelStyle.class));
-        descriptionLabel.setStyle(skin.get("white_16", Label.LabelStyle.class));
+        headerLabel.setStyle(skin.get("white_16", Label.LabelStyle.class));
+        descriptionLabel.setStyle(skin.get("white_italic_14", Label.LabelStyle.class));
     }
 
     public void render(float delta) {

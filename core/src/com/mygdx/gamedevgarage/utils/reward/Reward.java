@@ -9,7 +9,7 @@ import static com.mygdx.gamedevgarage.utils.data.GameFactory.previousTheme;
 import static com.mygdx.gamedevgarage.utils.data.GameFactory.technologies;
 import static com.mygdx.gamedevgarage.utils.data.GameFactory.theme;
 
-import com.mygdx.gamedevgarage.utils.Cost;
+import com.mygdx.gamedevgarage.utils.stats.Cost;
 import com.mygdx.gamedevgarage.utils.Utils;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
@@ -102,102 +102,102 @@ public class Reward {
         String[] primaryTechnologies;
         String[] secondaryTechnologies;
 
-        switch (genre) {
+        switch (genre.getBundleKey()) {
             case "Shooter":{
                 primaryTechnologies = new String[]{
-                        "Physics of motion", "Surround sound", "Interactive sound", "Multiplayer",
-                        "Procedural level generation", "Realistic destruction physics",
+                        "Physics_of_motion", "Surround_sound", "Interactive_sound", "Multiplayer",
+                        "Procedural_level_generation", "Realistic_destruction_physics",
                 };
                 secondaryTechnologies = new String[]{
-                        "Virtual reality", "Volumetric Effects"
+                        "Virtual_reality", "Volumetric_Effects"
                 };
                 break;
             }
             case "Arcade":{
                 primaryTechnologies = new String[]{
-                        "Virtual reality", "Gesture control system", "Reactive environment", "Loading screens",
-                        "Procedural level generation",
+                        "Virtual_reality", "Gesture_control_system", "Reactive_environment", "Loading_screens",
+                        "Procedural_level_generation",
                 };
                 secondaryTechnologies = new String[]{
-                        "Multiplayer", "Realistic destruction physics", "Interactive sound"
+                        "Multiplayer", "Realistic destruction_physics", "Interactive_sound"
                 };
                 break;
             }
             case "Strategy":{
                 primaryTechnologies = new String[]{
-                        "Reactive environment", "Artificial intelligence", "Realistic illumination",
-                        "Procedural level generation", "Photorealism", "Loading screens"
+                        "Reactive_environment", "Artificial_intelligence", "Realistic_illumination",
+                        "Procedural_level_generation", "Photorealism", "Loading_screens"
                 };
                 secondaryTechnologies = new String[]{
-                        "Multiplayer", "Volumetric Effects", "Surround sound", "Procedural animation"
+                        "Multiplayer", "Volumetric_Effects", "Surround_sound", "Procedural_animation"
                 };
                 break;
             }
             case "RPG":{
                 primaryTechnologies = new String[]{
-                        "Physics of motion", "Procedural level generation",
-                        "Volumetric Effects", "Integration with cloud services",
-                        "Reactive environment", "Dynamic change of time of day", "Multiplayer"
+                        "Physics_of_motion", "Procedural_level_generation",
+                        "Volumetric_Effects", "Integration_with_cloud_services",
+                        "Reactive_environment", "Dynamic_change_of_time_of_day", "Multiplayer"
                 };
                 secondaryTechnologies = new String[]{
-                        "Volumetric Effects", "Interactive sound", "Loading screens", "Surround sound"
+                        "Volumetric_Effects", "Interactive_sound", "Loading_screens", "Surround_sound"
                 };
                 break;
             }
             case "Platform":{
                 primaryTechnologies = new String[]{
-                        "Procedural level generation", "Realistic destruction physics", "Interactive sound",
-                        "Gesture control system", "Reactive environment", "Dynamic change of time of day"
+                        "Procedural_level_generation", "Realistic_destruction_physics", "Interactive_sound",
+                        "Gesture_control_system", "Reactive environment", "Dynamic_change_of_time_of_day"
                 };
                 secondaryTechnologies = new String[]{
-                        "Physics of motion", "Volumetric Effects", "Loading screens"
+                        "Physics_of_motion", "Volumetric_Effects", "Loading_screens"
                 };
                 break;
             }
             case "Stealth":{
                 primaryTechnologies = new String[]{
-                        "Physics of motion", "Artificial intelligence", "Surround sound",
-                        "Photorealism", "Virtual reality", "Animated videos",
-                        "Interactive sound", "Procedural animation",
-                        "Reactive environment"
+                        "Physics_of_motion", "Artificial_intelligence", "Surround_sound",
+                        "Photorealism", "Virtual_reality", "Animated_videos",
+                        "Interactive_sound", "Procedural_animation",
+                        "Reactive_environment"
                 };
                 secondaryTechnologies = new String[]{
-                        "Multiplayer", "Physics of motion", "Volumetric Effects", "Add gamepad vibration"
+                        "Multiplayer", "Physics_of_motion", "Volumetric_Effects", "Add gamepad_vibration"
                 };
                 break;
             }
             case "Survival":{
                 primaryTechnologies = new String[]{
-                        "Physics of motion", "Photorealism", "Procedural level generation",
-                        "Realistic illumination", "Volumetric Effects", "Interactive sound",
-                        "Reactive environment", "Dynamic change of time of day", "Photomode"
+                        "Physics_of_motion", "Photorealism", "Procedural_level_generation",
+                        "Realistic_illumination", "Volumetric_Effects", "Interactive_sound",
+                        "Reactive_environment", "Dynamic_change_of_time of day", "Photomode"
                 };
                 secondaryTechnologies = new String[]{
-                        "Multiplayer", "Physics of motion", "Procedural animation",
-                        "Add gamepad vibration", "Virtual reality", "Surround sound"
+                        "Multiplayer", "Physics_of_motion", "Procedural_animation",
+                        "Add_gamepad_vibration", "Virtual_reality", "Surround_sound"
                 };
                 break;
             }
             case "Action":{
                 primaryTechnologies = new String[]{
-                        "Physics of motion", "Surround sound", "Photorealism",
-                        "Virtual reality", "Multiplayer", "Interactive sound",
-                        "Procedural animation"
+                        "Physics_of_motion", "Surround_sound", "Photorealism",
+                        "Virtual_reality", "Multiplayer", "Interactive_sound",
+                        "Procedural_animation"
                 };
                 secondaryTechnologies = new String[]{
-                        "Multiplayer", "Procedural level generation", "Artificial intelligence",
-                        "Photomode", "Add gamepad vibration"
+                        "Multiplayer", "Procedural_level_generation", "Artificial_intelligence",
+                        "Photomode", "Add_gamepad_vibration"
                 };
                 break;
             }
             default:{   // case "Quest":
                 primaryTechnologies = new String[]{
-                        "Procedural level generation", "Gesture control system",
-                        "Reactive environment", "Physics of motion"
+                        "Procedural_level_generation", "Gesture_control_system",
+                        "Reactive_environment", "Physics_of_motion"
                 };
                 secondaryTechnologies = new String[]{
-                        "Virtual reality", "Multiplayer", "Artificial intelligence",
-                        "Surround sound"
+                        "Virtual_reality", "Multiplayer", "Artificial_intelligence",
+                        "Surround_sound"
                 };
                 break;
             }
@@ -215,9 +215,9 @@ public class Reward {
     }
 
     HashMap<String, String> exceptions = new HashMap<String, String>() {{
-        put("Online multiplayer", "Multiplayer");
-        put("Complete destruction of the environment", "Realistic destruction physics");
-        put("Environmental influence", "Reactive environment");
+        put("Online_multiplayer", "Multiplayer");
+        put("Complete_destruction_of_the_environment", "Realistic_destruction_physics");
+        put("Environmental_influence", "Reactive_environment");
     }};
 
     private int calculateMechanicScore() {
@@ -253,113 +253,113 @@ public class Reward {
         String[] primaryMechanics;
         String[] secondaryMechanics;
 
-        switch (genre) {
+        switch (genre.getBundleKey()) {
             case "Shooter":{
                 primaryMechanics = new String[]{
-                        "Free movement on the map", "First person camera control", "Dodging and blocking",
-                        "Squad formation", "Change of perspective", "Character evolution", "Complete destruction of the environment"
+                        "Free_movement_on_the_map", "First_person_camera_control", "Dodging_and_blocking",
+                        "Squad_formation", "Change_of_perspective", "Character_evolution", "Complete_destruction_of_the_environment"
                 };
                 secondaryMechanics = new String[]{
-                        "Time slows down", "Nonlinear plot", "Stealth/Invisibility", "Online multiplayer",
-                        "Lots of playable characters", "Base leveling", "Identity substitution", "Time attack"
+                        "Time_slows_down", "Nonlinear_plot", "Stealth/Invisibility", "Online_multiplayer",
+                        "Lots_of_playable_characters", "Base_leveling", "Identity substitution", "Time_attack"
                 };
                 break;
             }
             case "Arcade":{
                 primaryMechanics = new String[]{
-                        "Time slows down", "Multiplayer on one screen", "Split-dresser mode", "Time attack",
-                        "Online multiplayer"
+                        "Time_slows_down", "Multiplayer_on_one_screen", "Split-dresser_mode", "Time_attack",
+                        "Online_multiplayer"
                 };
                 secondaryMechanics = new String[]{
-                        "First person camera control", "Dodging and blocking", "Stealth/Invisibility",
-                        "Lots of playable characters", "Environmental influence", "Change of perspective",
-                        "Creation of unique game elements by the player"
+                        "First_person_camera_control", "Dodging_and_blocking", "Stealth/Invisibility",
+                        "Lots_of_playable_characters", "Environmental_influence", "Change_of_perspective",
+                        "Creation_of_unique_game_elements_by_the_player"
                 };
                 break;
             }
             case "Strategy":{
                 primaryMechanics = new String[]{
-                        "Free movement on the map", "Lots of playable characters",
-                        "Squad formation", "Change of perspective", "Base leveling",
-                        "Character evolution", "Online multiplayer"
+                        "Free_movement_on_the_map", "Lots_of_playable_characters",
+                        "Squad_formation", "Change_of_perspective", "Base_leveling",
+                        "Character_evolution", "Online_multiplayer"
                 };
                 secondaryMechanics = new String[]{
-                        "Time slows down", "Environmental influence", "Split-dresser mode",
-                        "Multiplayer on one screen", "Complete destruction of the environment"
+                        "Time_slows_down", "Environmental influence", "Split-dresser_mode",
+                        "Multiplayer_on_one_screen", "Complete_destruction_of_the_environment"
                 };
                 break;
             }
             case "RPG":{
                 primaryMechanics = new String[]{
-                        "Free movement on the map", "First person camera control", "Nonlinear plot",
-                        "Dodging and blocking", "Dialogue selection system", "Stealth/Invisibility",
-                        "Lots of playable characters", "Squad formation", "Character evolution",
-                        "Online multiplayer"
+                        "Free_movement_on_the_map", "First_person_camera_control", "Nonlinear_plot",
+                        "Dodging_and_blocking", "Dialogue_selection_system", "Stealth/Invisibility",
+                        "Lots_of_playable_characters", "Squad_formation", "Character_evolution",
+                        "Online_multiplayer"
                 };
                 secondaryMechanics = new String[]{
-                        "Time slows down", "Environmental influence", "Squad formation",
-                        "Creation of unique game elements by the player"
+                        "Time_slows_down", "Environmental_influence", "Squad_formation",
+                        "Creation_of_unique game_elements_by_the_player"
                 };
                 break;
             }
             case "Platform":{
                 primaryMechanics = new String[]{
-                        "Time slows down", "Dodging and blocking", "Multiplayer on one screen",
-                        "Lots of playable characters", "Split-dresser mode"
+                        "Time_slows_down", "Dodging_and_blocking", "Multiplayer_on_one_screen",
+                        "Lots_of_playable_characters", "Split-dresser_mode"
                 };
                 secondaryMechanics = new String[]{
-                        "Free movement on the map", "Environmental influence", "Change of perspective",
-                        "Character evolution", "Online multiplayer",
+                        "Free_movement_on_the_map", "Environmental_influence", "Change_of_perspective",
+                        "Character_evolution", "Online_multiplayer",
                 };
                 break;
             }
             case "Stealth":{
                 primaryMechanics = new String[]{
-                        "Free movement on the map", "Time slows down", "First person camera control",
-                        "Nonlinear plot", "Dodging and blocking", "Dialogue selection system",
-                        "Stealth/Invisibility", "Identity substitution", "Time attack"
+                        "Free_movement_on_the_map", "Time_slows_down", "First_person_camera_control",
+                        "Nonlinear_plot", "Dodging_and_blocking", "Dialogue_selection_system",
+                        "Stealth/Invisibility", "Identity_substitution", "Time attack"
                 };
                 secondaryMechanics = new String[]{
-                        "Lots of playable characters", "Environmental influence", "Change of perspective",
-                        "Character evolution", "Online multiplayer", "Complete destruction of the environment"
+                        "Lots_of_playable_characters", "Environmental_influence", "Change_of_perspective",
+                        "Character_evolution", "Online_multiplayer", "Complete destruction_of_the_environment"
                 };
                 break;
             }
             case "Survival":{
                 primaryMechanics = new String[]{
-                        "Free movement on the map", "First person camera control", "Lots of playable characters",
-                        "Environmental influence", "Base leveling", "Character evolution",
-                        "Creation of unique game elements by the player", "Complete destruction of the environment"
+                        "Free_movement_on_the_map", "First_person_camera_control", "Lots_of_playable_characters",
+                        "Environmental_influence", "Base_leveling", "Character_evolution",
+                        "Creation_of_unique_game_elements_by_the player", "Complete_destruction_of_the_environment"
                 };
                 secondaryMechanics = new String[]{
-                        "Dodging and blocking", "Multiplayer on one screen", "Squad formation",
-                        "Change of perspective", "Online multiplayer"
+                        "Dodging_and_blocking", "Multiplayer_on_one_screen", "Squad_formation",
+                        "Change_of_perspective", "Online_multiplayer"
                 };
                 break;
             }
             case "Action":{
                 primaryMechanics = new String[]{
-                        "Free movement on the map", "First person camera control",
-                        "Dodging and blocking", "Lots of playable characters",
-                        "Change of perspective",
+                        "Free_movement_on_the_map", "First_person_camera_control",
+                        "Dodging_and_blocking", "Lots_of_playable_characters",
+                        "Change_of_perspective",
                 };
                 secondaryMechanics = new String[]{
-                        "Time slows down", "Dialogue selection system", "Nonlinear plot",
-                        "Stealth/Invisibility", "Squad formation", "Identity substitution",
-                        "Time attack", "Character evolution", "Online multiplayer"
+                        "Time_slows_down", "Dialogue_selection_system", "Nonlinear_plot",
+                        "Stealth/Invisibility", "Squad_formation", "Identity_substitution",
+                        "Time_attack", "Character_evolution", "Online_multiplayer"
                 };
                 break;
             }
             default:{   // case "Quest":
                 primaryMechanics = new String[]{
-                        "Free movement on the map", "Time slows down", "First person camera control",
-                        "Nonlinear plot", "Dialogue selection system", "Environmental influence",
-                        "Change of perspective", "Time attack", "Creation of unique game elements by the player",
-                        "Complete destruction of the environment"
+                        "Free_movement_on_the_map", "Time_slows_down", "First_person_camera control",
+                        "Nonlinear_plot", "Dialogue_selection_system", "Environmental_influence",
+                        "Change_of_perspective", "Time_attack", "Creation_of_unique_game_elements_by_the_player",
+                        "Complete_destruction_of_the_environment"
                 };
                 secondaryMechanics = new String[]{
-                        "Dodging and blocking", "Multiplayer on one screen", "Stealth/Invisibility",
-                        "Lots of playable characters", "Identity substitution", "Online multiplayer",
+                        "Dodging_and_blocking", "Multiplayer_on_one_screen", "Stealth/Invisibility",
+                        "Lots_of_playable characters", "Identity_substitution", "Online_multiplayer",
                 };
                 break;
             }
@@ -390,8 +390,10 @@ public class Reward {
     }
 
     private boolean isFirstDesign(){
-        String design1 = theme + "_1";
-        String design2 = theme + "_2";
+        String themeName = theme.getBundleKey();
+
+        String design1 = themeName + "_1";
+        String design2 = themeName + "_2";
 
         return object.equals(design1) || object.equals(design2);
     }
@@ -399,7 +401,7 @@ public class Reward {
     private boolean isSecondaryDesign(){
         String[] designs;
 
-        switch (theme) {
+        switch (theme.getBundleKey()) {
             case "Aliens":{
                 designs = new String[]{
                         "cyberpunk_1", "cyberpunk_2", "ninja_2",
@@ -697,7 +699,7 @@ public class Reward {
             }
         }
 
-        return Utils.isInArray(designs, genre);
+        return Utils.isInArray(designs, genre.getBundleKey());
     }
 
     private int calculateScore() {
@@ -723,7 +725,7 @@ public class Reward {
         }
 
         if(previousGenre != null && previousTheme != null) {
-            if (previousGenre.equals(genre) && previousTheme.equals(theme)) {
+            if (previousGenre.equals(genre.getBundleKey()) && previousTheme.equals(theme.getBundleKey())) {
                 int r = new Random().nextInt(2) + 1;
                 score = Math.max(1, score - r);
                 possibleHints.add("same_game");
@@ -750,28 +752,28 @@ public class Reward {
     private int getGenreThemeCompatibility(){
         String[] themes;
 
-        switch (genre) {
+        switch (genre.getBundleKey()) {
             case "Shooter":{
                 themes = new String[]{
                         "Aliens", "Aviation", "Criminal", "Cyberpunk", "Detective",
                         "Hunting", "Pirates", "School", "Space", "Superheros",
-                        "Vampires", "War", "Wild west", "Zombie"
+                        "Vampires", "War", "Wild_west", "Zombie"
                 };
                 break;
             }
             case "Arcade":{
                 themes = new String[]{
                         "Comedy", "Construction", "Cooking", "Dance", "Detective",
-                        "Fantasy", "Farm", "Game development", "Government", "Music",
+                        "Fantasy", "Farm", "Game_development", "Government", "Music",
                         "Ninja", "Race", "Rhythm", "Romantic", "Space",
-                        "Time traveling", "Virtual animals"
+                        "Time_traveling", "Virtual_animals"
                 };
                 break;
             }
             case "Strategy":{
                 themes = new String[]{
                         "Aliens", "Aviation", "Business", "Cinema", "City",
-                        "Construction", "Fashion", "Game development", "Government",
+                        "Construction", "Fashion", "Game_development", "Government",
                         "Hospital", "Life", "Medieval", "Romantic", "School", "Space",
                         "Sport", "Transport", "War"
                 };
@@ -789,22 +791,22 @@ public class Reward {
                 themes = new String[]{
                         "Aliens", "City", "Criminal", "Cyberpunk", "Fantasy", "Hacker",
                         "Medieval", "Ninja", "Prison", "Space", "Superheros",
-                        "Time traveling", "Transport", "Vampires", "War", "Zombie"
+                        "Time_traveling", "Transport", "Vampires", "War", "Zombie"
                 };
                 break;
             }
             case "Stealth":{
                 themes = new String[]{
                         "Aliens", "Criminal", "Detective", "Fantasy", "Hacker",
-                        "Horror", "Hunting", "Medieval", "Ninja", "Prison", "Time traveling",
-                        "Vampires", "War", "Wild west", "Zombie"
+                        "Horror", "Hunting", "Medieval", "Ninja", "Prison", "Time_traveling",
+                        "Vampires", "War", "Wild_west", "Zombie"
                 };
                 break;
             }
             case "Survival":{
                 themes = new String[]{
                         "Aliens", "Comedy", "Cyberpunk", "Fantasy", "Fashion",
-                        "Game development", "Government", "Horror", "Hospital",
+                        "Game_development", "Government", "Horror", "Hospital",
                         "Hunting", "Life", "Medieval", "Pirates", "Prison", "Space",
                         "War", "Zombie"
                 };
@@ -815,7 +817,7 @@ public class Reward {
                         "Aliens", "Aviation", "Cinema", "Criminal", "Cyberpunk",
                         "Detective", "Hacker", "Horror", "Hunting", "Life",
                         "Medieval", "Ninja", "Pirates", "Prison", "Space",
-                        "Superheros", "Vampires", "War", "Wild west", "Zombie"
+                        "Superheros", "Vampires", "War", "Wild_west", "Zombie"
                 };
                 break;
             }
@@ -824,13 +826,13 @@ public class Reward {
                         "Aliens", "Cinema", "Comedy", "Criminal", "Cyberpunk",
                         "Detective", "Fantasy", "Farm", "Fashion", "Hacker",
                         "Hospital", "Medieval", "Prison", "Romantic", "School",
-                        "Time traveling", "Transport"
+                        "Time_traveling", "Transport"
                 };
                 break;
             }
         }
 
-        if(!Utils.isInArray(themes, theme)){
+        if(!Utils.isInArray(themes, theme.getBundleKey())){
             possibleHints.add("genre_theme_compatibility");
             return 0;
         } else {
@@ -956,9 +958,17 @@ public class Reward {
     }
 
     public void setNewValues(){
-        stats.pay(new Cost(new Currency[]{Currency.DESIGN, Currency.PROGRAMMING, Currency.GAME_DESIGN, Currency.ENERGY},
-                new int[]{-design, -programming, -gameDesign, -energy}));
+        Random r = new Random();
 
+        int design = r.nextInt(Math.max(1, this.design));
+        int programming = r.nextInt(Math.max(1, this.programming));
+        int gameDesign = r.nextInt(Math.max(1, this.gameDesign));
+        int energy = r.nextInt(Math.max(1, this.energy));
+
+        Cost cost = new Cost(new Currency[]{Currency.DESIGN, Currency.PROGRAMMING, Currency.GAME_DESIGN, Currency.ENERGY},
+                new int[]{-design, -programming, -gameDesign, -energy});
+
+        stats.pay(cost);
         stats.setLevel(lvl);
         stats.setExperience(stats.getStat(Currency.EXPERIENCE) + exp, requiredExp);
     }

@@ -2,18 +2,21 @@ package com.mygdx.gamedevgarage.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Scaling;
 import com.mygdx.gamedevgarage.Assets;
-import com.mygdx.gamedevgarage.Game;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,13 +89,13 @@ public class Utils {
     public static TextButton createTextButton(String text, String styleName, String actorName){
         TextButton textButton = new TextButton(text, Assets.getInstance().getSkin(), styleName);
         textButton.setName(actorName);
-        createClickListener(Game.getInstance(), textButton, "button_click");
+        createClickListener(textButton, "button_click");
         return textButton;
     }
 
     public static TextButton createTextButton(String text, String styleName){
         TextButton textButton = new TextButton(text, Assets.getInstance().getSkin(), styleName);
-        createClickListener(Game.getInstance(), textButton, "button_click");
+        createClickListener(textButton, "button_click");
         return textButton;
     }
 
@@ -104,11 +107,11 @@ public class Utils {
 
     public static Button createButton(String styleName){
         Button button = new Button(Assets.getInstance().getSkin(), styleName);
-        createClickListener(Game.getInstance(), button, "button_click");
+        createClickListener(button, "button_click");
         return button;
     }
 
-    private static void createClickListener(final Game game, final Button button, final String soundName) {
+    private static void createClickListener(final Button button, final String soundName) {
         button.addListener(new ClickListener() {
            @Override
            public void clicked(InputEvent event, float x, float y) {
@@ -120,6 +123,19 @@ public class Utils {
                }
            }
        });
+    }
+
+    public static Stack createBgStack(String bgName, Actor... actors){
+        Image bg = new Image(Assets.getInstance().getSkin().getDrawable(bgName));
+        bg.setScaling(Scaling.fill);
+
+        Actor[] actorsArray = new Actor[actors.length + 1];
+        actorsArray[0] = bg;
+        System.arraycopy(actors, 0, actorsArray, 1, actors.length);
+
+        Stack stack = new Stack(actorsArray);
+        stack.setFillParent(true);
+        return stack;
     }
 
     public static boolean isInArray(String[] words, String word){

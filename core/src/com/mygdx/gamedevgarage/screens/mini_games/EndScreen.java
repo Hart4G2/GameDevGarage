@@ -1,5 +1,6 @@
 package com.mygdx.gamedevgarage.screens.mini_games;
 
+import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -10,13 +11,12 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
@@ -32,6 +32,7 @@ public class EndScreen implements Screen {
 
     private final Game game;
     private final Reward reward;
+    private final I18NBundle bundle;
     private final Skin skin;
     private Stage stage;
 
@@ -41,6 +42,7 @@ public class EndScreen implements Screen {
     public EndScreen() {
         game = Game.getInstance();
         reward = Reward.getInstance();
+        bundle = Assets.getInstance().myBundle;
         skin = Assets.getInstance().getSkin();
     }
 
@@ -64,7 +66,7 @@ public class EndScreen implements Screen {
     private void createUIElements(){
         statsTable = StatsTable.getInstance();
 
-        okButton = createTextButton("OK", "white_18");
+        okButton = createTextButton(bundle.get("ok"), "white_18");
         okButton.setDisabled(true);
 
         final boolean isSoundNeeded = Stats.getInstance().getStat(Currency.LEVEL) < reward.getLvl();
@@ -95,10 +97,7 @@ public class EndScreen implements Screen {
                 .padBottom(getHeightPercent(.03f))
                 .center().row();
 
-        Image bg = new Image(Assets.getInstance().getSkin().getDrawable("window_lightblue"));
-        bg.setScaling(Scaling.fill);
-        Stack stack = new Stack(bg, table);
-        stack.setFillParent(true);
+        Stack stack = createBgStack("window_lightblue", table);
 
         stage.addActor(stack);
         stage.addActor(statsTable);
@@ -118,6 +117,9 @@ public class EndScreen implements Screen {
     }
 
     private void createGameObject(){
+        GameFactory.previousGenre = GameFactory.genre.getBundleKey();
+        GameFactory.previousTheme = GameFactory.theme.getBundleKey();
+
         GameObject gameObject = GameFactory.createGameObject();
         game.addGame(gameObject);
         gameObject.startSelling();

@@ -1,4 +1,4 @@
-package com.mygdx.gamedevgarage.utils;
+package com.mygdx.gamedevgarage.utils.stats;
 
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
 

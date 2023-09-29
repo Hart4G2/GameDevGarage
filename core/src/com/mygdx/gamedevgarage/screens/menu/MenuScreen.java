@@ -1,6 +1,7 @@
 package com.mygdx.gamedevgarage.screens.menu;
 
 import static com.mygdx.gamedevgarage.utils.Utils.convertStringToList;
+import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
 import static com.mygdx.gamedevgarage.utils.Utils.createButton;
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
 import static com.mygdx.gamedevgarage.utils.Utils.createSlider;
@@ -16,30 +17,29 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.game_event.EventPublisher;
 import com.mygdx.gamedevgarage.screens.game_event.random.RandomEvent;
-import com.mygdx.gamedevgarage.screens.game_event.tax.GameOverScreen;
 import com.mygdx.gamedevgarage.screens.game_event.tax.TaxEvent;
+import com.mygdx.gamedevgarage.screens.menu.actors.SelectActor;
 import com.mygdx.gamedevgarage.utils.DataManager;
 import com.mygdx.gamedevgarage.utils.DialogThread;
 import com.mygdx.gamedevgarage.utils.constraints.GameState;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
 import com.mygdx.gamedevgarage.utils.data.GameObject;
+import com.mygdx.gamedevgarage.utils.data.TranslatableObject;
 import com.mygdx.gamedevgarage.utils.reward.Reward;
 
 import java.util.HashMap;
@@ -60,6 +60,7 @@ public class MenuScreen implements Screen {
     private Label volumeLabel;
     private Table mainMenuTable;
     private Table settingsTable;
+    private SelectActor selectActor;
 
     public MenuScreen() {
         game = Game.getInstance();
@@ -77,11 +78,11 @@ public class MenuScreen implements Screen {
     }
 
     private void createUIElements(){
-        Skin skin = assets.getSkin();
+        I18NBundle bundle = assets.myBundle;
 
-        startButton = createTextButton("Start", "green_18");
-        settingsButton = createTextButton("Settings", "default");
-        howToPlayButton = createTextButton("How to play", "red_18");
+        startButton = createTextButton(bundle.get("Start"), "green_18");
+        settingsButton = createTextButton(bundle.get("Settings"), "default");
+        howToPlayButton = createTextButton(bundle.get("How_to_play"), "red_18");
         startButton.addAction(Actions.alpha(.8f));
         settingsButton.addAction(Actions.alpha(.8f));
         howToPlayButton.addAction(Actions.alpha(.8f));
@@ -89,12 +90,13 @@ public class MenuScreen implements Screen {
         backButton = createButton("back_button");
         volumeSlider = createSlider(0, 1, 0.01f, getHeightPercent(.065f));
         volumeSlider.setValue(assets.getVolume());
-        volumeHeaderLabel = createLabel("Volume", "white_24", false);
+        volumeHeaderLabel = createLabel(bundle.get("Volume"), "white_24", false);
         volumeLabel = createLabel(String.valueOf(Math.round(assets.getVolume() * 100)), "white_24", false);
 
         volumeSlider.addAction(Actions.alpha(.8f));
         volumeHeaderLabel.addAction(Actions.alpha(.8f));
         volumeLabel.addAction(Actions.alpha(.8f));
+        selectActor = new SelectActor();
 
         mainMenuTable = new Table();
         mainMenuTable.setFillParent(true);
@@ -124,18 +126,20 @@ public class MenuScreen implements Screen {
                 .padRight(getWidthPercent(.03f)).padLeft(getWidthPercent(.02f))
                 .left();
         settingsTable.add(volumeLabel)
+                .width(getWidthPercent(.05f))
+                .padBottom(getHeightPercent(.1f))
+                .row();
+        settingsTable.add(selectActor).width(getWidthPercent(.8f)).height(getHeightPercent(.1f))
                 .width(getWidthPercent(.05f));
         settingsTable.setVisible(false);
 
-        Image bg = new Image(skin.getDrawable("window_mainbg"));
-        bg.setScaling(Scaling.fill);
-        Stack mainStack = new Stack(bg, settingsTable, mainMenuTable);
-        mainStack.setFillParent(true);
+        Stack mainStack = createBgStack("window_mainbg", settingsTable, mainMenuTable);
 
         stage.addActor(mainStack);
 
         fadeInTable(mainMenuTable, .5f);
     }
+
     private void setupUIListeners() {
         startButton.addListener(new ClickListener() {
             @Override
@@ -169,9 +173,16 @@ public class MenuScreen implements Screen {
                 volumeLabel.setText(Math.round(value * 100));
             }
         });
+        selectActor.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                updateBundle();
+            }
+        });
     }
 
     private void fadeInTable(final Table table, float duration){
+        table.clearActions();
         table.addAction(Actions.sequence(
                 Actions.alpha(0f, .0f),
                 Actions.run(new Runnable() {
@@ -185,6 +196,7 @@ public class MenuScreen implements Screen {
     }
 
     private void fadeOutTable(final Table table, float duration){
+        table.clearActions();
         table.addAction(Actions.sequence(
                 Actions.fadeOut(duration),
                 Actions.run(new Runnable() {
@@ -197,8 +209,9 @@ public class MenuScreen implements Screen {
     }
 
     private void start(){
+        game.needToSave = true;
         game.games = dataManager.getGames();
-        System.out.println(game.games);
+
         game.setMainScreen();
 
         if(!getSavedData()) {
@@ -237,7 +250,7 @@ public class MenuScreen implements Screen {
             new Timer().scheduleTask(new Timer.Task() {
                 @Override
                 public void run() {
-                    game.setScreen(new GameOverScreen());
+                    game.setGameOverScreen();
                 }
             }, 0);
         }
@@ -245,23 +258,25 @@ public class MenuScreen implements Screen {
 
     private void getSavedGameState(){
         game.isGameStarted = dataManager.isGameStarted();
+
+        HashMap<String, String> gameData = dataManager.getGameData();
+
+        GameFactory.previousTheme = gameData.get("previousTheme");
+        GameFactory.previousGenre = gameData.get("previousGenre");
+
         if(game.isGameStarted){
             game.gameState = dataManager.getGameState();
             game.isScreenShowed = dataManager.isScreenShowed();
             game.isEndScreenCalculated = game.gameState == GameState.END && game.isScreenShowed;
-            setGameState();
+            setGameState(gameData);
             game.getMainScreen().setGameStarted();
         }
     }
 
-    private void setSavedGameData() {
-        HashMap<String, String> gameData = dataManager.getGameData();
-
+    private void setSavedGameData(HashMap<String, String> gameData) {
         GameFactory.name = gameData.get("name");
-        GameFactory.genre = gameData.get("genre");
-        GameFactory.theme = gameData.get("theme");
-        GameFactory.previousTheme = gameData.get("previousTheme");
-        GameFactory.previousGenre = gameData.get("previousGenre");
+        GameFactory.genre = new TranslatableObject(gameData.get("genre"));
+        GameFactory.theme = new TranslatableObject(gameData.get("theme"));
         GameFactory.color = gameData.get("color");
         GameFactory.object = gameData.get("object");
         GameFactory.technologies = convertStringToList(gameData.get("technologies"));
@@ -283,8 +298,8 @@ public class MenuScreen implements Screen {
         }
     }
 
-    private void setGameState(){
-        setSavedGameData();
+    private void setGameState(HashMap<String, String> gameData){
+        setSavedGameData(gameData);
 
         DialogThread dialogThread = DialogThread.getInstance();
 
@@ -359,5 +374,13 @@ public class MenuScreen implements Screen {
     @Override
     public void dispose() {
         stage.dispose();
+    }
+
+    public void updateBundle(){
+        I18NBundle bundle = Assets.getInstance().myBundle;
+        startButton.setText(bundle.get("Start"));
+        settingsButton.setText(bundle.get("Settings"));
+        howToPlayButton.setText(bundle.get("How_to_play"));
+        volumeHeaderLabel.setText(bundle.get("Volume"));
     }
 }

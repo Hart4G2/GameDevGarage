@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 
+import java.util.Collections;
 import java.util.List;
 
 public class CoverList extends Table {
@@ -26,11 +27,12 @@ public class CoverList extends Table {
         this.coverImage = coverImage;
         this.parent = parent;
 
+        items = isColorList ? DataArrayFactory.createColors() : DataArrayFactory.createCoverObjects();
+        Collections.shuffle(items);
+
         if(isColorList){
-            items = DataArrayFactory.createColors();
             addColorItems();
         } else {
-            items = DataArrayFactory.createCoverObjects();
             addObjectItems();
         }
     }
@@ -65,7 +67,7 @@ public class CoverList extends Table {
             public void clicked(InputEvent event, float x, float y) {
                 playSound();
                 coverImage.setDrawable(item.getImage().getDrawable());
-                parent.setSelectedColor(item.getCoverObject().getName());
+                parent.setSelectedColor(item.getCoverObject().getBundleKey());
             }
         });
     }
@@ -89,8 +91,7 @@ public class CoverList extends Table {
                 item.getImage().addAction(clickAnimation);
 
                 coverImage.setDrawable(item.getImage().getDrawable());
-                parent.setSelectedObject(item.getCoverObject().getName());
-
+                parent.setSelectedObject(item.getCoverObject().getBundleKey());
                 playSound();
             }
 

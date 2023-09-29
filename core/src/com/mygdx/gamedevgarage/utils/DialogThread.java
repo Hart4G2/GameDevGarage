@@ -8,13 +8,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.Timer;
+import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.MainScreen;
 import com.mygdx.gamedevgarage.utils.constraints.Constants;
 import com.mygdx.gamedevgarage.utils.constraints.GameState;
+import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
-import com.mygdx.gamedevgarage.utils.stats.StatsTable;
+import com.mygdx.gamedevgarage.utils.data.TranslatableObject;
 
 public class DialogThread {
 
@@ -101,6 +104,7 @@ public class DialogThread {
     private void openGameMakeDialog() {
         final Game game = Game.getInstance();
         final MainScreen screen = game.getMainScreen();
+        I18NBundle bundle = Assets.getInstance().myBundle;
 
         mainThread.cancel();
         screen.hide();
@@ -120,10 +124,12 @@ public class DialogThread {
                 screen.setDialogOpened(false);
                 dialog.hide();
                 getInstance().setDesignThread(true);
-                GameFactory.previousGenre = GameFactory.genre;
-                GameFactory.previousTheme = GameFactory.theme;
-                GameFactory.genre = genreSelectBox.getSelected();
-                GameFactory.theme = themesSelectBox.getSelected();
+
+                TranslatableObject genre = DataArrayFactory.getGenre(genreSelectBox.getSelected());
+                TranslatableObject theme = DataArrayFactory.getTheme(themesSelectBox.getSelected());
+
+                GameFactory.genre = genre;
+                GameFactory.theme = theme;
                 GameFactory.name = nameTextField.getText();
             }
         });

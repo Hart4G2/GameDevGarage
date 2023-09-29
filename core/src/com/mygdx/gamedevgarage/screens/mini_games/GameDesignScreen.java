@@ -1,5 +1,6 @@
 package com.mygdx.gamedevgarage.screens.mini_games;
 
+import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
@@ -12,14 +13,13 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
@@ -37,6 +37,7 @@ import java.util.List;
 public class GameDesignScreen implements Screen {
 
     private final Skin skin;
+    private final I18NBundle bundle;
     private Stage stage;
 
     private Button okButton;
@@ -44,8 +45,11 @@ public class GameDesignScreen implements Screen {
     private StatsTable statsTable;
     private Label headerLabel;
 
+    private String genre;
+
     public GameDesignScreen() {
-        this.skin = Assets.getInstance().getSkin();
+        skin = Assets.getInstance().getSkin();
+        bundle = Assets.getInstance().myBundle;
     }
 
     @Override
@@ -54,6 +58,8 @@ public class GameDesignScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         Game.getInstance().isScreenShowed = true;
+
+        genre = GameFactory.genre.getText();
 
         createUIElements();
         setupUIListeners();
@@ -73,9 +79,9 @@ public class GameDesignScreen implements Screen {
         scrollPane.setFillParent(true);
         scrollPane.setScrollbarsVisible(true);
 
-        headerLabel = createLabel("Choose mechanics (0 / 3)", "white_20", false);
+        headerLabel = createLabel(bundle.get("Choose_mechanics_for") + genre + " (0 / 3)", "white_20", false);
 
-        okButton = createTextButton("OK", "white_18");
+        okButton = createTextButton(bundle.get("ok"), "white_18");
         okButton.setDisabled(true);
 
         Group group = new Group();
@@ -95,10 +101,7 @@ public class GameDesignScreen implements Screen {
                 .colspan(2).center()
                 .row();
 
-        Image bg = new Image(Assets.getInstance().getSkin().getDrawable("window_green"));
-        bg.setScaling(Scaling.fill);
-        Stack stack = new Stack(bg, table);
-        stack.setFillParent(true);
+        Stack stack = createBgStack("window_green", table);
 
         stage.addActor(stack);
         stage.addActor(statsTable);
@@ -112,7 +115,7 @@ public class GameDesignScreen implements Screen {
                     Game.getInstance().setMainScreen();
                     DialogThread.getInstance().setPlatformThread(true);
                     for(CheckObject object : mechanicList.getSelectedItems()){
-                        GameFactory.mechanics.add(object.getName());
+                        GameFactory.mechanics.add(object.getBundleKey());
                     }
                 }
             }
@@ -128,7 +131,7 @@ public class GameDesignScreen implements Screen {
     }
 
     private void setSelectedCount(){
-        headerLabel.setText("Choose mechanics (" + mechanicList.getSelectedItems().size() + " / 3)");
+        headerLabel.setText(bundle.get("Choose_mechanics_for") + genre + " (" + mechanicList.getSelectedItems().size() + " / 3)");
     }
 
     @Override
@@ -151,12 +154,10 @@ public class GameDesignScreen implements Screen {
 
     @Override
     public void pause() {
-        // Действия при приостановке экрана (например, когда игра переходит в фоновый режим)
     }
 
     @Override
     public void resume() {
-        // Действия при возобновлении экрана (например, когда игра возвращается из фонового режима)
     }
 
     @Override

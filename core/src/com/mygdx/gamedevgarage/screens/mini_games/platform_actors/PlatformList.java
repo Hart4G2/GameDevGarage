@@ -16,7 +16,7 @@ import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.mini_games.cover_actors.CoverListItem;
 import com.mygdx.gamedevgarage.utils.stats.Stats;
-import com.mygdx.gamedevgarage.utils.Cost;
+import com.mygdx.gamedevgarage.utils.stats.Cost;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
 import com.mygdx.gamedevgarage.utils.data.CoverObject;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
@@ -54,12 +54,14 @@ public class PlatformList extends Table {
                 addClickListener(button);
                 buttons.add(button);
 
-                add(item).width(getWidthPercent(.8f)).height(getHeightPercent(.15f))
-                        .padRight(getWidthPercent(.01f));
-                add(button).width(getWidthPercent(.17f)).height(getWidthPercent(.17f)).row();
+                add(item).width(getWidthPercent(.8f)).height(getHeightPercent(.2f))
+                        .padRight(getWidthPercent(.001f));
+                add(button).width(getWidthPercent(.17f)).height(getWidthPercent(.17f))
+                        .row();
             } else {
-                add(item).width(getWidthPercent(.8f)).height(getHeightPercent(.15f))
-                        .padRight(getWidthPercent(.01f)).row();
+                add(item).width(getWidthPercent(.8f)).height(getHeightPercent(.2f))
+                        .padRight(getWidthPercent(.001f))
+                        .row();
             }
             addClickListener(item);
         }
@@ -76,7 +78,7 @@ public class PlatformList extends Table {
             icons.add(getSkin().getDrawable(currency.getDrawableName()));
         }
 
-        Button button = createBuyButton(coverObject.getName());
+        Button button = createBuyButton(coverObject.getBundleKey());
 
         float imageSize = getWidthPercent(.04f);
 
@@ -123,10 +125,12 @@ public class PlatformList extends Table {
             playSound("buying_platform");
             stats.pay(cost);
 
-            item.getCoverObject().setPurchased(true);
-            Game.getInstance().setPlatformPurchased(item.getCoverObject().getName());
+            String platformName =  item.getCoverObject().getBundleKey();
 
-            Button button = findButton(item.getCoverObject().getName());
+            item.getCoverObject().setPurchased(true);
+            Game.getInstance().setPlatformPurchased(platformName);
+
+            Button button = findButton(platformName);
             buttons.remove(button);
             removeActor(button);
 
@@ -138,7 +142,7 @@ public class PlatformList extends Table {
 
     private void selectPlatform(CoverListItem item){
         String selectedPlatform = GameFactory.platform;
-        String thisPlatform = item.getCoverObject().getName();
+        String thisPlatform = item.getCoverObject().getBundleKey();
 
         if(!selectedPlatform.equals("") && !selectedPlatform.equals(thisPlatform)) {
             CoverListItem previousItem = findItem(selectedPlatform);
@@ -153,7 +157,7 @@ public class PlatformList extends Table {
 
     private CoverListItem findItem(String name){
         for(CoverListItem item : items){
-            if(item.getCoverObject().getName().equals(name)){
+            if(item.getCoverObject().getBundleKey().equals(name)){
                 return item;
             }
         }

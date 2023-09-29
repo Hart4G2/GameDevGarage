@@ -1,5 +1,6 @@
 package com.mygdx.gamedevgarage.screens.upgrade;
 
+import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
 import static com.mygdx.gamedevgarage.utils.Utils.createButton;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
@@ -7,37 +8,45 @@ import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.I18NBundle;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.upgrade.ui.UpgradeCheckItemsList;
 import com.mygdx.gamedevgarage.screens.upgrade.ui.UpgradeCoverObjectsList;
+import com.mygdx.gamedevgarage.utils.constraints.Currency;
+import com.mygdx.gamedevgarage.utils.stats.Cost;
+import com.mygdx.gamedevgarage.utils.stats.Stats;
 import com.mygdx.gamedevgarage.utils.stats.StatsTable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class UpgradeScreen implements Screen {
 
     private final Skin skin;
+    private final I18NBundle bundle;
     private Stage stage;
 
     private TextButton showCover;
     private TextButton showTech;
     private TextButton showMechanic;
+    private TextButton showAd;
     private Button backButton;
     private UpgradeCoverObjectsList coverList;
     private UpgradeCheckItemsList techList;
@@ -53,7 +62,8 @@ public class UpgradeScreen implements Screen {
     private static final String SHOW_MECHANIC_BUTTON = "showMechanic";
 
     public UpgradeScreen() {
-        this.skin = Assets.getInstance().getSkin();
+        skin = Assets.getInstance().getSkin();
+        bundle = Assets.getInstance().myBundle;
     }
 
     @Override
@@ -89,11 +99,11 @@ public class UpgradeScreen implements Screen {
         group.addActor(coverObjectsScrollPane);
         group.addActor(technologiesScrollPane);
         group.addActor(mechanicsScrollPane);
-        group.setSize(getWidthPercent(.95f), getHeightPercent(.8f));
 
-        showCover = createTextButton("Covers", "default", SHOW_COVER_BUTTON);
-        showTech = createTextButton("Technologies", "default", SHOW_TECH_BUTTON);
-        showMechanic = createTextButton("Mechanics", "default", SHOW_MECHANIC_BUTTON);
+        showCover = createTextButton(bundle.get("Covers"), "default", SHOW_COVER_BUTTON);
+        showTech = createTextButton(bundle.get("Technologies"), "default", SHOW_TECH_BUTTON);
+        showMechanic = createTextButton(bundle.get("Mechanics"), "default", SHOW_MECHANIC_BUTTON);
+        showAd = createTextButton(bundle.get("Get_bonus"), "default");
         backButton = createButton("back_button");
         showCover.setDisabled(true);
 
@@ -105,28 +115,27 @@ public class UpgradeScreen implements Screen {
 
         buttonClicked(SHOW_COVER_BUTTON);
 
-        float buttonPad = getWidthPercent(.01f);
+        float buttonPad = getWidthPercent(.001f);
         float topPad = getHeightPercent(.07f);
 
         Table table = new Table(skin);
         table.setFillParent(true);
-        table.add(backButton).width(getWidthPercent(.15f)).height(getWidthPercent(.15f))
+        table.add(backButton).width(getWidthPercent(.13f)).height(getWidthPercent(.13f))
                 .pad(topPad, buttonPad, buttonPad, buttonPad);
-        table.add(showCover).width(getWidthPercent(.25f)).height(getHeightPercent(.06f))
+        table.add(showCover).width(getWidthPercent(.2f)).height(getHeightPercent(.06f))
                 .pad(topPad, buttonPad, buttonPad, buttonPad);
-        table.add(showTech).width(getWidthPercent(.28f)).height(getHeightPercent(.06f))
+        table.add(showTech).width(getWidthPercent(.22f)).height(getHeightPercent(.06f))
                 .pad(topPad, buttonPad, buttonPad, buttonPad);
-        table.add(showMechanic).width(getWidthPercent(.25f)).height(getHeightPercent(.06f))
+        table.add(showMechanic).width(getWidthPercent(.2f)).height(getHeightPercent(.06f))
+                .pad(topPad, buttonPad, buttonPad, buttonPad);
+        table.add(showAd).width(getWidthPercent(.2f)).height(getHeightPercent(.06f))
                 .pad(topPad, buttonPad, buttonPad, buttonPad)
                 .row();
-        table.add(group).colspan(4)
-                .pad(0, buttonPad, getHeightPercent(0.01f), buttonPad)
-                .row();
+        table.add(group).width(getWidthPercent(.999f)).height(getHeightPercent(.8f))
+                .padBottom(getHeightPercent(0.01f))
+                .colspan(5).row();
 
-        Image bg = new Image(skin.getDrawable("window_darkred"));
-        bg.setScaling(Scaling.fill);
-        Stack stack = new Stack(bg, table);
-        stack.setFillParent(true);
+        Stack stack = createBgStack("window_darkred", table);
 
         stage.addActor(stack);
         stage.addActor(statsTable);
@@ -143,6 +152,7 @@ public class UpgradeScreen implements Screen {
         showCover.addListener(createButtonClickListener(SHOW_COVER_BUTTON));
         showTech.addListener(createButtonClickListener(SHOW_TECH_BUTTON));
         showMechanic.addListener(createButtonClickListener(SHOW_MECHANIC_BUTTON));
+        showAd.addListener(showAdButton());
     }
 
     private ClickListener createButtonClickListener(final String buttonName) {
@@ -152,6 +162,85 @@ public class UpgradeScreen implements Screen {
                 buttonClicked(buttonName);
             }
         };
+    }
+
+    Timer timer = new Timer();
+
+    private ClickListener showAdButton() {
+        return new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if(!showAd.isDisabled()) {
+                    Game.getInstance().getAdHandler().showRewardAd("upgrade");
+
+                    showAd.setDisabled(true);
+                    timer.scheduleTask(new Timer.Task() {
+                        @Override
+                        public void run() {
+                            showAd.setDisabled(false);
+                        }
+                    }, 3);
+                }
+            }
+        };
+    }
+
+    public void setAdShowed(boolean isShowed){
+        if(isShowed){
+            setBonus();
+        } else {
+            if(!showAd.hasActions())
+                showAd.addAction(Actions.sequence(
+                        Actions.run(new Runnable() {
+                            @Override
+                            public void run() {
+                                showAd.setText(bundle.get("error"));
+                                showAd.getLabel().getStyle().font.setColor(Color.RED);
+                            }
+                        }),
+                        Actions.delay(2f),
+                        Actions.run(new Runnable() {
+                            @Override
+                            public void run() {
+                                showAd.getLabel().getStyle().font.setColor(Color.WHITE);
+                                showAd.setText(bundle.get("Get_bonus"));
+                            }
+                        })
+                ));
+        }
+    }
+
+    public void setBonus(){
+        Random r = new Random();
+
+        int rCur = r.nextInt(4);
+        Currency currency;
+
+        switch (rCur){
+            case 0:
+                currency = Currency.DESIGN;
+                break;
+            case 1:
+                currency = Currency.PROGRAMMING;
+                break;
+            case 2:
+                currency = Currency.GAME_DESIGN;
+                break;
+            default:
+                currency = Currency.MONEY;
+                break;
+        }
+
+        int value = r.nextInt(8) + 3;
+
+        Cost bonus = new Cost(
+                new Currency[]{currency},
+                new int[]{-value}
+        );
+
+        Stats.getInstance().pay(bonus);
+
+        StatsTable.setHint(currency, bundle.get("THANK_YOU"), "white_16");
     }
 
     @Override

@@ -9,10 +9,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.utils.Align;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
-import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 import com.mygdx.gamedevgarage.utils.reward.Reward;
 import com.mygdx.gamedevgarage.utils.stats.Stats;
 
@@ -85,10 +85,11 @@ public class NumberActor extends Table {
 
         if(hints != null && !(hints.size() == 0)){
             int r = new Random().nextInt(hints.size());
-            hint = DataArrayFactory.gameHints.get(hints.get(r));
+            hint = Assets.getInstance().myBundle.get(hints.get(r));
         }
 
         hintLabel = createLabel(hint, "white_24", true);
+        hintLabel.setAlignment(Align.center);
         hintLabel.setVisible(false);
 
         add(scoreItem).width(getWidthPercent(.9f)).height(getHeightPercent(.15f))

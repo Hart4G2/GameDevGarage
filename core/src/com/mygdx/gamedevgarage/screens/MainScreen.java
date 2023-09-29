@@ -29,6 +29,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.gamedevgarage.Assets;
@@ -46,6 +47,7 @@ public class MainScreen implements Screen {
 
     private final Game game;
     private final Assets assets;
+    private final I18NBundle bundle;
 
     private PerspectiveCamera cam;
     private ModelBatch modelBatch;
@@ -67,8 +69,9 @@ public class MainScreen implements Screen {
     private ModelBatch shadowBatch;
 
     public MainScreen() {
-        this.game = Game.getInstance();
-        this.assets = Assets.getInstance();
+        game = Game.getInstance();
+        assets = Assets.getInstance();
+        bundle = assets.myBundle;
 
         createUIElements();
         setupUIListeners();
@@ -134,7 +137,7 @@ public class MainScreen implements Screen {
     private void createUIElements(){
         statsTable = StatsTable.getInstance();
 
-        makeGameButton = createTextButton("Make a game", "white_18");
+        makeGameButton = createTextButton(bundle.get("Make_a_game"), "white_18");
         upgradeButton = createButton("store_button");
         collectionButton = createButton("collection_button");
         talkLabel = createLabel("", "white_18", true);

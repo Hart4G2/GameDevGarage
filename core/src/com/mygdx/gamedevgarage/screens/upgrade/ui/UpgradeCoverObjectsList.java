@@ -16,12 +16,13 @@ import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.mini_games.cover_actors.CoverListItem;
 import com.mygdx.gamedevgarage.utils.stats.Stats;
-import com.mygdx.gamedevgarage.utils.Cost;
+import com.mygdx.gamedevgarage.utils.stats.Cost;
 import com.mygdx.gamedevgarage.utils.constraints.Currency;
 import com.mygdx.gamedevgarage.utils.data.CoverObject;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class UpgradeCoverObjectsList extends Table {
@@ -37,6 +38,7 @@ public class UpgradeCoverObjectsList extends Table {
         this.game = Game.getInstance();
         this.stats = Stats.getInstance();
         this.items = DataArrayFactory.createCoverObjects();
+        Collections.shuffle(items);
 
         buttons = new ArrayList<>();
         addItems();

@@ -1,5 +1,6 @@
 package com.mygdx.gamedevgarage.screens.mini_games;
 
+import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -10,12 +11,11 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.I18NBundle;
 import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.mini_games.cover_actors.CoverMainActor;
@@ -26,10 +26,16 @@ import com.mygdx.gamedevgarage.utils.stats.StatsTable;
 
 public class DesignScreen implements Screen {
 
+    private final I18NBundle bundle;
     private Stage stage;
 
     private Button okButton;
     private StatsTable statsTable;
+    private String theme;
+
+    public DesignScreen() {
+        bundle = Assets.getInstance().myBundle;
+    }
 
     @Override
     public void show() {
@@ -37,6 +43,8 @@ public class DesignScreen implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         Game.getInstance().isScreenShowed = true;
+
+        theme = GameFactory.theme.getText();
 
         createUIElements();
         setupUIListeners();
@@ -49,9 +57,9 @@ public class DesignScreen implements Screen {
 
         CoverMainActor coverListActor = new CoverMainActor(this);
 
-        Label headerLabel = Utils.createLabel("Create a game cover", "black_20", false);
+        Label headerLabel = Utils.createLabel(bundle.get("Create_a_game_cover_for") + theme, "black_20", false);
 
-        okButton = createTextButton("OK", "white_18");
+        okButton = createTextButton(bundle.get("ok"), "white_18");
         okButton.setDisabled(true);
 
         Table table = new Table(Assets.getInstance().getSkin());
@@ -66,10 +74,7 @@ public class DesignScreen implements Screen {
                 .padBottom(getHeightPercent(.05f))
                 .center().row();
 
-        Image bg = new Image(Assets.getInstance().getSkin().getDrawable("window_yellow"));
-        bg.setScaling(Scaling.fill);
-        Stack stack = new Stack(bg, table);
-        stack.setFillParent(true);
+        Stack stack = createBgStack("window_yellow", table);
 
         stage.addActor(stack);
         stage.addActor(statsTable);

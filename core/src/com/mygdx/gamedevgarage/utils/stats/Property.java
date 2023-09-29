@@ -18,24 +18,20 @@ public class Property extends Table {
 
     private String text;
     private int value;
-    private Drawable icon;
     private Image image;
     private Label valueLabel;
     private Label hintLabel;
 
-    public Property(String text, int value) {
+    public Property(String text, Drawable icon, int value) {
         super(Assets.getInstance().getSkin());
         this.value = value;
         this.text = text;
 
-        String iconName = text.replace(" ", "_");
-        icon = getSkin().getDrawable(iconName);
-
-        createUIElements();
+        createUIElements(icon);
         setupUIListeners();
     }
 
-    private void createUIElements(){
+    private void createUIElements(Drawable icon){
         image = new Image(icon);
         valueLabel = createLabel(String.valueOf(value), "white_16", false);
 
