@@ -5,6 +5,7 @@ import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
 import static com.mygdx.gamedevgarage.utils.Utils.createButton;
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
 import static com.mygdx.gamedevgarage.utils.Utils.createSlider;
+import static com.mygdx.gamedevgarage.utils.Utils.createTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -98,8 +99,7 @@ public class MenuScreen implements Screen {
         volumeLabel.addAction(Actions.alpha(.8f));
         selectActor = new SelectActor();
 
-        mainMenuTable = new Table();
-        mainMenuTable.setFillParent(true);
+        mainMenuTable = createTable(null, true);
         mainMenuTable.add(startButton)
                 .width(getWidthPercent(.5f)).height(getHeightPercent(.1f))
                 .pad(getHeightPercent(.5f), 0, getHeightPercent(.03f), 0)
@@ -111,8 +111,7 @@ public class MenuScreen implements Screen {
         mainMenuTable.add(howToPlayButton)
                 .width(getWidthPercent(.5f)).height(getHeightPercent(.1f));
 
-        settingsTable = new Table();
-        settingsTable.setFillParent(true);
+        settingsTable = createTable(null, true);
         settingsTable.add(backButton)
                 .width(getWidthPercent(.13f)).height(getWidthPercent(.13f))
                 .pad(getHeightPercent(.3f), 0, getHeightPercent(.03f), 0)

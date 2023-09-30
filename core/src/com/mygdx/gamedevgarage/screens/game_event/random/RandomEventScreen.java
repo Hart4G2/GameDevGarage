@@ -2,6 +2,7 @@ package com.mygdx.gamedevgarage.screens.game_event.random;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
+import static com.mygdx.gamedevgarage.utils.Utils.createTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -68,8 +69,7 @@ public class RandomEventScreen implements Screen {
         confirmButton = createTextButton(bundle.get("Confirm"), "white_18");
         rejectButton = createTextButton(bundle.get("Reject"), "white_18");
 
-        Table table = new Table(skin);
-        table.setFillParent(true);
+        Table table = createTable(skin, true);
         table.add(image).width(getHeightPercent(.4f)).height(getHeightPercent(.4f))
                 .padTop(getHeightPercent(.1f)).padBottom(getHeightPercent(.01f))
                 .colspan(2).center().row();

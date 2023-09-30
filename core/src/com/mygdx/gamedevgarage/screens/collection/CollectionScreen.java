@@ -2,6 +2,7 @@ package com.mygdx.gamedevgarage.screens.collection;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
 import static com.mygdx.gamedevgarage.utils.Utils.createButton;
+import static com.mygdx.gamedevgarage.utils.Utils.createTable;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
@@ -58,8 +59,7 @@ public class CollectionScreen implements Screen {
 
         backButton = createButton("back_button");
 
-        Table table = new Table();
-        table.setFillParent(true);
+        Table table = createTable(skin, true);
         table.add(backButton).width(getWidthPercent(.15f)).height(getWidthPercent(.15f))
                 .left().row();
         table.add(scrollPaneContainer)

@@ -1,6 +1,7 @@
 package com.mygdx.gamedevgarage.screens.mini_games.cover_actors;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
+import static com.mygdx.gamedevgarage.utils.Utils.createTable;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
@@ -48,8 +49,7 @@ public class CoverListItem extends Group {
         imageGroup.addActor(backgroundImage);
         imageGroup.addActor(image);
 
-        table = new Table();
-        table.setFillParent(true);
+        table = createTable(null, true);
         table.setBackground(background);
         table.add(headerLabel).width(getWidthPercent(.4f)).height(getHeightPercent(.2f))
                 .padRight(getWidthPercent(.01f))

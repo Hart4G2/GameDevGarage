@@ -2,6 +2,7 @@ package com.mygdx.gamedevgarage.screens.mini_games;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
+import static com.mygdx.gamedevgarage.utils.Utils.createTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -31,6 +33,7 @@ import java.util.List;
 public class PlatformScreen implements Screen {
 
     private final I18NBundle bundle;
+    private final Skin skin;
     private Stage stage;
 
     private Button okButton;
@@ -39,6 +42,7 @@ public class PlatformScreen implements Screen {
 
     public PlatformScreen() {
         bundle = Assets.getInstance().myBundle;
+        skin = Assets.getInstance().getSkin();
     }
 
     @Override
@@ -66,8 +70,7 @@ public class PlatformScreen implements Screen {
 
         Label headerLabel = createLabel(bundle.get("Choose_platform"), "white_20", false);
 
-        Table table = new Table(Assets.getInstance().getSkin());
-        table.setFillParent(true);
+        Table table = createTable(skin, true);
         table.add(headerLabel)
                 .pad(getHeightPercent(.07f), 0, getHeightPercent(.003f), 0)
                 .row();

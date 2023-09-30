@@ -1,6 +1,7 @@
 package com.mygdx.gamedevgarage.screens.collection.actors;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
+import static com.mygdx.gamedevgarage.utils.Utils.createTable;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
@@ -73,7 +74,7 @@ public class GameItem extends Table {
         float iconSize = textTableSize / 8;
         float labelSize = (textTableSize - (iconSize * 2)) / 4;
 
-        Table table = new Table();
+        Table table = createTable(null);
         table.add(nameLabel).width(textTableSize)
                 .padBottom(getHeightPercent(.05f))
                 .colspan(4).left().top().row();

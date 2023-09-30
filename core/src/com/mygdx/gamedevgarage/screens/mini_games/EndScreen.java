@@ -1,6 +1,7 @@
 package com.mygdx.gamedevgarage.screens.mini_games;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
+import static com.mygdx.gamedevgarage.utils.Utils.createTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -88,8 +89,7 @@ public class EndScreen implements Screen {
 
         NumberActor numberActor = new NumberActor();
 
-        Table table = new Table(skin);
-        table.setFillParent(true);
+        Table table = createTable(skin, true);
         table.add(numberActor).width(getWidthPercent(.9f)).height(getHeightPercent(.8f))
                 .pad(getHeightPercent(.01f), getWidthPercent(.05f), getHeightPercent(.01f), getWidthPercent(.05f))
                 .center().row();

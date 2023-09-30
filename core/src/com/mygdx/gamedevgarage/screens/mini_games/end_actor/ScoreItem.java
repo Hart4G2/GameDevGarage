@@ -2,6 +2,7 @@ package com.mygdx.gamedevgarage.screens.mini_games.end_actor;
 
 
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
+import static com.mygdx.gamedevgarage.utils.Utils.createTable;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
@@ -44,7 +45,7 @@ public class ScoreItem extends Table {
         float pad = getWidthPercent(.05f);
         float labelHeight = getHeightPercent(.15f);
 
-        Table imageTable = new Table(getSkin());
+        Table imageTable = createTable(getSkin());
         imageTable.add(iconImage).width(imageSize).height(imageSize);
 
         add(imageTable)

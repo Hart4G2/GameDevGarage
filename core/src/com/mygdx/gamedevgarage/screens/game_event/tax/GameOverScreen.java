@@ -2,6 +2,7 @@ package com.mygdx.gamedevgarage.screens.game_event.tax;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
+import static com.mygdx.gamedevgarage.utils.Utils.createTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -32,6 +34,7 @@ public class GameOverScreen implements Screen {
 
     private final Game game;
     private final I18NBundle bundle;
+    private final Skin skin;
     private Stage stage;
     private StatsTable statsTable;
 
@@ -45,6 +48,7 @@ public class GameOverScreen implements Screen {
     public GameOverScreen() {
         game = Game.getInstance();
         bundle = Assets.getInstance().myBundle;
+        skin = Assets.getInstance().getSkin();
     }
 
     @Override
@@ -85,8 +89,7 @@ public class GameOverScreen implements Screen {
         loadingLabel.setAlignment(Align.center);
         loadingLabel.setVisible(false);
 
-        Table table = new Table(Assets.getInstance().getSkin());
-        table.setFillParent(true);
+        Table table = createTable(skin, true);
         table.add(header).width(getWidthPercent(.8f)).height(getHeightPercent(.2f))
                 .pad(getHeightPercent(.1f), getWidthPercent(.05f), getHeightPercent(.1f), getWidthPercent(.05f)).row();
         table.add(loadingLabel).width(getWidthPercent(.5f)).height(getHeightPercent(.05f))

@@ -1,6 +1,7 @@
 package com.mygdx.gamedevgarage.screens.mini_games.selection_actors;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
+import static com.mygdx.gamedevgarage.utils.Utils.createTable;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
@@ -79,14 +80,13 @@ public class CheckListItem extends Group {
 
         float labelSize = checkObject.isPurchased() ? getWidthPercent(.6f) : getWidthPercent(.4f);
 
-        Table textTable = new Table();
+        Table textTable = createTable(skin);
         textTable.add(headerLabel).width(labelSize)
                 .colspan(2).center().row();
         textTable.add(descriptionLabel).width(labelSize)
                 .colspan(2).left();
 
-        mainTable = new Table(skin);
-        mainTable.setFillParent(true);
+        mainTable = createTable(skin, true);
         mainTable.setBackground(bgUnselected);
         mainTable.add(textTable).width(labelSize).height(getHeightPercent(.2f))
                 .pad(getHeightPercent(.001f), getWidthPercent(.03f), 0, getWidthPercent(.01f))

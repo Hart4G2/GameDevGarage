@@ -2,6 +2,7 @@ package com.mygdx.gamedevgarage.screens.mini_games;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
+import static com.mygdx.gamedevgarage.utils.Utils.createTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -88,8 +89,7 @@ public class GameDesignScreen implements Screen {
         group.addActor(scrollPane);
         group.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight() / 1.15f);
 
-        Table table = new Table(skin);
-        table.setFillParent(true);
+        Table table = createTable(skin, true);
         table.add(headerLabel)
                 .pad(getHeightPercent(.07f), 0, getHeightPercent(.003f), 0)
                 .colspan(2).center()

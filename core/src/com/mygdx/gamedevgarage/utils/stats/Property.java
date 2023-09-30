@@ -2,6 +2,7 @@ package com.mygdx.gamedevgarage.utils.stats;
 
 import static com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
+import static com.mygdx.gamedevgarage.utils.Utils.createTable;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
 
@@ -38,7 +39,7 @@ public class Property extends Table {
         hintLabel = createLabel(text, "white_14", true);
         hintLabel.setVisible(false);
 
-        Table hintContainer = new Table();
+        Table hintContainer = createTable(getSkin());
         hintContainer.add(hintLabel).width(getWidthPercent(.138f));
 
         add(image).width(getWidthPercent(.05f)).height(getWidthPercent(.05f))

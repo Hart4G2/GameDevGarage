@@ -2,6 +2,7 @@ package com.mygdx.gamedevgarage.screens.upgrade;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
 import static com.mygdx.gamedevgarage.utils.Utils.createButton;
+import static com.mygdx.gamedevgarage.utils.Utils.createTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -101,9 +102,9 @@ public class UpgradeScreen implements Screen {
         group.addActor(mechanicsScrollPane);
 
         showCover = createTextButton(bundle.get("Covers"), "default", SHOW_COVER_BUTTON);
-        showTech = createTextButton(bundle.get("Technologies"), "default", SHOW_TECH_BUTTON);
+        showTech = createTextButton(bundle.get("Technologies"), "red_16", SHOW_TECH_BUTTON);
         showMechanic = createTextButton(bundle.get("Mechanics"), "default", SHOW_MECHANIC_BUTTON);
-        showAd = createTextButton(bundle.get("Get_bonus"), "default");
+        showAd = createTextButton(bundle.get("Get_bonus"), "green_16");
         backButton = createButton("back_button");
         showCover.setDisabled(true);
 
@@ -118,8 +119,7 @@ public class UpgradeScreen implements Screen {
         float buttonPad = getWidthPercent(.001f);
         float topPad = getHeightPercent(.07f);
 
-        Table table = new Table(skin);
-        table.setFillParent(true);
+        Table table = createTable(skin, true);
         table.add(backButton).width(getWidthPercent(.13f)).height(getWidthPercent(.13f))
                 .pad(topPad, buttonPad, buttonPad, buttonPad);
         table.add(showCover).width(getWidthPercent(.2f)).height(getHeightPercent(.06f))
@@ -149,19 +149,83 @@ public class UpgradeScreen implements Screen {
             }
         });
 
-        showCover.addListener(createButtonClickListener(SHOW_COVER_BUTTON));
-        showTech.addListener(createButtonClickListener(SHOW_TECH_BUTTON));
-        showMechanic.addListener(createButtonClickListener(SHOW_MECHANIC_BUTTON));
+        showCover.addListener(createButtonClickListener(showCover));
+        showTech.addListener(createButtonClickListener(showTech));
+        showMechanic.addListener(createButtonClickListener(showMechanic));
         showAd.addListener(showAdButton());
     }
 
-    private ClickListener createButtonClickListener(final String buttonName) {
+    private ClickListener createButtonClickListener(final TextButton button) {
         return new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                buttonClicked(buttonName);
+                if(!button.isDisabled()){
+                    buttonClicked(button.getName());
+                }
             }
         };
+    }
+
+    @Override
+    public void render(float delta) {
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        statsTable.update();
+        techList.render(delta);
+        mechanicList.render(delta);
+
+        stage.act(delta);
+        stage.draw();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        stage.getViewport().update(width, height, true);
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+        Gdx.input.setInputProcessor(null);
+    }
+
+    @Override
+    public void dispose() {
+        stage.dispose();
+    }
+
+    private void buttonClicked(String buttonName) {
+        showCover.setDisabled(SHOW_COVER_BUTTON.equals(buttonName));
+        showTech.setDisabled(SHOW_TECH_BUTTON.equals(buttonName));
+        showMechanic.setDisabled(SHOW_MECHANIC_BUTTON.equals(buttonName));
+
+        ScrollPane panelToShow = buttonPanelMap.get(buttonName);
+        showPanel(panelToShow);
+    }
+
+    private void showPanel(final ScrollPane panelToShow) {
+        panelToShow.addAction(Actions.sequence(
+                Actions.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        coverObjectsScrollPane.setVisible(panelToShow == coverObjectsScrollPane);
+                        technologiesScrollPane.setVisible(panelToShow == technologiesScrollPane);
+                        mechanicsScrollPane.setVisible(panelToShow == mechanicsScrollPane);
+                    }
+                }),
+                Actions.alpha(0,0),
+                Actions.fadeIn(.4f)
+        ));
     }
 
     Timer timer = new Timer();
@@ -241,58 +305,5 @@ public class UpgradeScreen implements Screen {
         Stats.getInstance().pay(bonus);
 
         StatsTable.setHint(currency, bundle.get("THANK_YOU"), "white_16");
-    }
-
-    @Override
-    public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        statsTable.update();
-        techList.render(delta);
-        mechanicList.render(delta);
-
-        stage.act(delta);
-        stage.draw();
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        stage.getViewport().update(width, height, true);
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-        Gdx.input.setInputProcessor(null);
-    }
-
-    @Override
-    public void dispose() {
-        stage.dispose();
-    }
-
-    private void buttonClicked(String buttonName) {
-        showCover.setDisabled(SHOW_COVER_BUTTON.equals(buttonName));
-        showTech.setDisabled(SHOW_TECH_BUTTON.equals(buttonName));
-        showMechanic.setDisabled(SHOW_MECHANIC_BUTTON.equals(buttonName));
-
-        ScrollPane panelToShow = buttonPanelMap.get(buttonName);
-        showPanel(panelToShow);
-    }
-
-    private void showPanel(ScrollPane panelToShow) {
-        coverObjectsScrollPane.setVisible(panelToShow == coverObjectsScrollPane);
-        technologiesScrollPane.setVisible(panelToShow == technologiesScrollPane);
-        mechanicsScrollPane.setVisible(panelToShow == mechanicsScrollPane);
     }
 }

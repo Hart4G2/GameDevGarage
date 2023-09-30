@@ -32,7 +32,7 @@ public class Stats {
             HashMap<String, Integer> statsMap = DataManager.getInstance().getStats();
 
             if(statsMap.isEmpty()){
-                instance = new Stats(6, 49, 30, 30, 30, 10, 10);
+                instance = new Stats(1, 0, 0, 0, 0, 20, 7);
             } else {
                 instance = new Stats(statsMap.get("level"), statsMap.get("exp"),
                         statsMap.get("design"), statsMap.get("programming"),

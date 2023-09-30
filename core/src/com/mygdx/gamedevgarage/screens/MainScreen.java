@@ -25,6 +25,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
@@ -37,6 +38,7 @@ import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.main_actors.SellActor;
 import com.mygdx.gamedevgarage.screens.main_actors.SellTable;
 import com.mygdx.gamedevgarage.utils.DialogThread;
+import com.mygdx.gamedevgarage.utils.Utils;
 import com.mygdx.gamedevgarage.utils.data.DataArrayFactory;
 import com.mygdx.gamedevgarage.utils.data.GameObject;
 import com.mygdx.gamedevgarage.utils.stats.StatsTable;
@@ -58,6 +60,7 @@ public class MainScreen implements Screen {
     private TextButton makeGameButton;
     private Button upgradeButton;
     private Button collectionButton;
+    private Table talkTable;
     private Label talkLabel;
     private StatsTable statsTable;
     private SellTable sellTable;
@@ -77,7 +80,7 @@ public class MainScreen implements Screen {
         setupUIListeners();
         createScene();
 
-        talkTimer.scheduleTask(talkTask, 10, 10, -1);
+        talkTimer.scheduleTask(talkTask, 2, 10, -1);
     }
 
     @Override
@@ -88,7 +91,7 @@ public class MainScreen implements Screen {
         stage.addActor(makeGameButton);
         stage.addActor(upgradeButton);
         stage.addActor(collectionButton);
-        stage.addActor(talkLabel);
+        stage.addActor(talkTable);
         stage.addActor(sellScrollPane);
         stage.addActor(statsTable);
 
@@ -140,9 +143,16 @@ public class MainScreen implements Screen {
         makeGameButton = createTextButton(bundle.get("Make_a_game"), "white_18");
         upgradeButton = createButton("store_button");
         collectionButton = createButton("collection_button");
-        talkLabel = createLabel("", "white_18", true);
+        talkLabel = createLabel("", "black_italic_16", true);
         talkLabel.setAlignment(Align.center);
-        talkLabel.setVisible(false);
+
+        talkTable = Utils.createTable(assets.getSkin());
+        talkTable.setVisible(false);
+        talkTable.align(Align.top);
+        talkTable.setBackground("talk_cloud");
+        talkTable.setPosition(getWidthPercent(.35f), getHeightPercent(.57f));
+        talkTable.setSize(getWidthPercent(.5f), getHeightPercent(.1f));
+        talkTable.add(talkLabel).width(getWidthPercent(.46f)).height(getHeightPercent(.08f));
 
         upgradeButton.setPosition(getWidthPercent(.05f), getHeightPercent(.78f));
         upgradeButton.setSize(getWidthPercent(.18f), getWidthPercent(.18f));
@@ -152,9 +162,6 @@ public class MainScreen implements Screen {
 
         makeGameButton.setPosition(getWidthPercent(.1f), getHeightPercent(.02f));
         makeGameButton.setSize(getWidthPercent(.84f), getHeightPercent(.15f));
-
-        talkLabel.setPosition(getWidthPercent(.3f), getHeightPercent(.55f));
-        talkLabel.setSize(getWidthPercent(.5f), getHeightPercent(.15f));
 
         sellTable = new SellTable();
         sellScrollPane = new ScrollPane(sellTable, assets.getSkin());
@@ -323,26 +330,27 @@ public class MainScreen implements Screen {
     };
 
     private void setHintTalk(final String hint){
-        talkLabel.addAction(Actions.sequence(
-                Actions.run(new Runnable() {
-                    @Override
-                    public void run() {
-                        talkLabel.setText(hint);
-                        talkLabel.addAction(Actions.alpha(0f, .001f));
-                        talkLabel.setVisible(true);
-                    }
-                }),
-                Actions.delay(.01f),
-                Actions.fadeIn(.2f),
-                Actions.delay(3f),
-                Actions.fadeOut(.3f),
-                Actions.delay(.1f),
-                Actions.run(new Runnable() {
-                    @Override
-                    public void run() {
-                        talkLabel.setVisible(false);
-                    }
-                })
-        ));
+        talkLabel.setText(hint);
+
+        talkTable.addAction(
+                Actions.sequence(
+                        Actions.alpha(0, 0),
+                        Actions.visible(true),
+                        Actions.moveBy(0, -getHeightPercent(.05f), 0),
+                        Actions.delay(.01f),
+                        Actions.parallel(
+                                Actions.moveBy(0, getHeightPercent(.05f), .2f),
+                                Actions.fadeIn(.3f)
+                        ),
+                        Actions.delay(3f),
+                        Actions.parallel(
+                                Actions.moveBy(0, getHeightPercent(.05f), .2f),
+                                Actions.fadeOut(.3f)
+                        ),
+                        Actions.delay(.1f),
+                        Actions.visible(false),
+                        Actions.moveTo(getWidthPercent(.35f), getHeightPercent(.57f), 0)
+                )
+        );
     }
 }

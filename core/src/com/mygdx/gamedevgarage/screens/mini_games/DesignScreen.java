@@ -1,6 +1,8 @@
 package com.mygdx.gamedevgarage.screens.mini_games;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createBgStack;
+import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
+import static com.mygdx.gamedevgarage.utils.Utils.createTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
@@ -12,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -20,13 +23,13 @@ import com.mygdx.gamedevgarage.Assets;
 import com.mygdx.gamedevgarage.Game;
 import com.mygdx.gamedevgarage.screens.mini_games.cover_actors.CoverMainActor;
 import com.mygdx.gamedevgarage.utils.DialogThread;
-import com.mygdx.gamedevgarage.utils.Utils;
 import com.mygdx.gamedevgarage.utils.data.GameFactory;
 import com.mygdx.gamedevgarage.utils.stats.StatsTable;
 
 public class DesignScreen implements Screen {
 
     private final I18NBundle bundle;
+    private final Skin skin;
     private Stage stage;
 
     private Button okButton;
@@ -35,6 +38,7 @@ public class DesignScreen implements Screen {
 
     public DesignScreen() {
         bundle = Assets.getInstance().myBundle;
+        skin = Assets.getInstance().getSkin();
     }
 
     @Override
@@ -57,13 +61,12 @@ public class DesignScreen implements Screen {
 
         CoverMainActor coverListActor = new CoverMainActor(this);
 
-        Label headerLabel = Utils.createLabel(bundle.get("Create_a_game_cover_for") + theme, "black_20", false);
+        Label headerLabel = createLabel(bundle.get("Create_a_game_cover_for") + theme, "black_20", false);
 
         okButton = createTextButton(bundle.get("ok"), "white_18");
         okButton.setDisabled(true);
 
-        Table table = new Table(Assets.getInstance().getSkin());
-        table.setFillParent(true);
+        Table table = createTable(skin, true);
         table.add(headerLabel)
                 .pad(getHeightPercent(.1f), 0, getHeightPercent(.005f), 0)
                 .center().row();

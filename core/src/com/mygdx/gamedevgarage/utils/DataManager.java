@@ -58,7 +58,7 @@ public class DataManager {
 
     public String getLanguage() {
         Preferences prefs = Gdx.app.getPreferences(prefName);
-        String dataJson = prefs.getString("language", "en");
+        String dataJson = prefs.getString("language", "English");
 
         return new Json().fromJson(String.class, String.valueOf(dataJson));
     }
