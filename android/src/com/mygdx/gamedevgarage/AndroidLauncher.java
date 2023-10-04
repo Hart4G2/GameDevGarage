@@ -28,7 +28,7 @@ public class AndroidLauncher extends AndroidApplication  {
 		UnityAds.initialize(this, "5428154", new IUnityAdsInitializationListener() {
 			@Override
 			public void onInitializationComplete() {
-				System.out.println("add initialisation complete");
+				System.out.println("ad initialisation complete");
 			}
 
 			@Override
@@ -113,6 +113,4 @@ public class AndroidLauncher extends AndroidApplication  {
 			UnityAds.load("Rewarded_Android", loadListener);
 		}
 	}
-
-
 }
