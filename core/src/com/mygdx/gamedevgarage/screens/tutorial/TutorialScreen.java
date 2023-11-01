@@ -1,4 +1,4 @@
-package com.mygdx.gamedevgarage.screens.howtoplay;
+package com.mygdx.gamedevgarage.screens.tutorial;
 
 import static com.mygdx.gamedevgarage.utils.Utils.createLabel;
 import static com.mygdx.gamedevgarage.utils.Utils.createScalingImage;
@@ -6,56 +6,27 @@ import static com.mygdx.gamedevgarage.utils.Utils.createTable;
 import static com.mygdx.gamedevgarage.utils.Utils.createTextButton;
 import static com.mygdx.gamedevgarage.utils.Utils.getHeightPercent;
 import static com.mygdx.gamedevgarage.utils.Utils.getWidthPercent;
+import static com.mygdx.gamedevgarage.utils.Utils.randomInt;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.I18NBundle;
 import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.mygdx.gamedevgarage.Assets;
-import com.mygdx.gamedevgarage.Game;
+import com.mygdx.gamedevgarage.screens.GameScreen;
 
-import java.util.Random;
-
-public class TutorialScreen implements Screen {
-
-    private final Game game;
-    private final Assets assets;
-    private Stage stage;
+public class TutorialScreen extends GameScreen {
 
     private TextButton backButton;
 
-    public TutorialScreen() {
-        game = Game.getInstance();
-        assets = Assets.getInstance();
-    }
-
     @Override
-    public void show() {
-        stage = new Stage(new ScreenViewport());
-        Gdx.input.setInputProcessor(stage);
-
-        createUIElements();
-        setupUIListeners();
-    }
-
-    private void createUIElements(){
-        I18NBundle bundle = assets.myBundle;
-        Skin skin = assets.getSkin();
-
+    protected void createUIElements(){
         Label header = createLabel(bundle.get("How_to_play"), "white_32", false, Align.center);
 
         Label propertiesHeader = createLabel(bundle.get("Properties_header"), "white_24", false, Align.center);
@@ -66,7 +37,8 @@ public class TutorialScreen implements Screen {
         Label gameDesignText = createLabel(bundle.get("game_design_text"), "white_18", true);
         Label energyText = createLabel(bundle.get("energy_text"), "white_18", true);
 
-        Label createGameHeader = createLabel(bundle.get("Create_game_text"), "white_24", false, Align.center);
+        Label createGameHeader = createLabel(bundle.get("Create_game_header"), "white_24", false, Align.center);
+        Label createGameText = createLabel(bundle.get("Create_game_text"), "white_18", true);
         Label timeText = createLabel(bundle.get("Time_text"), "white_18", true);
         Label genreThemeText = createLabel(bundle.get("Genre_theme_text"), "white_18", true);
         Label coverText = createLabel(bundle.get("Cover_text"), "white_18", true);
@@ -85,16 +57,19 @@ public class TutorialScreen implements Screen {
         Image gameDesignImage = createScalingImage(skin.getDrawable("game_design"), Scaling.fit);
         Image energyImage = createScalingImage(skin.getDrawable("energy"), Scaling.fit);
 
-        Image timeImage = createScalingImage(new Texture("tutorial/time_tutorial.png"), Scaling.fit);
-        Image genreThemeImage = createScalingImage(new Texture("tutorial/create_game_tutorial.png"), Scaling.fit);
-        Image coverImage = createScalingImage(new Texture("tutorial/cover_tutorial.png"), Scaling.fit);
-        Image technologyImage = createScalingImage(new Texture("tutorial/technologies_tutorial.png"), Scaling.fit);
-        Image mechanicImage = createScalingImage(new Texture("tutorial/mechanics_tutorial.png"), Scaling.fit);
-        Image platformImage = createScalingImage(new Texture("tutorial/platform_tutorial.png"), Scaling.fit);
-        Image endGameImage = createScalingImage(new Texture("tutorial/score_tutorial.png"), Scaling.fit);
-        Image sellingImage = createScalingImage(new Texture("tutorial/selling_tutorial.png"), Scaling.fit);
-        Image upgradeImage = createScalingImage(new Texture("tutorial/upgrade_tutorial.png"), Scaling.fit);
-        Image almostForgotImage = createScalingImage(new Texture("tutorial/almost_forgot_tutorial.png"), Scaling.fit);
+        TextureAtlas tutorialAtlas = assets.tutorialAtlas;
+
+        Image createGameImage = createScalingImage(tutorialAtlas.findRegion("create_game_tutorial"), Scaling.fit);
+        Image timeImage = createScalingImage(tutorialAtlas.findRegion("time_tutorial"), Scaling.fit);
+        Image genreThemeImage = createScalingImage(tutorialAtlas.findRegion("genre_theme_tutorial"), Scaling.fit);
+        Image coverImage = createScalingImage(tutorialAtlas.findRegion("cover_tutorial"), Scaling.fit);
+        Image technologyImage = createScalingImage(tutorialAtlas.findRegion("technologies_tutorial"), Scaling.fit);
+        Image mechanicImage = createScalingImage(tutorialAtlas.findRegion("mechanics_tutorial"), Scaling.fit);
+        Image platformImage = createScalingImage(tutorialAtlas.findRegion("platform_tutorial"), Scaling.fit);
+        Image endGameImage = createScalingImage(tutorialAtlas.findRegion("score_tutorial"), Scaling.fit);
+        Image sellingImage = createScalingImage(tutorialAtlas.findRegion("selling_tutorial"), Scaling.fit);
+        Image upgradeImage = createScalingImage(tutorialAtlas.findRegion("upgrade_tutorial"), Scaling.fit);
+        Image almostForgotImage = createScalingImage(tutorialAtlas.findRegion("almost_forgot_tutorial"), Scaling.fit);
 
         backButton = createTextButton(bundle.get("Back"), "white_18");
 
@@ -153,6 +128,13 @@ public class TutorialScreen implements Screen {
         table.add(createGameHeader).width(getWidthPercent(.95f)).height(getHeightPercent(.01f))
                 .padBottom(getHeightPercent(.02f))
                 .colspan(2).center()
+                .row();
+        table.add(createGameImage).width(getWidthPercent(.4f)).height(getHeightPercent(.2f))
+                .padBottom(getHeightPercent(.02f))
+                .colspan(1);
+        table.add(createGameText).width(getWidthPercent(.4f)).height(getHeightPercent(.2f))
+                .padBottom(getHeightPercent(.02f))
+                .colspan(1)
                 .row();
         table.add(timeImage).width(getWidthPercent(.4f)).height(getHeightPercent(.4f))
                 .padBottom(getHeightPercent(.02f))
@@ -251,47 +233,14 @@ public class TutorialScreen implements Screen {
         createLabelAnimation(sellingText);
     }
 
-    private void setupUIListeners() {
+    @Override
+    protected void setupUIListeners() {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.setMenuScreen();
             }
         });
-    }
-
-    @Override
-    public void render(float delta) {
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        stage.act(delta);
-        stage.draw();
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        stage.getViewport().update(width, height, true);
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-        Gdx.input.setInputProcessor(null);
-    }
-
-    @Override
-    public void dispose() {
-        stage.dispose();
     }
 
     private void createLabelAnimation(final Label label){
@@ -308,14 +257,9 @@ public class TutorialScreen implements Screen {
                                 Actions.run(new Runnable() {
                                     @Override
                                     public void run() {
-                                        int r = new Random().nextInt(2);
+                                        int r = randomInt(2);
 
                                         delay[0] = r == 0 ? .01f : 02f;
-
-                                        if(finishText.equals("How to play")) {
-                                            System.out.println("animtext " + animText);
-                                            System.out.println("finishText " + finishText);
-                                        }
 
                                         if(animText.length() < finishText.length()){
                                             animText.append(finishText.charAt(animText.length()));
